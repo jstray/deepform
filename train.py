@@ -94,7 +94,7 @@ c9 = Conv1DTranspose(u8, filters=8, kernel_size=5, padding='same') # 4096
 u9 = concatenate([c1,c9], axis=2) # 4096 x 16
 
 # This last convolution produces the target token scores
-c10 = Conv1D(filters=1, kernel_size=10, padding='same')(c9)  # 4096 x 1
+c10 = Conv1D(filters=1, kernel_size=10, padding='same', activation='relu')(c9)  # 4096 x 1
 f = Flatten()(c10)
 
 model = Model(inputs=[indata], outputs=[f])
