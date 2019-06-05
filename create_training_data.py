@@ -13,12 +13,12 @@ import re
 targets = ['committee','agency','callsign','gross_amount']
 
 
-filings = pd.read_csv('ftf-all-filings.tsv', sep='\t')
+filings = pd.read_csv('source/ftf-all-filings.tsv', sep='\t')
 
-incsv = csv.DictReader(open('filings-tokens-2.csv', mode='r'))
+incsv = csv.DictReader(open('data/filings-tokens.csv', mode='r'))
 
 outcols = ['slug','page','x','y','token'] + targets
-outcsv = csv.DictWriter(open('training.csv', mode='w'), fieldnames=outcols)
+outcsv = csv.DictWriter(open('data/training.csv', mode='w'), fieldnames=outcols)
 outcsv.writeheader()
 
 
@@ -55,6 +55,10 @@ def process_doc(slug, rows):
 		print(f'Skipping {slug} because it matches {len(answers)} rows')
 		return
 	answers = answers.iloc[0]
+
+	if answers[targets].isnull().any():
+		print(f'Skipping {slug} because it is missing answers for {[t for t in targets if pd.isnull(answers[t])]}')
+		return
 
 
 	df = pd.DataFrame(rows)
