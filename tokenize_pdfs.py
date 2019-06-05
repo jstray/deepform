@@ -5,9 +5,9 @@ import pdfplumber
 import csv
 import json
 
-d = pd.read_csv('ftf-all-filings.tsv', sep='\t')
+d = pd.read_csv('data/ftf-all-filings.tsv', sep='\t')
 
-f = open('filings-tokens-2.csv', mode='w')
+f = open('data/filings-tokens.csv', mode='w')
 csv = csv.writer(f)
 csv.writerow(['slug','page','x','y','token'])
 
