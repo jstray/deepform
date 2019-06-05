@@ -10,8 +10,14 @@ import pandas as pd
 import numpy as np
 import csv
 
+import wandb
+from wandb.keras import WandbCallback
 
-# Thanks, StackOverflow
+run = wandb.init()
+config = run.config
+config.epochs = 25
+
+# Thanks, StackOverflow. This "undoes" a 1D convolution, by combining upsampling plus convolution.
 def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same'):
     x = Lambda(lambda x: expand_dims(x, axis=2))(input_tensor)
     x = Conv2DTranspose(filters=filters, kernel_size=(kernel_size, 1), strides=(strides, 1), padding=padding)(x)
@@ -22,20 +28,20 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 max_doc_length = 4096
 vocab_size = 5000
 
+# --- Create training data ---
 incsv = csv.DictReader(open('data/training.csv', mode='r'))
-
 
 # input and labels
 docs = []
-targets = []
+labels = []
 
 # Reconstruct documents by concatenating all rows with the same slug
 active_slug = None
-tokens = [] 
-target = []
+doc1 = [] 
+labels1 = []
 for row in incsv:
-	if len(targets) == 1000:
-		break
+# 	if len(targets) == 1000:
+# 		break
 
 	token = row['token']
 	if len(token) < 3:
@@ -43,29 +49,29 @@ for row in incsv:
 
 	if row['slug'] != active_slug:
 		if active_slug:
-			docs.append(' '.join(tokens))
-			targets.append(target)
+			docs.append(' '.join(doc1))
+			labels.append(label1)
 		active_slug = row['slug']
-		tokens = [row['token']]
-		target = [0 if float(row['gross_amount']) < 0.9 else 1]
+		doc1 = [row['token']]
+		label1 = [0 if float(row['gross_amount']) < 0.9 else 1]
 	else:
-		tokens.append(row['token'])
-		target.append(0 if float(row['gross_amount']) < 0.9 else 1)
+		doc1.append(row['token'])
+		label1.append(0 if float(row['gross_amount']) < 0.9 else 1)
 
-max_length = max([len(x) for x in targets])
+print(f'Loaded {len(docs)}')
+max_length = max([len(x) for x in labels])
 print(f'Max document size {max_length}')
+avg_length = sum([len(x) for x in labels])/len(labels)
+print(f'Average document size {avg_length}')
 
-# Truncate to max_doc_length and turn into np array
-#y = np.array([row + [0]*(max_length-len(row)) for row in targets])
-y = pad_sequences(targets, maxlen=max_doc_length, padding='post', truncating='post')
-print(y[1:10,])
-
-# integer encode the documents
+# integer encode the documents, truncate to max_doc_length
 encoded_docs = [one_hot(d, vocab_size) for d in docs]
+x = pad_sequences(encoded_docs, maxlen=max_doc_length, padding='post', truncating='post')
 
-# pad documents to longest length
-padded_docs = pad_sequences(encoded_docs, maxlen=max_doc_length, padding='post', truncating='post')
+# Truncate to max_doc_length
+y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='post')
 
+# --- Specify network ---
 
 # We use a U-net to handle long range dependencies between tokens 
 indata = Input((max_doc_length,))
@@ -100,10 +106,14 @@ f = Flatten()(c10)
 model = Model(inputs=[indata], outputs=[f])
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
-print(model.summary())
+#print(model.summary())
 
-# # fit the model
-model.fit(padded_docs, y, epochs=50, verbose=0)
-# # evaluate the model
-loss, accuracy = model.evaluate(padded_docs, y, verbose=0)
-print('Accuracy: %f' % (accuracy*100))
+
+# --- Go! ----
+
+model.fit(
+    x=x,
+    y=y,
+    epochs=config.epochs,
+    validation_split=0.2,
+    callbacks=[WandbCallback()])
