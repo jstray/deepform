@@ -9,6 +9,7 @@ from keras.backend import expand_dims, squeeze
 import pandas as pd
 import numpy as np
 import csv
+import pdfplumber
 
 import wandb
 from wandb.keras import WandbCallback
@@ -19,10 +20,10 @@ config.epochs = 25
 
 # Thanks, StackOverflow. This "undoes" a 1D convolution, by combining upsampling plus convolution.
 def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same'):
-    x = Lambda(lambda x: expand_dims(x, axis=2))(input_tensor)
-    x = Conv2DTranspose(filters=filters, kernel_size=(kernel_size, 1), strides=(strides, 1), padding=padding)(x)
-    x = Lambda(lambda x: squeeze(x, axis=2))(x)
-    return x
+		x = Lambda(lambda x: expand_dims(x, axis=2))(input_tensor)
+		x = Conv2DTranspose(filters=filters, kernel_size=(kernel_size, 1), strides=(strides, 1), padding=padding)(x)
+		x = Lambda(lambda x: squeeze(x, axis=2))(x)
+		return x
 
 # Configuration
 max_doc_length = 4096
@@ -34,6 +35,7 @@ incsv = csv.DictReader(open('data/training.csv', mode='r'))
 # input and labels
 docs = []
 labels = []
+docslugs = []
 
 # Reconstruct documents by concatenating all rows with the same slug
 active_slug = None
@@ -51,6 +53,7 @@ for row in incsv:
 		if active_slug:
 			docs.append(' '.join(doc1))
 			labels.append(label1)
+			docslugs.append(active_slug)
 		active_slug = row['slug']
 		doc1 = [row['token']]
 		label1 = [0 if float(row['gross_amount']) < 0.9 else 1]
@@ -112,8 +115,28 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 # --- Go! ----
 
 model.fit(
-    x=x,
-    y=y,
-    epochs=config.epochs,
-    validation_split=0.2,
-    callbacks=[WandbCallback()])
+		x=x,
+		y=y,
+		epochs=1,
+		validation_split=0.2,
+		callbacks=[WandbCallback()])
+
+# --- Log output PDF images ---
+
+examples = []
+for index,slug in enumerate(docslugs):
+	fname = 'pdfs/' + slug + '.pdf'
+	try:
+		pdf = pdfplumber.open(fname)
+	except Exception as e:
+		# If the file's not there, that's fine
+		continue
+
+	print('Rendering output for ' +  fname)
+		
+	for pagenum,page in enumerate(pdf.pages):
+		im = page.to_image(resolution=300)
+		examples.append(wandb.Image(im.original, caption=slug + ' page ' +  str(pagenum)))
+		
+wandb.log({"examples": examples})
+		
