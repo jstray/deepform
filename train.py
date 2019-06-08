@@ -29,37 +29,46 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 max_doc_length = 4096
 vocab_size = 5000
 
-# --- Create training data ---
-incsv = csv.DictReader(open('data/training.csv', mode='r'))
+# Generator that reads all our training data
+# For each document, yields an array of dictionaries, each of which is a token
+def input_docs(max_docs=None):
+	incsv = csv.DictReader(open('data/training.csv', mode='r'))
+    
+	# Reconstruct documents by concatenating all rows with the same slug
+	active_slug = None
+	doc_rows = [] 
+	num_docs = 0
 
-# input and labels
+	for row in incsv:	
+		# throw out tokens that are too short, they won't help us
+		token = row['token']
+		if len(token) < 3:
+			continue 
+
+		if row['slug'] != active_slug:
+			if active_slug:
+				yield doc_rows
+				num_docs += 1
+				if max_docs and num_docs >= max_docs:
+					return
+			doc_rows = [row]
+			active_slug = row['slug']
+		else:
+			doc_rows.append(row)
+		
+	yield doc_rows
+
+
+# --- Create training data ---
+print('Loading training data...')
 docs = []
 labels = []
-docslugs = []
-
-# Reconstruct documents by concatenating all rows with the same slug
-active_slug = None
-doc1 = [] 
-labels1 = []
-for row in incsv:
-# 	if len(targets) == 1000:
-# 		break
-
-	token = row['token']
-	if len(token) < 3:
-		continue 
-
-	if row['slug'] != active_slug:
-		if active_slug:
-			docs.append(' '.join(doc1))
-			labels.append(label1)
-			docslugs.append(active_slug)
-		active_slug = row['slug']
-		doc1 = [row['token']]
-		label1 = [0 if float(row['gross_amount']) < 0.9 else 1]
-	else:
-		doc1.append(row['token'])
-		label1.append(0 if float(row['gross_amount']) < 0.9 else 1)
+for docrows in input_docs():	
+	# reconstruct document text (will be tokenized again below, huh)
+	docs.append(' '.join([row['token'] for row in docrows]))
+	
+	# threshold fuzzy matching score with our target field, to get binary labels 
+	labels.append([(0 if float(row['gross_amount']) < 0.9 else 1) for row in docrows])
 
 print(f'Loaded {len(docs)}')
 max_length = max([len(x) for x in labels])
@@ -123,7 +132,8 @@ model.fit(
 
 # --- Log output PDF images ---
 
-for index,slug in enumerate(docslugs):
+for docrows in input_docs():
+	slug = docrows[0]['slug']
 	fname = 'pdfs/' + slug + '.pdf'
 	try:
 		pdf = pdfplumber.open(fname)
