@@ -123,7 +123,6 @@ model.fit(
 
 # --- Log output PDF images ---
 
-examples = []
 for index,slug in enumerate(docslugs):
 	fname = 'pdfs/' + slug + '.pdf'
 	try:
@@ -133,10 +132,11 @@ for index,slug in enumerate(docslugs):
 		continue
 
 	print('Rendering output for ' +  fname)
-		
+
+	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
-		examples.append(wandb.Image(im.original, caption=slug + ' page ' +  str(pagenum)))
+		page_images.append(wandb.Image(im.original, caption='page ' +  str(pagenum)))
 		
-wandb.log({"examples": examples})
+	wandb.log({slug: page_images})
 		
