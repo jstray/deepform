@@ -8,16 +8,17 @@ from fuzzywuzzy import fuzz
 import csv
 import re
 
+output_docs = 0
 
 # data in filings that we want to find
-targets = ['committee','agency','callsign','gross_amount']
-
+#targets = ['committee','agency','callsign','gross_amount']
+targets = ['gross_amount']
 
 filings = pd.read_csv('source/ftf-all-filings.tsv', sep='\t')
 
 incsv = csv.DictReader(open('data/filings-tokens.csv', mode='r'))
 
-outcols = ['slug','page','x','y','token'] + targets
+outcols = ['slug','page','x0','y0','x1','y1','token'] + targets
 outcsv = csv.DictWriter(open('data/training.csv', mode='w'), fieldnames=outcols)
 outcsv.writeheader()
 
@@ -46,6 +47,7 @@ def target_match(answer, tokens):
 	
 
 def process_doc(slug, rows):
+	global output_docs
 	if len(rows) < 10:
 		print(f'Skipping {slug} because it has only {len(rows)} tokens') # probably needs OCR
 		return
@@ -73,17 +75,22 @@ def process_doc(slug, rows):
 		outcsv.writerow(row.to_dict())
 
 	print(f'Processed {slug} with {len(df)} tokens')
+	output_docs += 1
 
 # --- Main ---
 # Accumulate all rows with the same slug
 active_rows = []
 active_slug = None
-
+input_docs=0
 for row in incsv:
 	if row['slug'] != active_slug:
 		if active_slug:
 			process_doc(active_slug, active_rows)
+			input_docs += 1
 		active_slug = row['slug']
 		active_rows = [row]
 	else:
 		active_rows.append(row)
+
+print(f'Input documents {input_docs}')
+print(f'Output documents {output_docs}')
