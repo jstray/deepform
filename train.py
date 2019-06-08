@@ -28,6 +28,7 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 # Configuration
 max_doc_length = 4096
 vocab_size = 5000
+target_thresh = 0.9
 
 # Generator that reads all our training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -68,7 +69,7 @@ for docrows in input_docs():
 	docs.append(' '.join([row['token'] for row in docrows]))
 	
 	# threshold fuzzy matching score with our target field, to get binary labels 
-	labels.append([(0 if float(row['gross_amount']) < 0.9 else 1) for row in docrows])
+	labels.append([(0 if float(row['gross_amount']) < target_thresh else 1) for row in docrows])
 
 print(f'Loaded {len(docs)}')
 max_length = max([len(x) for x in labels])
