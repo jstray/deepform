@@ -29,7 +29,7 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 # Configuration
 max_doc_length = 4096
 vocab_size = 5000
-target_thresh = 90
+target_thresh = 0.9
 
 # Generator that reads all our training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -125,17 +125,23 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 
 # --- Go! ----
 
-# model.fit(
-# 		x=x,
-# 		y=y,
-# 		epochs=1,
-# 		validation_split=0.2,
-# 		callbacks=[WandbCallback()])
+model.fit(
+		x=x,
+		y=y,
+		epochs=1,
+		validation_split=0.2,
+		callbacks=[WandbCallback()])
 
 # --- Log output PDF images ---
 
+# convert a single row of document data (one token) to bbox format needed for drawing
+def docrow_to_bbox(t):
+	return [Decimal(t['x0']), Decimal(t['y0']), Decimal(t['x1']), Decimal(t['y1'])] 
+	
+cnt=0
 for doc_idx,doc_rows in enumerate(input_docs()):
 	slug = doc_rows[0]['slug']
+	doc_rows = doc_rows[:max_doc_length]
 	fname = 'pdfs/' + slug + '.pdf'
 	try:
 		pdf = pdfplumber.open(fname)
@@ -145,18 +151,38 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 
 	print('Rendering output for ' +  fname)
 
-	# find the indices of the token(s) labelled 1
+	# Get the correct answers: find the indices of the token(s) labelled 1
 	target_idx = [idx for (idx,val) in enumerate(y[doc_idx]) if val==1]
 			
+	# Draw the machine output: get a score for each token
+	z = np.array([x[doc_idx]])
+	predict = model.predict(z)
+	
+	if cnt==0:
+		print('--- predict ---')
+		print(predict)
+		cnt+=1
+		
+	predict = predict.squeeze(axis=0)
+	
 	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
-		
 		current_page = str(pagenum/float(len(pdf.pages)-1)) # training data has 0..1 for page range
-		target_toks = [doc_rows[i] for i in target_idx if doc_rows[i]['page']==current_page]
-		rects = [ [Decimal(t['x0']), Decimal(t['y0']), Decimal(t['x1']), Decimal(t['y1'])] for t in target_toks]
-		im.draw_rects(rects, stroke='blue')
 		
+		# Draw target tokens
+		target_toks = [doc_rows[i] for i in target_idx if doc_rows[i]['page']==current_page]
+		rects = [ docrow_to_bbox(t) for t in target_toks]
+		im.draw_rects(rects, stroke='blue', stroke_width=3, fill=None)
+		
+		# Draw guesses
+		for idx,tok in enumerate(doc_rows):
+			if predict[idx]>0.1 and tok['page']==current_page:
+				c = int(255*predict[idx])
+				im.draw_rect(docrow_to_bbox(tok), 
+							 stroke=(255, 255-c, 255-c),
+							 fill=None)
+				
 		page_images.append(wandb.Image(im.annotated, caption='page ' +  str(pagenum)))
 		
 	wandb.log({slug: page_images})
