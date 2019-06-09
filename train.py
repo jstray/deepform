@@ -147,12 +147,12 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 
 	# find the indices of the token(s) labelled 1
 	target_idx = [idx for (idx,val) in enumerate(y[doc_idx]) if val==1]
-	
+			
 	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
 		
-		current_page = str(pagenum/float(len(pdf.pages))) # training data has 0..1 for page range
+		current_page = str(pagenum/float(len(pdf.pages)-1)) # training data has 0..1 for page range
 		target_toks = [doc_rows[i] for i in target_idx if doc_rows[i]['page']==current_page]
 		rects = [ [Decimal(t['x0']), Decimal(t['y0']), Decimal(t['x1']), Decimal(t['y1'])] for t in target_toks]
 		im.draw_rects(rects, stroke='blue')
