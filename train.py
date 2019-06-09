@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 import csv
 import pdfplumber
+from decimal import Decimal
 
 import wandb
 from wandb.keras import WandbCallback
@@ -28,7 +29,7 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 # Configuration
 max_doc_length = 4096
 vocab_size = 5000
-target_thresh = 0.9
+target_thresh = 90
 
 # Generator that reads all our training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -124,30 +125,39 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 
 # --- Go! ----
 
-model.fit(
-		x=x,
-		y=y,
-		epochs=1,
-		validation_split=0.2,
-		callbacks=[WandbCallback()])
+# model.fit(
+# 		x=x,
+# 		y=y,
+# 		epochs=1,
+# 		validation_split=0.2,
+# 		callbacks=[WandbCallback()])
 
 # --- Log output PDF images ---
 
-for docrows in input_docs():
-	slug = docrows[0]['slug']
+for doc_idx,doc_rows in enumerate(input_docs()):
+	slug = doc_rows[0]['slug']
 	fname = 'pdfs/' + slug + '.pdf'
 	try:
 		pdf = pdfplumber.open(fname)
 	except Exception as e:
-		# If the file's not there, that's fine
+		# If the file's not there, that's fine -- we use available PDFs to define what to see
 		continue
 
 	print('Rendering output for ' +  fname)
 
+	# find the indices of the token(s) labelled 1
+	target_idx = [idx for (idx,val) in enumerate(y[doc_idx]) if val==1]
+	
 	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
-		page_images.append(wandb.Image(im.original, caption='page ' +  str(pagenum)))
+		
+		current_page = str(pagenum/float(len(pdf.pages))) # training data has 0..1 for page range
+		target_toks = [doc_rows[i] for i in target_idx if doc_rows[i]['page']==current_page]
+		rects = [ [Decimal(t['x0']), Decimal(t['y0']), Decimal(t['x1']), Decimal(t['y1'])] for t in target_toks]
+		im.draw_rects(rects, stroke='blue')
+		
+		page_images.append(wandb.Image(im.annotated, caption='page ' +  str(pagenum)))
 		
 	wandb.log({slug: page_images})
 		
