@@ -9,6 +9,7 @@ from keras.backend import expand_dims, squeeze
 import pandas as pd
 import numpy as np
 import csv
+import re
 import pdfplumber
 from decimal import Decimal
 
@@ -30,6 +31,9 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 max_doc_length = 4096
 vocab_size = 5000
 target_thresh = 0.9
+augment_dims = 4 # number of features per token, other then token type
+
+wandb.log({'algorithm':'U-net with position'})
 
 # Generator that reads all our training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -61,16 +65,27 @@ def input_docs(max_docs=None):
 	yield doc_rows
 
 
+# --- additional features ----
+def is_dollar_amount(s):
+	return re.search(r'\$?\d[\d,]+(\.\d\d)?',s) != None
+
+def augment_row(row):
+	return [ row['page'], row['x0'], row['y0'], is_dollar_amount(row['token'])]
+	
+
 # --- Create training data ---
 print('Loading training data...')
 docs = []
 labels = []
+augment = []
 for docrows in input_docs():	
 	# reconstruct document text (will be tokenized again below, huh)
 	docs.append(' '.join([row['token'] for row in docrows]))
 	
 	# threshold fuzzy matching score with our target field, to get binary labels 
 	labels.append([(0 if float(row['gross_amount']) < target_thresh else 1) for row in docrows])
+	
+	augment.append([augment_row(r) for row in docrows])
 
 print(f'Loaded {len(docs)}')
 max_length = max([len(x) for x in labels])
@@ -81,15 +96,22 @@ print(f'Average document size {avg_length}')
 # integer encode the documents, truncate to max_doc_length
 encoded_docs = [one_hot(d, vocab_size) for d in docs]
 x = pad_sequences(encoded_docs, maxlen=max_doc_length, padding='post', truncating='post')
+print(f'x.shape: {x.shape}')
 
 # Truncate to max_doc_length
 y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='post')
 
+# additional features
+#a = pad_sequences(augment, maxlen=max_doc_length, padding='post', truncating='post'))
+
 # --- Specify network ---
 
 # We use a U-net to handle long range dependencies between tokens 
-indata = Input((max_doc_length,))
-embed = Embedding(vocab_size, 32)(indata)
+indata = Input((max_doc_length, augment_dims+1))
+tok_word = Lambda( lambda x: slice(x, 0, 1))(indata)
+tok_feature = Lambda( lambda x: slice(x, 1, -1))(indata)
+embed = Embedding(vocab_size, 32)(tok_word)
+
 c1 = Conv1D(filters=8, kernel_size=5, padding='same')(embed)  # 4096
 p1 = MaxPooling1D()(c1)
 c2 = Conv1D(filters=16, kernel_size=5, padding='same')(p1) # 2048
@@ -114,7 +136,7 @@ c9 = Conv1DTranspose(u8, filters=8, kernel_size=5, padding='same') # 4096
 u9 = concatenate([c1,c9], axis=2) # 4096 x 16
 
 # This last convolution produces the target token scores
-c10 = Conv1D(filters=1, kernel_size=10, padding='same', activation='softmax')(c9)  # 4096 x 1
+c10 = Conv1D(filters=1, kernel_size=10, padding='same', activation='relu')(c9)  # 4096 x 1
 f = Flatten()(c10)
 
 model = Model(inputs=[indata], outputs=[f])
@@ -128,7 +150,7 @@ model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
 model.fit(
 		x=x,
 		y=y,
-		epochs=1,
+		epochs=10,
 		validation_split=0.2,
 		callbacks=[WandbCallback()])
 
