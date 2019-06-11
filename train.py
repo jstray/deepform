@@ -193,12 +193,16 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 			
 	# Draw the machine output: get a score for each token
 	z = np.array([x[doc_idx]])
-	predict = model.predict(z)
+
 	
 	if cnt==0:
 		print('--- predict ---')
+		predict = model.predict(z)
 		print(predict)
-		cnt+=1
+
+	cnt+=1
+	if cnt==10:
+		break
 		
 	predict = predict.squeeze(axis=0)
 	
@@ -206,7 +210,7 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
 		num_pages = len(pdf.pages)>0
-		if num_pages:
+		if num_pages>1:
 			current_page = pagenum/float(len(pdf.pages)-1) # training data has 0..1 for page range
 		else:
 			current_page = 0.0
