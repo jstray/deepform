@@ -1,4 +1,5 @@
 from numpy import array
+import keras as K
 from keras.preprocessing.text import one_hot
 from keras.preprocessing.sequence import pad_sequences
 from keras.engine.input_layer import Input
@@ -122,8 +123,9 @@ y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='pos
 
 # We use a U-net to handle long range dependencies between tokens 
 indata = Input((max_doc_length, augment_dims+1))
-tok_word = Lambda( lambda x: slice(x, 0, 1))(indata)
-tok_feature = Lambda( lambda x: slice(x, 1, -1))(indata)
+tok_word = Lambda( lambda x: squeeze(K.backend.slice(x, (0,0,0), (-1,-1,1)),axis=2))(indata)
+tok_feature = Lambda( lambda x: K.backend.slice(x, (0,0,1), (-1,-1,-1)))(indata)
+print(f'tok_word.shape {tok_word.shape}')
 embed = Embedding(vocab_size, 32)(tok_word)
 
 c1 = Conv1D(filters=8, kernel_size=5, padding='same')(embed)  # 4096
@@ -156,7 +158,7 @@ f = Flatten()(c10)
 model = Model(inputs=[indata], outputs=[f])
 
 model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
-#print(model.summary())
+print(model.summary())
 
 
 # --- Go! ----
