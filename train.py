@@ -92,7 +92,7 @@ print('Loading training data...')
 docs = []
 labels = []
 augment = []
-for docrows in input_docs(max_docs=100):	
+for docrows in input_docs(max_docs=10000):	
 	# reconstruct document text (will be tokenized again below, huh)
 	docs.append(' '.join([row['token'] for row in docrows]))
 	
@@ -112,9 +112,9 @@ print(f'Average document size {avg_length}')
 # integer encode the documents, truncate to max_doc_length
 encoded_docs = [one_hot(d, vocab_size) for d in docs]
 x = pad_sequences(encoded_docs, maxlen=max_doc_length, dtype=np.float32, padding='post', truncating='post')
-x = expand_dims(x, axis=2)
-a = tf.constant(augment, dtype=np.float32)
-x = tf.concat([x, a], axis=2)
+x = np.expand_dims(x, axis=2)
+a = np.array(augment, dtype=np.float32)
+x = np.concatenate([x, a], axis=2)
 
 # Truncate to max_doc_length
 y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='post')
@@ -125,7 +125,6 @@ y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='pos
 indata = Input((max_doc_length, augment_dims+1))
 tok_word = Lambda( lambda x: squeeze(K.backend.slice(x, (0,0,0), (-1,-1,1)),axis=2))(indata)
 tok_feature = Lambda( lambda x: K.backend.slice(x, (0,0,1), (-1,-1,-1)))(indata)
-print(f'tok_word.shape {tok_word.shape}')
 embed = Embedding(vocab_size, 32)(tok_word)
 
 c1 = Conv1D(filters=8, kernel_size=5, padding='same')(embed)  # 4096
@@ -206,7 +205,12 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
-		current_page = str(pagenum/float(len(pdf.pages)-1)) # training data has 0..1 for page range
+		num_pages = len(pdf.pages)>0
+		if num_pages:
+			current_page = pagenum/float(len(pdf.pages)-1) # training data has 0..1 for page range
+		else:
+			current_page = 0.0
+		current_page = str(current_page)
 		
 		# Draw target tokens
 		target_toks = [doc_rows[i] for i in target_idx if doc_rows[i]['page']==current_page]
