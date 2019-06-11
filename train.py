@@ -6,6 +6,7 @@ from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Lambda, Conv2DTra
 from keras.layers.embeddings import Embedding
 from keras.models import Model
 from keras.backend import expand_dims, squeeze
+import tensorflow as tf
 import pandas as pd
 import numpy as np
 import csv
@@ -70,22 +71,36 @@ def is_dollar_amount(s):
 	return re.search(r'\$?\d[\d,]+(\.\d\d)?',s) != None
 
 def augment_row(row):
-	return [ row['page'], row['x0'], row['y0'], is_dollar_amount(row['token'])]
+	return [ float(row['page']), 
+					 float(row['x0']),
+					 float(row['y0']), 
+					 float(is_dollar_amount(row['token'])) ]
 	
+def pad_list(x,maxlen,padv):
+	n = len(x)
+	if n>maxlen:
+		return x[:maxlen]
+	elif n<maxlen:
+		return x + [padv]*(maxlen-n)
+	else:
+		return x
+
 
 # --- Create training data ---
 print('Loading training data...')
 docs = []
 labels = []
 augment = []
-for docrows in input_docs():	
+for docrows in input_docs(max_docs=100):	
 	# reconstruct document text (will be tokenized again below, huh)
 	docs.append(' '.join([row['token'] for row in docrows]))
 	
 	# threshold fuzzy matching score with our target field, to get binary labels 
 	labels.append([(0 if float(row['gross_amount']) < target_thresh else 1) for row in docrows])
 	
-	augment.append([augment_row(r) for row in docrows])
+	augment.append(	pad_list([augment_row(row) for row in docrows], 
+									max_doc_length, 
+									[0]*augment_dims))
 
 print(f'Loaded {len(docs)}')
 max_length = max([len(x) for x in labels])
@@ -95,14 +110,13 @@ print(f'Average document size {avg_length}')
 
 # integer encode the documents, truncate to max_doc_length
 encoded_docs = [one_hot(d, vocab_size) for d in docs]
-x = pad_sequences(encoded_docs, maxlen=max_doc_length, padding='post', truncating='post')
-print(f'x.shape: {x.shape}')
+x = pad_sequences(encoded_docs, maxlen=max_doc_length, dtype=np.float32, padding='post', truncating='post')
+x = expand_dims(x, axis=2)
+a = tf.constant(augment, dtype=np.float32)
+x = tf.concat([x, a], axis=2)
 
 # Truncate to max_doc_length
 y = pad_sequences(labels, maxlen=max_doc_length, padding='post', truncating='post')
-
-# additional features
-#a = pad_sequences(augment, maxlen=max_doc_length, padding='post', truncating='post'))
 
 # --- Specify network ---
 

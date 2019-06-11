@@ -7,6 +7,8 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 import csv
 import re
+import decimal
+from decimal import Decimal
 
 output_docs = 0
 
@@ -29,14 +31,16 @@ outcsv.writeheader()
 def is_dollar_amount(s):
 	return re.search(r'\$?\d[\d,]+(\.\d\d)?',s) != None
 
+# take a string like "$56,333.1" and remove punct, round to two decimals, return string
+def normalize_dollars(s):
+	return str(round(Decimal(s.replace('$','').replace(',','')),2))
+
 def target_match_token(anstoks, token):
 	if len(anstoks)==1 and is_dollar_amount(anstoks[0]) and is_dollar_amount(token):
 		try:
-			ans_num = float(anstoks[0].replace('$','').replace(',',''))
-			tok_num = float(token.replace('$','').replace(',',''))
-			return fuzz.ratio(str(ans_num), str(tok_num))
-		except ValueError:
-			return fuzz.ratio(anstoks[0], token)  # not a number, maybe a date?
+			return fuzz.ratio(normalize_dollars(anstoks[0]), normalize_dollars(token))/100.0
+		except decimal.InvalidOperation:
+			return fuzz.ratio(anstoks[0], token)/100.0  # not a number, maybe a date?
 
 	else:
 		return max([fuzz.ratio(x,token) for x in anstoks])/100.0
@@ -66,7 +70,10 @@ def process_doc(slug, rows):
 	df = pd.DataFrame(rows)
 
 	page = pd.to_numeric(df['page'])
-	df['page'] = page / page.max()  # last page = 1.0
+	maxpage = page.max()
+	if maxpage: # avoid div/0 for one page docs
+		df['page'] = page / maxpage  # last page = 1.0
+
 
 	for t in targets:
 		df[t] = target_match(answers[t], df['token'])
