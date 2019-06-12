@@ -30,12 +30,13 @@ def Conv1DTranspose(input_tensor, filters, kernel_size, strides=2, padding='same
 		return x
 
 # Configuration
+read_docs = 10000 # how many docs to load, at most
 max_doc_length = 4096
 vocab_size = 5000
 target_thresh = 0.9
 augment_dims = 4 # number of features per token, other then token type
 
-wandb.log({'algorithm':'U-net with position'})
+wandb.log({'algorithm':'U-net with position and dollar marker'})
 
 # Generator that reads all our training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -92,7 +93,7 @@ print('Loading training data...')
 docs = []
 labels = []
 augment = []
-for docrows in input_docs(max_docs=10000):	
+for docrows in input_docs(max_docs=read_docs):	
 	# reconstruct document text (will be tokenized again below, huh)
 	docs.append(' '.join([row['token'] for row in docrows]))
 	
@@ -126,6 +127,7 @@ indata = Input((max_doc_length, augment_dims+1))
 tok_word = Lambda( lambda x: squeeze(K.backend.slice(x, (0,0,0), (-1,-1,1)),axis=2))(indata)
 tok_feature = Lambda( lambda x: K.backend.slice(x, (0,0,1), (-1,-1,-1)))(indata)
 embed = Embedding(vocab_size, 32)(tok_word)
+embed = concatenate([embed, tok_feature], axis=2)
 
 c1 = Conv1D(filters=8, kernel_size=5, padding='same')(embed)  # 4096
 p1 = MaxPooling1D()(c1)
@@ -176,7 +178,7 @@ def docrow_to_bbox(t):
 	return [Decimal(t['x0']), Decimal(t['y0']), Decimal(t['x1']), Decimal(t['y1'])] 
 	
 cnt=0
-for doc_idx,doc_rows in enumerate(input_docs()):
+for doc_idx,doc_rows in enumerate(input_docs(max_docs=read_docs)):
 	slug = doc_rows[0]['slug']
 	doc_rows = doc_rows[:max_doc_length]
 	fname = 'pdfs/' + slug + '.pdf'
@@ -191,21 +193,17 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 	# Get the correct answers: find the indices of the token(s) labelled 1
 	target_idx = [idx for (idx,val) in enumerate(y[doc_idx]) if val==1]
 			
-	# Draw the machine output: get a score for each token
 	z = np.array([x[doc_idx]])
-
-	
-	if cnt==0:
-		print('--- predict ---')
-		predict = model.predict(z)
-		print(predict)
-
-	cnt+=1
-	if cnt==10:
-		break
-		
+	predict = model.predict(z)
 	predict = predict.squeeze(axis=0)
 	
+	# print our best guess for each dcoument
+	answer_idx = np.argmax(y[doc_idx])
+	print(f"Correct answer: {doc_rows[answer_idx]['token']} with score {y[doc_idx][answer_idx]}")
+	output_idx = np.argmax(predict)
+	print(f"Best output: {doc_rows[output_idx]['token']} with score {predict[output_idx]}")
+		
+	# Draw the machine output: get a score for each token
 	page_images=[]
 	for pagenum,page in enumerate(pdf.pages):
 		im = page.to_image(resolution=300)
@@ -233,3 +231,6 @@ for doc_idx,doc_rows in enumerate(input_docs()):
 		
 	wandb.log({slug: page_images})
 		
+	cnt+=1
+	if cnt==10:
+		break
