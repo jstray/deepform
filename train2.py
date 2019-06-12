@@ -30,8 +30,9 @@ config.target_thresh = 0.9 # target match scores larger than this will becomes p
 config.epochs = 50
 config.batch_size=10000
 config.steps_per_epoch = 10
-config.doc_val_size = 25 # how many documents to check extraction on after each epoch
+config.doc_acc_sample_size = 25 # how many documents to check extraction on after each epoch
 config.penalize_missed = 10 # much more more a missed 1 counts than a missed 0 in output
+config.val_split = 0.2
 
 # ---- Load data and generate features ----
 
@@ -228,13 +229,14 @@ def compute_accuracy(model, window_len, slugs, token_text, features, labels, num
 # ---- Custom callback to log document-level accuracy ----
 
 class DocAccCallback(K.callbacks.Callback):
-	def __init__(self, window_len, slugs, token_text, features, labels, num_to_test):
+	def __init__(self, window_len, slugs, token_text, features, labels, num_to_test, logname):
 		self.window_len = window_len
 		self.slugs = slugs
 		self.token_text = token_text
 		self.features = features
 		self.labels = labels
 		self.num_to_test = num_to_test
+		self.logname = logname
 
 	def on_epoch_end(self, epoch, logs):
 		acc = compute_accuracy(self.model,
@@ -244,8 +246,8 @@ class DocAccCallback(K.callbacks.Callback):
 			self.features,
 			self.labels,
 			self.num_to_test+epoch)  # test more docs later in training, for more precise acc
-		print(f'This epoch document accuracy: {acc}')
-		wandb.log({'final_acc':acc})
+		print(f'This epoch {self.logname}: {acc}')
+		wandb.log({self.logname:acc})
 
 
 # --- MAIN ----
@@ -260,19 +262,52 @@ print(f'Max document size {max_length}')
 avg_length = sum([len(x) for x in labels])/len(labels)
 print(f'Average document size {avg_length}')
 
+# split into train and test
+slugs_train = []
+token_text_train = []
+features_train = []
+labels_train = []
+slugs_val = []
+token_text_val = []
+features_val = []
+labels_val = []
+for i in range(len(features)):
+	if random.random() < config.val_split:
+		slugs_val.append(slugs[i])
+		token_text_val.append(token_text[i])
+		features_val.append(features[i])
+		labels_val.append(labels[i])
+	else:
+		slugs_train.append(slugs[i])
+		token_text_train.append(token_text[i])		
+		features_train.append(features[i])
+		labels_train.append(labels[i])
+
+print(f'Training on {len(features_train)}, validating on {len(features_val)}')
+
 model = create_model(config)
 print(model.summary())
 
-# validation on same data for now, not so good
-x_val, y_val = next(windowed_generator(features, labels, config)) 
 
 model.fit_generator(
-	windowed_generator(features, labels, config),
-	validation_data=(x_val, y_val), 
+	windowed_generator(features_train, labels_train, config),
 	steps_per_epoch=config.steps_per_epoch,
 	epochs=config.epochs,
 	callbacks=[ 
 		WandbCallback(),
-		DocAccCallback(config.window_len, slugs, token_text, features, labels, config.doc_val_size)
+		DocAccCallback(	config.window_len, 
+										slugs_train, 
+										token_text_train, 
+										features_train, 
+										labels_train, 
+										config.doc_acc_sample_size,
+										'doc_train_acc'),
+		DocAccCallback(	config.window_len, 
+										slugs_val, 
+										token_text_val, 
+										features_val, 
+										labels_val, 
+										config.doc_acc_sample_size,
+										'doc_val_acc')
 	])
 

@@ -101,7 +101,7 @@ def correct_answer(doc_tokens):
 num_docs = 0.0
 correct_guesses = 0.0
 
-for doc_tokens in input_docs(max_docs=1000):	
+for doc_tokens in input_docs(max_docs=10000):	
 	guess = guess_doc_answer(doc_tokens)
 	correct = correct_answer(doc_tokens)
 	print(f"{doc_tokens[0]['slug']}: guessed {guess} correct {correct}")
