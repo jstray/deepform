@@ -169,10 +169,16 @@ def create_model(config):
 # Returns vector of token scores
 def predict_scores(model, features, window_len):
 	doc_len = len(features)
-	scores = np.zeros((doc_len))
-	for i in range(0, doc_len-window_len):
-		window_scores = model.predict([[features[i:i+window_len]]])
-		scores[i:i+window_len] += window_scores.flatten() # would max work better than sum?
+	num_windows = doc_len-window_len
+
+	windowed_features = np.array([features[i:i+window_len] for i in range(num_windows)])
+	print(f'windowed_features.shape: {windowed_features.shape}')
+	window_scores = model.predict(windowed_features)
+	print(f'window_scores.shape: {window_scores.shape}')
+
+	scores = np.zeros(doc_len)
+	for i in range(num_windows):
+		scores[i:i+window_len] += window_scores[i] # would max work better than sum?
 	return scores
 
 # returns text, score of best answer
