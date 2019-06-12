@@ -1,4 +1,3 @@
-from numpy import array
 import keras as K
 from keras.engine.input_layer import Input
 from keras.models import Model
@@ -25,13 +24,14 @@ config = run.config
 config.read_docs = 10000 # how many docs to load, at most
 config.window_len = 30 # size of token sequences to train on (and network size!)
 config.vocab_size = 500
-config.token_dims = 5 # number of features per token, including token hash
+config.token_dims = 7 # number of features per token, including token hash
 config.positive_fraction = 0.5
 config.target_thresh = 0.9 # target match scores larger than this will becomes positive labels
-config.epochs = 1
+config.epochs = 50
 config.batch_size=10000
 config.steps_per_epoch = 10
 config.doc_val_size = 25 # how many documents to check extraction on after each epoch
+config.penalize_missed = 10 # much more more a missed 1 counts than a missed 0 in output
 
 # ---- Load data and generate features ----
 
@@ -69,11 +69,14 @@ def is_dollar_amount(s):
 	return re.search(r'\$?\d[\d,]+(\.\d\d)?',s) != None
 
 def token_features(row, vocab_size):
-	return [ hash(row['token']) % vocab_size,
+	tokstr = row['token'].upper()
+	return [ hash(tokstr) % vocab_size,
 					 float(row['page']), 
 					 float(row['x0']),
 					 float(row['y0']), 
-					 float(is_dollar_amount(row['token'])) ]
+					 float(len(tokstr)),
+					 float(np.mean([c.isdigit() for c in tokstr])),
+					 float(is_dollar_amount(tokstr)) ]
 	
 # Load raw training data, create our per-token features and binary labels	
 def load_training_data_nocache(config):
@@ -139,6 +142,20 @@ def windowed_generator(features, labels, config):
 			batch_labels[i,:] = labels1
 		yield batch_features, batch_labels
 
+# ---- Custom loss function is basically MSE but high penalty for missing a 1 label ---
+
+def missed_token_loss(one_penalty):
+   
+	def _missed_token_loss(y_true, y_pred):
+	  expected_zero = tf.to_float(tf.math.equal(y_true,0))
+	  s = y_pred*expected_zero
+	  zero_loss = K.backend.mean(K.backend.square(s))
+	  expected_one = tf.to_float(tf.math.equal(y_true,1))
+	  t = one_penalty*(1-y_pred)*expected_one
+	  one_loss = K.backend.mean(K.backend.square(t))
+	  return zero_loss + one_loss
+
+	return _missed_token_loss # closes over one_penalty
 
 # --- Specify network ---
 
@@ -159,7 +176,10 @@ def create_model(config):
 	d5 = Dense(config.window_len, activation='elu')(d4)
 
 	model = Model(inputs=[indata], outputs=[d5])
-	model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+	model.compile(
+		optimizer='adam', 
+		loss=missed_token_loss(config.penalize_missed), 
+		metrics=['acc'])
 
 	return model
 
@@ -199,7 +219,7 @@ def compute_accuracy(model, window_len, slugs, token_text, features, labels, num
 		doc_idx = random.randint(0, len(slugs)-1)
 		predict_text, predict_score = predict_answer(model, features[doc_idx], token_text[doc_idx], window_len)
 		answer_text = correct_answer(features[doc_idx], labels[doc_idx], token_text[doc_idx])
-		print(f'{slugs[doc_idx]}: guessed {predict_text} with score {predict_score}, correct {answer_text}')
+		print(f'{slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
 		if predict_text==answer_text:
 			acc+=1
 	return acc/num_to_test
