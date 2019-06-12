@@ -28,10 +28,12 @@ config.vocab_size = 500
 config.token_dims = 5 # number of features per token, including token hash
 config.positive_fraction = 0.5
 config.target_thresh = 0.9 # target match scores larger than this will becomes positive labels
-config.epochs = 50
+config.epochs = 1
 config.batch_size=10000
 config.steps_per_epoch = 10
 
+
+# ---- Load data and generate features ----
 
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -75,35 +77,40 @@ def token_features(row, vocab_size):
 	
 # Load raw training data, create our per-token features and binary labels	
 def load_training_data_nocache(config):
+	slugs = []
+	token_text = []
 	features = []
 	labels = []
 	for doc_tokens in input_docs(max_docs=config.read_docs):	
 		if len(doc_tokens) < config.window_len:
 			continue # TODO pad shorter docs
 			
+		# Not training data, but used for evaluating results later
+		slugs.append(doc_tokens[0]['slug']) # unique document ID, also PDF filename
+		token_text.append([row['token'] for row in doc_tokens])
+
 		features.append([token_features(row, config.vocab_size) for row in doc_tokens])
 		
 		# threshold fuzzy matching score with our target field, to get binary labels 
 		labels.append([(0 if float(row['gross_amount']) < config.target_thresh else 1) for row in doc_tokens])
 
-	return features, labels
+	return slugs, token_text, features, labels
 	
 # Because generating the list of features is so expensive, we cache it on disk
 def load_training_data(config):
 	if os.path.isfile('data/cached_features.p'):
 		print('Loading training data from cache...')
-		features,labels = pickle.load(open('data/cached_features.p', 'rb'))
+		slugs, token_text, features,labels = pickle.load(open('data/cached_features.p', 'rb'))
 	else:
 		print('Loading training data...')
-		features, labels = load_training_data_nocache(config)
+		slugs, token_text, features, labels = load_training_data_nocache(config)
 		print('Saving training data to cache...')
-		pickle.dump((features, labels), open('data/cached_features.p', 'wb'))
+		pickle.dump((slugs, token_text, features, labels), open('data/cached_features.p', 'wb'))
 
-	return features,labels
-
+	return slugs, token_text, features,labels
 
 	
-# ---- Resample doc_features,labels as windows ----
+# ---- Resample features,labels as windows ----
 
 # returns a window of tokens, labels at a random position in a random document
 def one_window_unbalanced(features, labels, window_len):
@@ -156,12 +163,50 @@ def create_model(config):
 
 	return model
 
+# --- Predict ---
+# Our network is windowed, so we have to aggregate windows to get a final score
+
+# Returns vector of token scores
+def predict_scores(model, features, window_len):
+	doc_len = len(features)
+	scores = np.zeros((doc_len))
+	for i in range(0, doc_len-window_len):
+		window_scores = model.predict([[features[i:i+window_len]]])
+		scores[i:i+window_len] += window_scores.flatten() # would max work better than sum?
+	return scores
+
+# returns text, score of best answer
+def predict_answer(model, features, token_text, window_len):
+	scores = predict_scores(model, features, window_len)
+	best_score_idx = np.argmax(scores)
+	best_score_text = token_text[best_score_idx]
+	return best_score_text, scores[best_score_idx]
+
+# returns text of correct answer,
+def correct_answer(features, labels, token_text):
+	answer_idx = np.argmax(labels)
+	answer_text = token_text[answer_idx]
+	return answer_text
+
+# Calculate accuracy of answer extraction over num_to_test docs, print diagnostics while we do so
+def compute_accuracy(model, window_len, slugs, token_text, features, labels, num_to_test):
+	acc = 0.0
+	for i in range(num_to_test):
+		doc_idx = random.randint(0, len(slugs)-1)
+		predict_text, predict_score = predict_answer(model, features[doc_idx], token_text[doc_idx], window_len)
+		answer_text = correct_answer(features[doc_idx], labels[doc_idx], token_text[doc_idx])
+		print(f'{slugs[doc_idx]}: guessed {predict_text} with score {predict_score}, correct {answer_text}')
+		if predict_text==answer_text:
+			acc+=1
+	return acc/num_to_test
+
+
 # --- MAIN ----
 
 print('Configuration:')
 print(config)
 
-features, labels = load_training_data(config)
+slugs, token_text, features, labels = load_training_data(config)
 print(f'Loaded {len(features)}')
 max_length = max([len(x) for x in labels])
 print(f'Max document size {max_length}')
@@ -181,6 +226,6 @@ model.fit_generator(
 	epochs=config.epochs,
 	callbacks=[WandbCallback()])
 
-
+compute_accuracy(model, config.window_len, slugs, token_text, features, labels, 20)
 
 
