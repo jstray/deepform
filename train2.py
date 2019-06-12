@@ -31,7 +31,7 @@ config.target_thresh = 0.9 # target match scores larger than this will becomes p
 config.epochs = 1
 config.batch_size=10000
 config.steps_per_epoch = 10
-
+config.doc_val_size = 25 # how many documents to check extraction on after each epoch
 
 # ---- Load data and generate features ----
 
@@ -172,9 +172,7 @@ def predict_scores(model, features, window_len):
 	num_windows = doc_len-window_len
 
 	windowed_features = np.array([features[i:i+window_len] for i in range(num_windows)])
-	print(f'windowed_features.shape: {windowed_features.shape}')
 	window_scores = model.predict(windowed_features)
-	print(f'window_scores.shape: {window_scores.shape}')
 
 	scores = np.zeros(doc_len)
 	for i in range(num_windows):
@@ -207,6 +205,29 @@ def compute_accuracy(model, window_len, slugs, token_text, features, labels, num
 	return acc/num_to_test
 
 
+# ---- Custom callback to log document-level accuracy ----
+
+class DocAccCallback(K.callbacks.Callback):
+	def __init__(self, window_len, slugs, token_text, features, labels, num_to_test):
+		self.window_len = window_len
+		self.slugs = slugs
+		self.token_text = token_text
+		self.features = features
+		self.labels = labels
+		self.num_to_test = num_to_test
+
+	def on_epoch_end(self, epoch, logs):
+		acc = compute_accuracy(self.model,
+			self.window_len,
+			self.slugs,
+			self.token_text,
+			self.features,
+			self.labels,
+			self.num_to_test+epoch)  # test more docs later in training, for more precise acc
+		print(f'This epoch document accuracy: {acc}')
+		wandb.log({'final_acc':acc})
+
+
 # --- MAIN ----
 
 print('Configuration:')
@@ -230,8 +251,8 @@ model.fit_generator(
 	validation_data=(x_val, y_val), 
 	steps_per_epoch=config.steps_per_epoch,
 	epochs=config.epochs,
-	callbacks=[WandbCallback()])
-
-compute_accuracy(model, config.window_len, slugs, token_text, features, labels, 20)
-
+	callbacks=[ 
+		WandbCallback(),
+		DocAccCallback(config.window_len, slugs, token_text, features, labels, config.doc_val_size)
+	])
 
