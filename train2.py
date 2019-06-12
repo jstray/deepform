@@ -1,11 +1,9 @@
 from numpy import array
 import keras as K
-from keras.preprocessing.text import one_hot
-from keras.preprocessing.sequence import pad_sequences
 from keras.engine.input_layer import Input
-from keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Lambda, Conv2DTranspose, concatenate
-from keras.layers.embeddings import Embedding
 from keras.models import Model
+from keras.layers import Dense, Flatten, Dropout, Lambda, concatenate
+from keras.layers.embeddings import Embedding
 from keras.backend import expand_dims, squeeze
 import tensorflow as tf
 import pandas as pd
@@ -19,16 +17,14 @@ from decimal import Decimal
 import wandb
 from wandb.keras import WandbCallback
 
-# run = wandb.init()
-# config = run.config
-# config.epochs = 25
+run = wandb.init()
 
 
 # Configuration
-read_docs = 5 # how many docs to load, at most
+read_docs = 10000 # how many docs to load, at most
 target_thresh = 0.9 # target match scores larger than this will becomes positive labels
 window_len = 20 # size of token sequences to train on (and network size!)
-vocab_size = 5000
+vocab_size = 500
 token_dims = 5 # number of features per token, including token hash
 
 
@@ -109,11 +105,10 @@ def one_window_unbalanced():
 
 # control the fraction of windows that include a positive label. not efficient.
 def one_window():
-	positive = random.randint(0,1)
 	f,l = one_window_unbalanced()
-	if positive:
+	if random.randint(0,1):
 		while not 1 in l:
-			f,l = one_window()
+			f,l = one_window_unbalanced()
 	return f,l
 
 def windowed_generator(batch_size):
@@ -130,9 +125,38 @@ def windowed_generator(batch_size):
 		yield batch_features, batch_labels
 
 
-f,l = next(windowed_generator(25))
-print(f'f.shape: {f.shape}')
-print(f'f[0]: {f[0]}')
+x_val, y_val = next(windowed_generator(100))
 
-print(f'l.shape: {l.shape}')
-print(f'l[0]: {l[0]}')
+# --- Specify network ---
+
+indata = Input((window_len, token_dims))
+
+# split into the hash and the rest of the token features, embed hash as one-hot, then merge
+tok_hash = Lambda( lambda x: squeeze(K.backend.slice(x, (0,0,0), (-1,-1,1)),axis=2))(indata)
+tok_features = Lambda( lambda x: K.backend.slice(x, (0,0,1), (-1,-1,-1)))(indata)
+embed = Embedding(vocab_size, 32)(tok_hash)
+merged = concatenate([embed, tok_features], axis=2)
+
+f = Flatten()(merged)
+d1 = Dense(window_len*token_dims*5, activation='sigmoid')(f)
+d2 = Dropout(0.3)(d1)
+d3 = Dense(window_len*token_dims, activation='sigmoid')(d2)
+d4 = Dropout(0.3)(d3)
+d5 = Dense(window_len, activation='elu')(d4)
+
+model = Model(inputs=[indata], outputs=[d5])
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['acc'])
+print(model.summary())
+
+# --- fit ----
+
+# train the network
+model.fit_generator(
+	windowed_generator(batch_size=10000),
+	validation_data=(x_val, y_val), 
+	steps_per_epoch=10,
+	epochs=25,
+	callbacks=[WandbCallback()])
+
+
+
