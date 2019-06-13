@@ -6,6 +6,8 @@ This model achieves 90% accuracy extracting total spending from the PDFs in the 
 
 For results and discussion, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
+Full thanks to my collaborator Nicholas Bardy of Weights & Biases.
+
 ## Why?
 TV stations are required to disclose their sale of political advertising, but there is no requirement that this disclosure is machine readable. Every election, tens of thousands of PDFs are posted to the FCC Public File, available at [https://publicfiles.fcc.gov/](https://publicfiles.fcc.gov/) in hundreds of different formats. 
 
