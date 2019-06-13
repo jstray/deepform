@@ -1,8 +1,8 @@
 # Deepform
 
-An experiment to extract information from Tv station political advertising disclosure forms stations using deep learning, and a challenging journalism-relevant dataset for NLP/AI researchers. Orignal data from ProPublica's [Free The Files](https://projects.propublica.org/free-the-files/) project.
+An experiment to extract information from TV station political advertising disclosure forms using deep learning, and a challenging journalism-relevant dataset for NLP/AI researchers. Orignal data from ProPublica's [Free The Files](https://projects.propublica.org/free-the-files/) project.
 
-This model achieves 90% accuracy extracting total spending from the PDFs in the corpus.
+This model achieves 90% accuracy extracting total spending from the PDFs in the corpus. I expect it could be made much more accurate through some feature engineering (see below.)
 
 For results and discussion, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
