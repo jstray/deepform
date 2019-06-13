@@ -22,6 +22,7 @@ If you wish to reproduce this result, there are multple steps in the data prepar
 - `tokenize-pdfs.py` will read each PDF and output a list of tokens and their geometry. Also takes several days to run.
 - `create-training-data.py` reads the PDF tokens and matches them against the original data, outputting only documents where the training data is available. Edit this to control which extracted fields appear in the training data. 
 - `train.py` loads this data, trains a network, and logs the results using [Weights & Biases](https://www.wandb.com/)
+- `baseline.py` is a hand coded total extractor for comparison, which achieves 61% accuracy.
 
 ## Training data format
 The main training data file is `data/training.csv` but it's too big to post in github, so you can download it [here](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
