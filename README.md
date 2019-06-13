@@ -52,7 +52,7 @@ slug,page,x0,y0,x1,y1,token,gross_amount
 The `slug` is a unique document identifier, ultimately from the source TSV. The page number runs from 0 to 1, and the bounding box is in the original PDF coordinate system. The actual token text is reproduced as `token`. The `gross_amount` represents string similarity to the correct answer in the original `gross_amount` column, from 0 to 1. To add other ground-truth fields, edit `create-training-data.py`.
 
 
-## A Research data set
+## A research data set
 There is a great deal left to do! For example, we still need to try extracting the other fields such as advertiser and TV station call sign. This will probably be harder than totals as it's harder to identify tokens which "look like" the correct answer.
 
 There is still more data preparation work to do. We discovered that about 30% of the PDFs documents still need OCR, which should increase our training data set from 9k to ~17k documents.
