@@ -1,3 +1,12 @@
+# A first attempt at data extraction by deep learning, using a U-net architecture to handle
+# long-range dependencies between document tokens. Unfortunately, this never worked:
+# it wouldn't train.
+# 
+# Still, there are some useful bits here, for example code to draw images of the PDFs with 
+# output scores overlaid on them.
+#
+# jstray 2019-6-10
+
 from numpy import array
 import keras as K
 from keras.preprocessing.text import one_hot

@@ -1,3 +1,9 @@
+# Data extraction by deep learning, using a fully connected architecture over token windows.
+# Engineered to extract total amounts, using a few custom features.
+# Achieves up to 90% accuracy.
+#
+# jstray 2019-6-12
+
 import keras as K
 from keras.engine.input_layer import Input
 from keras.models import Model
