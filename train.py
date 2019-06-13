@@ -37,7 +37,7 @@ config.epochs = 50
 config.batch_size=10000
 config.steps_per_epoch = 10
 config.doc_acc_sample_size = 25 # how many documents to check extraction on after each epoch
-config.penalize_missed = 10 # much more more a missed 1 counts than a missed 0 in output
+config.penalize_missed = 5 # how much more a missed 1 counts than a missed 0 in output
 config.val_split = 0.2
 
 # ---- Load data and generate features ----
