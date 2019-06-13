@@ -13,7 +13,7 @@ TV stations are required to disclose their sale of political advertising, but th
 
 In 2012, ProPublica ran the Free The Files project (you can [read how it worked](https://www.niemanlab.org/2012/12/crowdsourcing-campaign-spending-what-propublica-learned-from-free-the-files/)) and hundreds of volunteers hand-entered information for over 17,000 of these forms. That data drove a bunch of campaign finance [coverage](https://www.propublica.org/series/free-the-files) and is now [available](https://www.propublica.org/datastore/dataset/free-the-files-filing-data) from their data store.
 
-Can we replicate this data extraction using modern deep learning techniques? This project aimed to find out, and successfully extracted the easiest of the fields (total amount) at 90% accuracy using a relatively simpled windowed network running on a "tokens with bounding boxes" representation (see below.)
+Can we replicate this data extraction using modern deep learning techniques? This project aimed to find out, and successfully extracted the easiest of the fields (total amount) at 90% accuracy using a relatively simple network.
 
 ## How it works
 I settled on a relatively simple design, using a fully connected three-layer network trained on 20 token windows of the data. Each token includes geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as the number of digit characters in the string. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
