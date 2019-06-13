@@ -13,6 +13,16 @@ In 2012, ProPublica ran the Free The Files project (you can [read how it worked]
 
 Can we replicate this data extraction using modern deep learning techniques? This project aimed to find out, and successfully extracted the easiest of the fields (total amount) at 90% accuracy using a relatively simpled windowed network running on a "tokens with bounding boxes" representation (see below.)
 
+## How it works
+I settled on a relatively simple design, using a fully connected three-layer network trained on 20 token windows of the data. Each token includes geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as the number of digit characters in the string. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
+
+Although 90% is a good result, it's probably not high enough for production use. However, I believe this approach has lots of room for improvement. The advantage of this type of system is that it can elegantly integrate multiple manual extraction methods — each of which can be individually crappy. The network actually learns when to trust each method. In ML speak this is "boosting over weak learners." 
+
+So the next steps would be something like:
+
+- Add additional hand-crafted features that signal when a token is the total. These don't have to be individually very accurate.
+- Extend the technique to the other fields we wish to extract (advertiser, etc.)
+
 ## How to run
 
 If you wish to reproduce this result, there are multple steps in the data preparation:
