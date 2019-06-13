@@ -18,7 +18,7 @@ Can we replicate this data extraction using modern deep learning techniques? Thi
 ## How it works
 I settled on a relatively simple design, using a fully connected three-layer network trained on 20 token windows of the data. Each token is hashed to an integer mod 500, then converted to 1-hot representation and embedded into 32 dimensions. This embedding is combined with geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as the number of digit characters in the string. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
-Although 90% is a good result, it's probably not high enough for production use. However, I believe this approach has lots of room for improvement. The advantage of this type of system is that it can elegantly integrate multiple manual extraction methods — each of which can be individually crappy. The network actually learns when to trust each method. In ML speak this is "boosting over weak learners." 
+Although 90% is a good result, it's probably not high enough for production use. However, I believe this approach has lots of room for improvement. The advantage of this type of system is that it can elegantly integrate multiple manual extraction methods —- the "hint" features -- each of which can be individually crappy. The network actually learns when to trust each method. In ML speak this is "boosting over weak learners." 
 
 So the next steps would be something like:
 
