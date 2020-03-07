@@ -1,0 +1,1927 @@
+{
+    "swagger":"2.0",
+    "info": {
+        "version": "0.9.0",
+        "title": "OPIF Service Data API"
+    },
+    "basePath": "/api/service",
+    "tags":[
+        {
+            "name": "facility",
+            "description": "OPIF Facility Search"
+        },
+		{
+            "name": "relationship",
+            "description": "OPIF Relationship FRN"
+        },
+		{
+            "name": "service",
+            "description": "OPIF Service Data"
+        },
+		{
+            "name": "cable",
+            "description": "OPIF Cable Data"
+        },
+		{
+            "name": "sdars",
+            "description": "OPIF SDARS Data"
+        },
+		{
+            "name": "dbs",
+            "description": "OPIF DBS Data"
+        }
+    ],
+    "paths":{
+        "/facility/search/{keyword}.{format}": {
+            "get":{
+                "tags": ["facility"],
+                "summary": "Search",
+                "description": "Search",
+                "parameters": [
+                    {
+                        "name":"keyword",
+                        "in":"path",
+                        "description":"",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "di"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/xml"
+                ]
+            }
+        },
+        "/relationship/frn/{frn}.{format}": {
+            "get":{
+                "tags": ["relationship"],
+                "summary": "Relationship FRN",
+                "description": "Relationship FRN",
+                "parameters": [
+                    {
+                        "name":"frn",
+                        "in":"path",
+                        "description":"frn - length of 10 digits",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "0024683344"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+         "/{serviceType}/relationship/frn/{frn}.{format}": {
+	            "get":{
+	                "tags": ["service"],
+	                "summary": "Relationship FRN",
+	                "description": "Relationship FRN",
+	                "parameters": [
+	                 {
+			                        "name":"serviceType",
+			                        "in":"path",
+			                        "description":"serviceType.<br /><br />Valid values: tv, fm, am",
+			                        "required":true,
+			                        "type":"string",
+			                        "defaultValue": "tv",
+			                        "enum": [
+			                            "tv",
+			                            "fm",
+			                            "am"
+			                        ]
+                    },
+	                    {
+	                        "name":"frn",
+	                        "in":"path",
+	                        "description":"frn - length of 10 digits",
+	                        "required":true,
+	                        "type":"string",
+	                        "defaultValue": "0024683344"
+	                    },
+	                    {
+	                        "name":"format",
+	                        "in":"path",
+	                        "description":"json, xml",
+	                        "required":true,
+	                        "type":"string",
+	                        "defaultValue": "json",
+	                        "enum": [
+	                            "json",
+
+	                            "xml"
+	                        ]
+	                    }
+	                ],
+	                "responses": {
+	                    "200": {
+	                        "description": "OK"
+
+	                    }
+	                },
+	                "produces": [
+	                    "application/json",
+
+	                    "application/xml"
+	                ]
+	            }
+        },
+
+        "/cable/relationship/username/{COALSID}.{format}": {
+            "get":{
+                "tags": ["cable"],
+                "summary": "Relationship Cable",
+                "description": "Relationship Cable",
+                "parameters": [
+                    {
+                        "name":"COALSID",
+                        "in":"path",
+                        "description":"COALS ID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "ssmith"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+         "/cable/eeo/{groupBy}.{format}": {
+	            "get":{
+	                "tags": ["cable"],
+	                "summary": "Cable eeo",
+	                "description": "Cable eeo",
+	                "parameters": [
+	                    {
+	                        "name":"groupBy",
+	                        "in":"path",
+	                        "description":"Group the eeo data by either employee unit id or form numbers",
+	                        "required":true,
+	                        "type":"string",
+	                        "defaultValue": "empUnitId",
+	                        "enum": [
+					                            "empUnitId",
+
+					                            "formNumber"
+	                        ]
+	                    },
+	                    {
+			    	                        "name":"empUnitId",
+			    	                        "in":"query",
+			    	                        "description":"array of employee unit id(s)",
+			    	                        "required":true,
+			    	                        "type":"array",
+			    	                        "items":{
+			    	                        "type":"string"
+			    	                        },
+			    	                        "collectionFormat": "multi"
+	                    },
+	                    {
+	                        "name":"format",
+	                        "in":"path",
+	                        "description":"json,  xml",
+	                        "required":true,
+	                        "type":"string",
+	                        "defaultValue": "json",
+	                        "enum": [
+	                            "json",
+
+	                            "xml"
+	                        ]
+	                    }
+	                ],
+	                "responses": {
+	                    "200": {
+	                        "description": "OK"
+
+	                    }
+	                },
+	                "produces": [
+	                    "application/json",
+
+	                    "application/xml"
+	                ]
+	            }
+        },
+
+        "/cable/serviceZipcodes/update.json": {
+	            "post":{
+	                "tags": ["cable"],
+	                "summary": "Modify Cable service zip codes",
+	                "description": "Modify Cable service zip codes",
+	                "parameters": [
+	                    {
+	                        "name":"CableServiceZipCodesUpdatePost",
+				                        "in":"body",
+				                        "description":"Create cable service zipcodes post data body.",
+				                        "required":true,
+				                        "schema": {
+				                            "$ref": "#/definitions/CableServiceZipCodesUpdatePost"
+                        				 }
+	                    }
+	                ],
+	                "responses": {
+	                    "200": {
+	                        "description": "OK"
+
+	                    }
+	                },
+	                "produces": [
+	                    "application/json"
+	                ]
+	            }
+        },
+         "/cable/empunitid/update.json": {
+		            "post":{
+		                "tags": ["cable"],
+		                "summary": "Modify Cable service employee units",
+		                "description": "Modify Cable service employee units",
+		                "parameters": [
+		                    {
+		                        "name":"CableServiceEmpUnitsUpdatePost",
+					                        "in":"body",
+					                        "description":"Create cable service employee units post data body.",
+					                        "required":true,
+					                        "schema": {
+					                            "$ref": "#/definitions/CableServiceEmpUnitsUpdatePost"
+	                        				 }
+		                    }
+		                ],
+		                "responses": {
+		                    "200": {
+		                        "description": "OK"
+
+		                    }
+		                },
+		                "produces": [
+		                    "application/json"
+		                ]
+		            }
+        },
+
+        "/cable/operatorAddress/update.json": {
+		            "post":{
+		                "tags": ["cable"],
+		                "summary": "Modify Cable operator address",
+		                "description": "Modify Cable operator address",
+		                "parameters": [
+		                    {
+		                        "name":"CableOperatorAddressUpdatePost",
+					                        "in":"body",
+					                        "description":"Create cable operator address post data body.",
+					                        "required":true,
+					                        "schema": {
+					                            "$ref": "#/definitions/CableOperatorAddressUpdatePost"
+	                        				 }
+		                    }
+		                ],
+		                "responses": {
+		                    "200": {
+		                        "description": "OK"
+
+		                    }
+		                },
+		                "produces": [
+		                    "application/json"
+		                ]
+		            }
+        },
+
+         "/cable/principalAddress/update.json": {
+			            "post":{
+			                "tags": ["cable"],
+			                "summary": "Modify Cable principal address",
+			                "description": "Modify Cable principal address",
+			                "parameters": [
+			                    {
+			                        "name":"CablePrincipalAddressUpdatePost",
+						                        "in":"body",
+						                        "description":"Create cable principal address post data body.",
+						                        "required":true,
+						                        "schema": {
+						                            "$ref": "#/definitions/CablePrincipalAddressUpdatePost"
+		                        				 }
+			                    }
+			                ],
+			                "responses": {
+			                    "200": {
+			                        "description": "OK"
+
+			                    }
+			                },
+			                "produces": [
+			                    "application/json"
+			                ]
+			            }
+        },
+        "/{serviceType}/facility/getall.{format}": {
+            "get":{
+                "tags": ["service"],
+                "summary": "Get All",
+                "description": "Get All",
+                "parameters": [
+                    {
+                        "name":"serviceType",
+                        "in":"path",
+                        "description":"serviceType.<br /><br />Valid values: tv, fm and am",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "tv",
+                        "enum": [
+                            "tv",
+                            "fm",
+                            "am"
+                        ]
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+        "/cable/getall.{format}": {
+            "get":{
+                "tags": ["cable"],
+                "summary": "Get All",
+                "description": "Get All",
+                "parameters": [
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+        "/sdars/getall.{format}": {
+            "get":{
+                "tags": ["sdars"],
+                "summary": "Get All",
+                "description": "Get All",
+                "parameters": [
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+        "/dbs/getall.{format}": {
+            "get":{
+                "tags": ["dbs"],
+                "summary": "Get All",
+                "description": "Get All",
+                "parameters": [
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/{serviceType}/facility/id/{entityID}.{format}": {
+            "get":{
+                "tags": ["service"],
+                "summary": "Entity Details",
+                "description": "Entity Details",
+                "parameters": [
+                    {
+                        "name":"serviceType",
+                        "in":"path",
+                        "description":"serviceType.<br /><br />Valid values: tv, fm, am",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "tv",
+                        "enum": [
+                            "tv",
+                            "fm",
+                            "am"
+                        ]
+                    },
+                    {
+                        "name":"entityID",
+                        "in":"path",
+                        "description":"Entity ID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "1051"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/{serviceType}/applications/facility/{entityID}.{format}": {
+            "get":{
+                "tags": ["service"],
+                "summary": "Entity Applications",
+                "description": "Entity Applications",
+                "parameters": [
+                    {
+                        "name":"serviceType",
+                        "in":"path",
+                        "description":"serviceType.<br /><br />Valid values: tv, fm, am",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "tv",
+                        "enum": [
+                            "tv",
+                            "fm",
+                            "am"
+                        ]
+                    },
+                    {
+                        "name":"entityID",
+                        "in":"path",
+                        "description":"Entity ID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "1051"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/{serviceType}/eeo/facilityid/{entityID}.{format}": {
+            "get":{
+                "tags": ["service"],
+                "summary": "Entity EEO",
+                "description": "Entity EEO",
+                "parameters": [
+                    {
+                        "name":"serviceType",
+                        "in":"path",
+                        "description":"serviceType.<br /><br />Valid values: tv, fm, am",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "tv",
+                        "enum": [
+                            "tv",
+                            "fm",
+                            "am"
+                        ]
+                    },
+                    {
+                        "name":"entityID",
+                        "in":"path",
+                        "description":"Entity ID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "1051"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/{serviceType}/ownership/facilityid/{entityID}.{format}": {
+            "get":{
+                "tags": ["service"],
+                "summary": "Entity Ownership",
+                "description": "Entity Ownership",
+                "parameters": [
+                    {
+                        "name":"serviceType",
+                        "in":"path",
+                        "description":"serviceType.<br /><br />Valid values: tv, fm, am",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "tv",
+                        "enum": [
+                            "tv",
+                            "fm",
+                            "am"
+                        ]
+                    },
+                    {
+                        "name":"entityID",
+                        "in":"path",
+                        "description":"Entity ID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "1051"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+        "contact/update.json": {
+            "post":{
+                "tags": ["Contact Updates"],
+                "summary": "Specify contactType as \"MS\" for Main Studio Contact and \"CC\" for Closed Caption Contact.",
+                "description": "Specify contactType as \"MS\" for Main Studio Contact and \"CC\" for Closed Caption Contact. Allowed values for contactSourceServiceCode are \"TV\", \"AM\" and \"FM\" for Main Studio Contact and \"TV\" for Closed Captions.",
+                "parameters": [
+
+                    {
+                        "name":"MainStudioUpdate",
+                        "in":"body",
+                        "description":"Specify contactType as \"MS\" for Main Studio Contact and \"CC\" for Closed Caption Contact. Allowed values for contactSourceServiceCode are \"TV\", \"AM\" and \"FM\" for Main Studio Contact and \"TV\" for Closed Captions.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/MainStudioClosedCaptionUpdate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/cable/psid/{psid}.{format}": {
+            "get":{
+                "tags": ["cable"],
+                "summary": "Cable Details",
+                "description": "Cable Details",
+                "parameters": [
+                    {
+                        "name":"psid",
+                        "in":"path",
+                        "description":"psid",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "000001"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/cable/communities/psid/{psid}.{format}": {
+            "get":{
+                "tags": ["cable"],
+                "summary": "Cable Communities",
+                "description": "Cable Communities",
+                "parameters": [
+                    {
+                        "name":"psid",
+                        "in":"path",
+                        "description":"psid",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "000001"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+
+        "/sdars/frn/{frn}.{format}": {
+            "get":{
+                "tags": ["sdars"],
+                "summary": "SDARS Entity Details",
+                "description": "SDARS Entity Details",
+                "parameters": [
+                    {
+                        "name":"frn",
+                        "in":"path",
+                        "description":"frn - length of 10 digits",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "0006345730"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+		"/sdars/licenseeAddress/update.json": {
+            "post":{
+                "tags": ["sdars"],
+                "summary": "Update licensee address",
+                "description": "Update licensee address",
+                "parameters": [
+
+                    {
+                        "name":"LicenseeAddressUpdatePost",
+                        "in":"body",
+                        "description":"Create address post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/LicenseeAddressUpdatePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+
+        "/sdars/eeo/facility/{facilityID}.{format}": {
+            "get":{
+                "tags": ["sdars"],
+                "summary": "SDARS EEO",
+                "description": "SDARS EEO",
+                "parameters": [
+                    {
+                        "name":"facilityID",
+                        "in":"path",
+                        "description":"facilityID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "SIRIUS"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+
+        "/dbs/frn/{frn}.{format}": {
+            "get":{
+                "tags": ["dbs"],
+                "summary": "DBS Entity Details",
+                "description": "DBS Entity Details",
+                "parameters": [
+                    {
+                        "name":"frn",
+                        "in":"path",
+                        "description":"frn - length of 10 digits",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "0013739842"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        },
+		"/dbs/licenseeAddress/update.json": {
+            "post":{
+                "tags": ["dbs"],
+                "summary": "Update licensee address",
+                "description": "Update licensee address",
+                "parameters": [
+
+                    {
+                        "name":"LicenseeAddressUpdatePost",
+                        "in":"body",
+                        "description":"Create address post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/LicenseeAddressUpdatePost"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+
+        "/dbs/eeo/facility/{facilityID}.{format}": {
+            "get":{
+                "tags": ["dbs"],
+                "summary": "DBS EEO",
+                "description": "DBS EEO",
+                "parameters": [
+                    {
+                        "name":"facilityID",
+                        "in":"path",
+                        "description":"facilityID",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "DISH"
+                    },
+                    {
+                        "name":"format",
+                        "in":"path",
+                        "description":"json,  xml",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": "json",
+                        "enum": [
+                            "json",
+
+                            "xml"
+                        ]
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+
+                    }
+                },
+                "produces": [
+                    "application/json",
+
+                    "application/xml"
+                ]
+            }
+        }
+    },
+    "parameters": {
+        "fileIdPostParam": {
+            "name":"fileId",
+            "in":"body",
+            "description":"Unique Id of the file.",
+            "required":true,
+            "type":"string"
+        },
+        "fileIdParam": {
+            "name":"fileId",
+            "in":"path",
+            "description":"Unique Id of the file.",
+            "required":true,
+            "type":"string"
+        },
+        "entityIdPost": {
+            "name":"entity Id",
+            "in":"body",
+            "description":"Unique Id of the entity.",
+            "required":true,
+            "type":"string"
+        },
+        "entityIdParam": {
+            "name":"entityId",
+            "in":"path",
+            "description":"Unique Id of the entity.",
+            "required":true,
+            "type":"string"
+        },
+        "folderIdParam": {
+            "name":"folderId",
+            "in":"path",
+            "description":"Unique Id of the folder.",
+            "required":true,
+            "type":"string"
+        },
+        "accessTokenParam": {
+            "name": "accessToken",
+            "in": "header",
+            "description": "API Access Key.",
+            "required": true,
+            "type": "string"
+        },
+        "serviceCodeParam": {
+            "name": "serviceCode",
+            "in": "path",
+            "description": "Entity Service Code",
+            "required": true,
+            "type": "string"
+        },
+        "facilityIdParam":{
+            "name":"entityId",
+            "in": "query",
+            "description":"Unique Entity Id.",
+            "required": true,
+            "type":"string"
+        },
+        "formatParam":{
+            "name":"format",
+            "in":"path",
+            "description":"Format for the returned results.<br /><br />Valid values: json,  xml",
+            "required":true,
+            "type":"string",
+            "enum": [
+                "json",
+
+                "xml"
+            ]
+        },
+        "callbackParam":{
+            "name":"callback",
+            "in":"query",
+            "description":"Callback parameter - required for jsonp requests.",
+            "required":false,
+            "type":"string"
+        },
+        "sourceServiceParam":{
+            "name":"sourceService",
+            "in":"query",
+            "description":"Source Service",
+            "required":true,
+            "type":"string"
+        }
+    },
+    "definitions": {
+        "File": {
+            "type": "object",
+            "properties": {
+                "file_id": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_extension": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "file_status": {
+                    "type": "string",
+                    "description": "File Status",
+                    "enum": [
+                        "pending",
+                        "upl",
+                        "cvt",
+                        "ins",
+                        "cpy",
+                        "err",
+                        "err_cvt"
+                    ]
+                },
+                "folder_id": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "file_manager_id": {
+                    "type": "string"
+                }
+
+            },
+            "xml": {
+                "name": "response"
+            }
+        },
+        "MainStudioClosedCaptionUpdate": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "contactEntityId": {
+                    "type": "string"
+                },
+                "contactSourceServiceCode": {
+                    "type": "string"
+                },
+                "contactName": {
+                    "type": "string"
+                },
+                "contactType": {
+                    "type": "string",
+                    "enum": [
+                        "MS", "CC"
+                    ]
+                },
+                "contactAddress1": {
+                    "type": "string"
+                },
+                "contactAddress2": {
+                    "type": "string"
+                },
+                "contactCity": {
+                    "type": "string"
+                },
+                "contactZip": {
+                    "type": "string"
+                },
+                "contactZipExt": {
+                    "type": "string"
+                },
+                "contactState": {
+                    "type": "string"
+                },
+                "contactPhone": {
+                    "type": "string"
+                },
+                "contactPhoneExt": {
+                    "type": "string"
+                },
+                "contactFax": {
+                    "type": "string"
+                },
+                "contactWebsite": {
+                    "type": "string"
+                },
+                "contactEmail": {
+                    "type": "string"
+                }
+            }
+        },
+        "ClosedCaptionsUpdate": {
+            "type": "object",
+            "properties": {
+                "accessToken": {
+                    "type": "string"
+                },
+                "contactEntityId": {
+                    "type": "string"
+                },
+                "contactSourceServiceCode": {
+                    "type": "string",
+                    "enum": [
+                        "TV"
+                    ]
+                },
+                "contactName": {
+                    "type": "string"
+                },
+                "contactType": {
+                    "type": "string",
+                    "enum": [
+                        "CC"
+                    ]
+                },
+                "contactAddress1": {
+                    "type": "string"
+                },
+                "contactAddress2": {
+                    "type": "string"
+                },
+                "contactCity": {
+                    "type": "string"
+                },
+                "contactZip": {
+                    "type": "string"
+                },
+                "contactZipExt": {
+                    "type": "string"
+                },
+                "contactState": {
+                    "type": "string"
+                },
+                "contactPhone": {
+                    "type": "string"
+                },
+                "contactPhoneExt": {
+                    "type": "string"
+                },
+                "contactFax": {
+                    "type": "string"
+                },
+                "contactWebsite": {
+                    "type": "string"
+                },
+                "contactEmail": {
+                    "type": "string"
+                }
+            }
+        },
+        "Folder": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "allow_rename_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "allow_subfolder_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "allow_upload_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },"allow_delete_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "more_public_files_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "file_count": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "Entity": {
+            "type": "object",
+            "properties": {
+                "folder": {
+                   "$ref": "#/definitions/Folder"
+                },
+                "subFolders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Folder"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/File"
+                    }
+                }
+            }
+        },
+        "SearchResult": {
+            "type": "object",
+            "properties": {
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Folder"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/File"
+                    }
+                }
+            }
+            },
+        "FileUploadStats": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "fileUploadCount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fileErrorCount": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "FileHistory": {
+            "type": "object",
+            "properties": {
+                "file_id": {
+                "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_extension": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "history_status": {
+                    "type": "string"
+                },
+                "folder_id": {
+                    "type": "string"
+                },
+                "file_manager_id": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "FolderHistory": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "history_status": {
+                    "type": "string"
+                },
+                "folder_history_id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "source_service_code": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "FolderCreate": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "source_service_code": {
+                    "type": "string"
+                },
+                "entity_folder_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "FolderUpdate": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                }
+            }
+        },
+        "FileRenamePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "fileName":  {
+                    "description":"New name of the specified file",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                }
+                ,
+                "serviceCode":{
+                    "description":"Entity service code.",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FileMovePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "newFolderId":  {
+                    "description":"Folder Id of the new file location.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },"serviceCode":{
+                    "description":"Entity service code.",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FileRestorePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "LicenseeAddressUpdatePost":  {
+            "type": "object",
+            "properties": {
+                "licensee": {
+                    "description":"Name of the licensee",
+                    "required": true,
+                    "type":"string"
+                },
+                "addressLine1":  {
+                    "description":"Address Line 1",
+                    "required": true,
+                    "type":"string"
+                },
+                "addressLine2":{
+                    "description":"Address Line 2",
+                    "required": true,
+                    "type":"string"
+                },
+                "city":{
+                    "description":"City",
+                    "required": true,
+                    "type":"string"
+                },
+                "state":{
+                    "description":"State code",
+                    "required": true,
+                    "type":"string"
+                },
+                "zipCode":{
+                    "description":"Zip code",
+                    "required": true,
+                    "type":"string"
+                },
+                "zipExt":{
+                    "description":"Zip code extension",
+                    "required": true,
+                    "type":"string"
+                },
+                "phone":{
+                    "description":"phone number with no spaces and hyphens",
+                    "required": true,
+                    "type":"string"
+                },
+                "email":{
+                    "description":"email",
+                    "required": true,
+                    "type":"string"
+                },
+                "website":{
+                    "description":"Website address",
+                    "required": true,
+                    "type":"string"
+                },
+                "facilityId":{
+                    "description":"Entity/Facility ID",
+                    "required": true,
+                    "type":"string"
+                },
+                "accessToken":{
+		                    "description":"Access token of the entity/facility",
+		                    "required": true,
+		                    "type":"string"
+                }
+            }
+        },
+         "CableServiceZipCodesUpdatePost":  {
+	            "type": "object",
+	            "properties": {
+	                "psid": {
+	                    "description":"cable psid",
+	                    "required": true,
+	                    "type":"string"
+	                },
+	                "zipcodes":{
+	                    "description":"array of zipcodes",
+	                    "required": true,
+	                    "type":"array",
+				"items": {
+  						"type": "string"
+					}
+	                },
+	                "accessToken":{
+			                    "description":"Access token of the entity/facility",
+			                    "required": true,
+			                    "type":"string"
+	                }
+	            }
+        },
+        "CableServiceEmpUnitsUpdatePost":  {
+		            "type": "object",
+		            "properties": {
+		                "psid": {
+		                    "description":"cable psid",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "empUnits":{
+		                    "description":"array of empunit ids",
+		                    "required": true,
+		                    "type":"array",
+					"items": {
+	  						"type": "string"
+						}
+		                },
+		                "accessToken":{
+				                    "description":"Access token of the entity/facility",
+				                    "required": true,
+				                    "type":"string"
+		                }
+		            }
+        },
+        "CableOperatorAddressUpdatePost":  {
+		            "type": "object",
+		            "properties": {
+		                "operatorAddressLine1": {
+		                    "description":"address line 1",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorAddressLine2":{
+		                    "description":"address line 2",
+		                    "required": true,
+		                    "type":"string"
+		                },
+
+					"operatorPoBox":{
+					"description":"post box number",
+					"required": true,
+					 "type":"string"
+		                },
+		                "operatorCity":{
+		                    "description":"city",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorZipCode":{
+		                    "description":"Zip Code",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorZipCodeSuffix":{
+		                    "description":"Zip Code Extension",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorState":{
+		                    "description":"state code",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorEmail":{
+		                    "description":"Email address",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "operatorWebsite":{
+		                    "description":"Website",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "psid":{
+		                    "description":"cable psid",
+		                    "required": true,
+		                    "type":"string"
+		                },
+		                "accessToken":{
+				                    "description":"Access token of the entity/facility",
+				                    "required": true,
+				                    "type":"string"
+		                }
+		            }
+        },
+        "CablePrincipalAddressUpdatePost":  {
+			            "type": "object",
+			            "properties":
+			            {
+			                "principalAddressInLocalFiles": {
+			                    "description":"Mandatory attribute indicating principal address specified in local files or not",
+			                    "required": true,
+			                    "type":"string",
+			                    "defaultValue": "N",
+					                            "enum": [
+					                                "Y",
+
+					                                "N"
+                        				]
+			                },
+
+
+			                "principalAddressLine1": {
+			                    "description":"address line 1",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "principalAddressLine2":{
+			                    "description":"address line 2",
+			                    "required": true,
+			                    "type":"string"
+			                },
+
+						"principalPoBox":{
+						"description":"post box number",
+						"required": true,
+						 "type":"string"
+			                },
+			                "principalCity":{
+			                    "description":"city",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "principalZipCode":{
+			                    "description":"Zip Code",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "principalZipCodeSuffix":{
+			                    "description":"Zip Code Extension",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "principalState":{
+			                    "description":"state code",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "psid":{
+			                    "description":"cable psid",
+			                    "required": true,
+			                    "type":"string"
+			                },
+			                "accessToken":{
+					                    "description":"Access token of the entity/facility",
+					                    "required": true,
+					                    "type":"string"
+			                }
+			            }
+        },
+        "FolderRenamePost":  {
+            "type": "object",
+            "properties": {
+                "folderId": {
+                    "description":"Unique Id of the folder.",
+                    "required": true,
+                    "type":"string"
+                },
+                "folderName":  {
+                    "description":"Name of the new folder",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FolderPost":  {
+            "type": "object",
+            "properties": {
+                "folderId": {
+                    "description":"Unique Folder Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        }
+
+    },
+    "produces": [
+        "application/json",
+        "application/xml"
+    ]
+}
