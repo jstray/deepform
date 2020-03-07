@@ -1,0 +1,74 @@
+{
+    "swagger":"2.0",
+    "info": {
+        "version": "0.9.0",
+        "title": "OPIF File Search"
+    },
+    "host": "www.fcc.gov",
+    "basePath": "/search/api?t=opif&",
+    "schemes": ["https"],
+    "tags":[
+        {
+            "name": "solr_search",
+            "description": "OPIF File Search"
+        }
+    ],
+    "paths":{
+
+		"q={keyword}&s={offset}&o={order}&f={filters}": {
+            "get":{
+                "tags": ["search"],
+                "summary": "Search File Names",
+                "description": "Search file names of the uploaded documents in the OPIF system.",
+                "parameters": [
+                    {
+                        "name":"keyword",
+                        "in":"path",
+                        "description":"Keyword.",
+                        "required":true,
+                        "type":"string",
+                        "defaultValue": ""
+                    },
+                    {
+						"name":"offset",
+						"in":"path",
+						"description":"Search results starting number.",
+						"required":false,
+						"type":"string",
+						"defaultValue": "0"
+					},
+					{
+						"name":"order",
+						"in":"path",
+						"description":"Sorting parameter.",
+						"required":false,
+						"type":"string",
+						"defaultValue": "best",
+						"enum": [
+							"best",
+							"new",
+							"old"
+						]
+					},
+					{
+						"name":"filters",
+						"in":"path",
+						"description":"JSON array of Filters. See Filter descriptions below.",
+						"required":false,
+						"type":"string",
+						"defaultValue": "[]"
+					}
+				],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        }
+
+    }
+}
