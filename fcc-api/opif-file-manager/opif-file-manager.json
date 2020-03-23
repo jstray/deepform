@@ -1,0 +1,1514 @@
+{
+    "swagger":"2.0",
+    "info": {
+        "version": "0.9.0",
+        "title": "OPIF Manager API"
+    },
+    "basePath": "/api/manager",
+    "tags":[
+        {
+            "name":"token",
+            "description":"OPIF Token Manager"
+        },
+		{
+            "name":"folder",
+            "description":"OPIF Folder Manager"
+        },
+        {
+            "name":"file",
+            "description":"OPIF File Manager"
+        },
+        {
+            "name":"search",
+            "description":"OPIF File & Folder Search"
+        },
+        {
+            "name":"logo",
+            "description":"OPIF Logo Manager"
+        }
+    ],
+    "paths":{
+        "/folder/id/{folderId}.{format}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Get Subfolder and files",
+                "description": "Get OPIF folder information including list of subfolders and files. Response returned in specified format.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/folderIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                   ],
+                "responses": {
+                    "200": {
+                        "description": "get folder response",
+                        "schema": {
+                             "$ref": "#/definitions/Entity"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/parentFolders.{format}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Get parent folders",
+                "description": "Get root folder information including list of subfolders and files. Response returned in specified format.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/sourceServiceParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                   ],
+                "responses": {
+                    "200": {
+                        "description": "get parent folders response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Folder"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/morePublicFolders.{format}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Get More Public Folders ",
+                "description": "Get folders for the specified entityId in 'More Public Files'category. Response returned in specified format.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/sourceServiceParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                   ],
+                "responses": {
+                    "200": {
+                        "description": "get more public folders response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Folder"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/path.{format}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Get Folder for specified path.",
+                "description": "Get OPIF folder information. Response returned in specified format.",
+                "parameters": [
+                    {
+                        "name":"folderPath",
+                        "in":"query",
+                        "description":"Complete folder path.",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/sourceServiceParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                   ],
+                "responses": {
+                    "200": {
+                        "description": "get folder response",
+                        "schema": {
+                             "$ref": "#/definitions/Folder"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/create.{format}": {
+            "post":{
+                "tags": ["folder"],
+                "summary": "Create new folder",
+                "description": "Create new folder with the folder details specified.",
+                "parameters": [
+                    {
+                        "name":"FolderCreatePost",
+                        "in":"body",
+                        "description":"Create folder post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/FolderCreatePost"
+                        }
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "create folder response",
+                        "schema": {
+                            "$ref": "#/definitions/FolderCreate"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/rename.{format}": {
+            "put":{
+                "tags": ["folder"],
+                "summary": "Rename Folder",
+                "description": "Rename the folder with the specified folder name.",
+                "parameters": [
+                    {
+                        "name":"FolderRenamePost",
+                        "in":"body",
+                        "description":"Rename folder post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/FolderRenamePost"
+                        }
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "rename folder response",
+                        "schema": {
+                            "$ref": "#/definitions/FolderUpdate"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/history.{format}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Folder changes list",
+                "description": "Lists folders that were modified.",
+                "parameters": [
+                    {
+                        "name":"count",
+                        "in":"query",
+                        "description":"Number of folders in the list.",
+                        "required":false,
+                        "type":"integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name":"entityId",
+                        "in": "query",
+                        "description":"Unique Entity Id.",
+                        "required": false,
+                        "type":"string"
+                    },
+                    {
+                        "name":"startDate",
+                        "in":"query",
+                        "description": "Date in ISO-8601 format.<br /><br />YYYY-MM-DD (eg 2015-08-25)",
+                        "required": false,
+                        "type":"string",
+                        "format": "date"
+                    },
+                    {
+                        "name":"endDate",
+                        "in":"query",
+                        "description": "Date in ISO-8601 format.<br /><br />YYYY-MM-DD (eg 2015-08-25)",
+                        "required": false,
+                        "type":"string",
+                        "format": "date"
+                    },
+                    {
+                        "name":"offset",
+                        "in":"query",
+                        "description": "Starting row number",
+                        "required": false,
+                        "type":"integer",
+                        "format": "int332"
+                    },
+                    {
+                        "name":"status",
+                        "in":"query",
+                        "description": "Folder Status",
+                        "required": false,
+                        "type":"string"
+
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of changed folders response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FolderHistory"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/historyCount.json?entityId={entityId}": {
+            "get":{
+                "tags": ["folder"],
+                "summary": "Count of Folder changes",
+                "description": "Count folders that were modified.",
+                "parameters": [
+                    {
+                        "name":"entityId",
+                        "in": "query",
+                        "description":"Unique Entity Id.",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of changed folders response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FolderHistoryCount"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/folder/restore.{format}": {
+            "put":{
+                "tags": ["folder"],
+                "summary": "Restore Folder",
+                "description": "Restore the status of the folder with the specified id.",
+                "parameters": [
+                    {
+                        "name":"FolderPost",
+                        "in":"body",
+                        "description":"Restore folder post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/FolderPost"
+                        }
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "restore folder response",
+                        "schema": {
+                            "$ref": "#/definitions/FolderUpdate"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/delete/{folderId}/{entityId}/{serviceCode}.{format}": {
+            "delete":{
+                "tags": ["folder"],
+                "summary": "Delete Folder",
+                "description": "Mark the specified folder as deleted.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/folderIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/entityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                    ,
+                    {
+                        "$ref":"#/parameters/serviceCodeParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "remove folder response",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/folder/purge/{folderId}/{entityId}/{serviceCode}.{format}": {
+            "delete":{
+                "tags": ["folder"],
+                "summary": "Purge Folder",
+                "description": "Purge the folder with the specified id.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/folderIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/entityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    },
+                    {
+                        "$ref":"#/parameters/serviceCodeParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Purge folder response",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/id/{fileId}.{format}": {
+            "get":{
+                "tags": ["file"],
+                "summary": "Get File Details",
+                "description": "Returns the file information for the specified file id.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/fileIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get file response",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/history.{format}": {
+            "get":{
+                "tags": ["file"],
+                "summary": "List changed files",
+                "description": "Lists files that were modified.",
+                "parameters": [
+                    {
+                        "name":"count",
+                        "in":"query",
+                        "description":"Number of files in the list.",
+                        "required":false,
+                        "type":"integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name":"entityId",
+                        "in": "query",
+                        "description":"Unique Entity Id.",
+                        "required": false,
+                        "type":"string"
+                    },
+                    {
+                        "name":"startDate",
+                        "in":"query",
+                        "description": "Date in ISO-8601 format.<br /><br />YYYY-MM-DD (eg 2015-08-25)",
+                        "required": false,
+                        "type":"string",
+                        "format": "date"
+                    },
+                    {
+                        "name":"endDate",
+                        "in":"query",
+                        "description": "Date in ISO-8601 format.<br /><br />YYYY-MM-DD (eg 2015-08-25)",
+                        "required": false,
+                        "type":"string",
+                        "format": "date"
+                    },
+                    {
+                        "name":"offset",
+                        "in":"query",
+                        "description": "Starting row number",
+                        "required": false,
+                        "type":"integer",
+                        "format": "int332"
+                    },
+                    {
+                        "name":"status",
+                        "in":"query",
+                        "description": "File Status",
+                        "required": false,
+                        "type":"string"
+
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of changed files response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FileHistory"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/historyCount.json?entityId={entityId}": {
+            "get":{
+                "tags": ["file"],
+                "summary": "Count of Files changes",
+                "description": "Count files that were modified.",
+                "parameters": [
+                    {
+                        "name":"entityId",
+                        "in": "query",
+                        "description":"Unique Entity Id.",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Count of changed files response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/FileHistoryCount"
+                            }
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/file/upload.{format}": {
+            "post":{
+                "tags": ["file"],
+                "summary": "Upload file",
+                "description": "Upload file.",
+                "parameters": [
+                    {
+                        "name":"upload",
+                        "in":"formData",
+                        "description":"File to be uploaded.",
+                        "required":true,
+                        "type":"file"
+                    },
+                    {
+                        "name":"parentFolderId",
+                        "in":"formData",
+                        "description": "Unique Id of the parent folder",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "name":"entityId",
+                        "in": "formData",
+                        "description":"Unique Entity Id.",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                    ,
+                    {
+                        "name":"serviceCode",
+                        "in": "formData",
+                        "description":"Entity Service code",
+                        "required": true,
+                        "type":"string"
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/rename.{format}": {
+            "put":{
+                "tags": ["file"],
+                "summary": "Rename File ",
+                "description": "Rename the file with specified file name.",
+                "parameters": [
+                    {
+                        "name":"FileRenamePost",
+                        "in":"body",
+                        "description":"File rename post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/FileRenamePost"
+                        }
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "rename file response",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/move.{format}": {
+            "put":{
+                "tags": ["file"],
+                "summary": "Move File ",
+                "description": "Move the file to a new folder location.",
+                "parameters": [
+                    {
+                        "name":"FileMovePost",
+                        "in":"body",
+                        "description":"File move post data body.",
+                        "required":true,
+                        "schema": {
+                            "$ref": "#/definitions/FileMovePost" }
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "move file response",
+                        "schema": {
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/restore.{format}": {
+            "put":{
+                "tags": ["file"],
+                "summary": "Restore File ",
+                "description": "Restore the file with the specified id.",
+                "parameters": [
+{
+    "name":"FileRestorePost",
+    "in":"body",
+    "description":"File restore post data body.",
+    "required":true,
+    "schema": {
+        "$ref": "#/definitions/FileRestorePost" }
+},
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "restore file response",
+                        "schema": {
+                            "$ref": "#/definitions/File"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/remove/{fileId}/{entityId}/{serviceCode}.{format}": {
+            "delete":{
+                "tags": ["file"],
+                "summary": "Remove File",
+                "description": "Mark file as deleted.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/fileIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/entityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                    ,
+                    {
+                        "$ref":"#/parameters/serviceCodeParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "remove file response",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/file/purge/{fileId}/{entityId}/{serviceCode}.{format}": {
+            "delete":{
+                "tags": ["file"],
+                "summary": "Purge File",
+                "description": "Mark file as purged.",
+                "parameters": [
+                    {
+                        "$ref":"#/parameters/fileIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/entityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    },
+                    {
+                        "$ref":"#/parameters/serviceCodeParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "purge file response",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/entity/logo/upload": {
+            "post":{
+                "tags": ["file"],
+                "summary": "Upload logo",
+                "description": "Upload logo file in jpeg/jpg, png or gif or tiff format.",
+                "parameters": [
+                    {
+                        "name":"image",
+                        "in":"formData",
+                        "description":"Logo file to be uploaded.<br /><br />Valid formats: jpeg/jpg, png or gif or tiff",
+                        "required":true,
+                        "type":"file"
+                    },
+                    {
+                        "name":"entityId",
+                        "in": "formData",
+                        "description":"Unique Entity Id.",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "name":"serviceCode",
+                        "in":"formData",
+                        "description":"Entity Service Code",
+                        "required":true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/accessTokenParam"
+                    }
+                ],
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/search/key/{searchKey}.{format}": {
+            "get":{
+                "tags": ["search"],
+                "summary": "Search for files and folders",
+                "description": "Search for files and folders based on specified searchKey",
+                "parameters": [
+                    {
+                        "name":"searchKey",
+                        "in":"path",
+                        "description": "Search key parameter",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "$ref":"#/parameters/facilityIdParam"
+                    },
+                    {
+                        "$ref":"#/parameters/formatParam"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "get folder response",
+                        "schema": {
+                             "$ref": "#/definitions/SearchResult"
+                        }
+                    }
+                  },
+                "produces": [
+                    "application/json",
+                    "application/jsonp",
+                    "application/xml"
+                ]
+            }
+        },
+        "/download/{folderID}/{fileManagerID}.pdf": {
+            "get":{
+                "tags": ["download"],
+                "summary": "Dowload converted File",
+                "description": "Downloads a converted File based on Folder ID and File Manager ID",
+                "parameters": [
+                    {
+                        "name":"folderID",
+                        "in":"path",
+                        "description": "Folder ID",
+                        "required": true,
+                        "type":"string"
+                    },
+                    {
+                        "name":"fileManagerID",
+                        "in":"path",
+                        "description": "File Manager ID",
+                        "required": true,
+                        "type":"string"
+                    }
+                ]
+            }
+        }
+    },
+    "parameters": {
+        "fileIdPostParam": {
+            "name":"fileId",
+            "in":"body",
+            "description":"Unique Id of the file.",
+            "required":true,
+            "type":"string"
+        },
+        "fileIdParam": {
+            "name":"fileId",
+            "in":"path",
+            "description":"Unique Id of the file.",
+            "required":true,
+            "type":"string"
+        },
+        "entityIdPost": {
+            "name":"entity Id",
+            "in":"body",
+            "description":"Unique Id of the entity.",
+            "required":true,
+            "type":"string"
+        },
+        "entityIdParam": {
+            "name":"entityId",
+            "in":"path",
+            "description":"Unique Id of the entity.",
+            "required":true,
+            "type":"string"
+        },
+        "folderIdParam": {
+            "name":"folderId",
+            "in":"path",
+            "description":"Unique Id of the folder.",
+            "required":true,
+            "type":"string"
+        },
+        "accessTokenParam": {
+            "name": "accessToken",
+            "in": "header",
+            "description": "API Access Key.",
+            "required": true,
+            "type": "string"
+        },
+        "serviceCodeParam": {
+            "name": "serviceCode",
+            "in": "path",
+            "description": "Entity Service Code",
+            "required": true,
+            "type": "string"
+        },
+        "facilityIdParam":{
+            "name":"entityId",
+            "in": "query",
+            "description":"Unique Entity Id.",
+            "required": true,
+            "type":"string"
+        },
+        "formatParam":{
+            "name":"format",
+            "in":"path",
+            "description":"Format for the returned results.<br /><br />Valid values: json, jsonp, xml",
+            "required":true,
+            "type":"string",
+            "enum": [
+                "json",
+                "jsonp",
+                "xml"
+            ]
+        },
+        "callbackParam":{
+            "name":"callback",
+            "in":"query",
+            "description":"Callback parameter - required for jsonp requests.",
+            "required":false,
+            "type":"string"
+        },
+        "sourceServiceParam":{
+            "name":"sourceService",
+            "in":"query",
+            "description":"Source Service",
+            "required":true,
+            "type":"string",
+            "enum": [
+                "tv",
+                "fm",
+                "am",
+                "cable",
+                "sdars",
+                "dbs"
+            ]
+        }
+    },
+    "definitions": {
+        "File": {
+            "type": "object",
+            "properties": {
+                "file_id": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_extension": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "file_status": {
+                    "type": "string",
+                    "description": "File Status",
+                    "enum": [
+                        "pending",
+                        "upl",
+                        "cvt",
+                        "ins",
+                        "cpy",
+                        "err",
+                        "err_cvt"
+                    ]
+                },
+                "folder_id": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "file_manager_id": {
+                    "type": "string"
+                }
+
+            },
+            "xml": {
+                "name": "response"
+            }
+        },
+        "Folder": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "allow_rename_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "allow_subfolder_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "allow_upload_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },"allow_delete_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "more_public_files_ind": {
+                    "type":"string",
+                    "enum": [
+                        "Y",
+                        "N"
+                    ]
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "file_count": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "Entity": {
+            "type": "object",
+            "properties": {
+                "folder": {
+                   "$ref": "#/definitions/Folder"
+                },
+                "subFolders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Folder"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/File"
+                    }
+                }
+            }
+        },
+        "SearchResult": {
+            "type": "object",
+            "properties": {
+                "folders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Folder"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/File"
+                    }
+                }
+            }
+            },
+        "FileUploadStats": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string",
+                    "format": "date"
+                },
+                "fileUploadCount": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fileErrorCount": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            }
+        },
+        "FileHistory": {
+            "type": "object",
+            "properties": {
+                "file_id": {
+                "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_extension": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "history_status": {
+                    "type": "string"
+                },
+                "folder_id": {
+                    "type": "string"
+                },
+                "file_manager_id": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "FolderHistoryCount": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "type": "integer"
+                },
+                "statusMessage": {
+                    "type": "string"
+                },
+                "folderHistoryCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "FileHistoryCount": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "statusCode": {
+                    "type": "integer"
+                },
+                "statusMessage": {
+                    "type": "string"
+                },
+                "fileHistoryCount": {
+                    "type": "integer"
+                }
+            }
+        },
+        "FolderHistory": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "history_status": {
+                    "type": "string"
+                },
+                "folder_history_id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "source_service_code": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "FolderCreate": {
+            "type": "object",
+            "properties": {
+                "folder_name": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                },
+                "source_service_code": {
+                    "type": "string"
+                },
+                "entity_folder_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "FolderUpdate": {
+            "type": "object",
+            "properties": {
+                "entity_folder_id": {
+                    "type": "string"
+                },
+                "entity_id": {
+                    "type": "string"
+                },
+                "folder_name": {
+                    "type": "string"
+                },
+                "created_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "last_update_ts": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "parent_folder_id": {
+                    "type": "string"
+                },
+                "folder_path": {
+                    "type": "string"
+                }
+            }
+        },
+        "FileRenamePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "fileName":  {
+                    "description":"New name of the specified file",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                }
+                ,
+                "serviceCode":{
+                    "description":"Entity service code.",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FileMovePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "newFolderId":  {
+                    "description":"Folder Id of the new file location.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },"serviceCode":{
+                    "description":"Entity service code.",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FileRestorePost":  {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "description":"Unique Id of the file.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FolderCreatePost":  {
+            "type": "object",
+            "properties": {
+                "parentFolderId": {
+                    "description":"Unique Id of the parent folder.",
+                    "required": true,
+                    "type":"string"
+                },
+                "folderName":  {
+                    "description":"Name of the new folder",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "AccessTokenPost":  {
+            "type": "object",
+            "properties": {
+
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FolderRenamePost":  {
+            "type": "object",
+            "properties": {
+                "folderId": {
+                    "description":"Unique Id of the folder.",
+                    "required": true,
+                    "type":"string"
+                },
+                "folderName":  {
+                    "description":"Name of the new folder",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        },
+        "FolderPost":  {
+            "type": "object",
+            "properties": {
+                "folderId": {
+                    "description":"Unique Folder Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "entityId":{
+                    "description":"Unique Entity Id.",
+                    "required": true,
+                    "type":"string"
+                },
+                "serviceCode":{
+                    "description":"Entity Service Code",
+                    "required": true,
+                    "type":"string"
+                }
+            }
+        }
+
+    },
+    "produces": [
+        "application/json",
+        "application/xml"
+    ]
+}
