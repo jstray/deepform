@@ -1,5 +1,7 @@
 CREATE DATABASE `deepform`;
 
+USE `deepform`;
+
 CREATE TABLE `document` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `dc_slug` varchar(256) DEFAULT NULL,
