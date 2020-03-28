@@ -1,98 +1,157 @@
-2020-03-28 14:29:27,859 DEBUG   MainThread:709 [wandb_config.py:_load_defaults():122] no defaults not found in config-defaults.yaml
-2020-03-28 14:29:27,864 DEBUG   MainThread:709 [meta.py:setup():97] code probe starting
-2020-03-28 14:29:27,867 DEBUG   MainThread:709 [meta.py:_setup_code_git():49] probe for git information
-2020-03-28 14:29:27,902 DEBUG   MainThread:709 [meta.py:_setup_code_program():58] save program starting
-2020-03-28 14:29:27,903 DEBUG   MainThread:709 [meta.py:_setup_code_program():60] save program starting: /Users/relic/Documents/deepform/s2s/s2s_model1.py
-2020-03-28 14:29:27,903 DEBUG   MainThread:709 [meta.py:_setup_code_program():65] save program saved: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/code/s2s/s2s_model1.py
-2020-03-28 14:29:27,903 DEBUG   MainThread:709 [meta.py:_setup_code_program():67] save program
-2020-03-28 14:29:27,903 DEBUG   MainThread:709 [meta.py:setup():119] code probe done
-2020-03-28 14:29:27,920 DEBUG   MainThread:709 [run_manager.py:__init__():541] Initialized sync for seq2seq_lstm_char_test/1n3s630i
-2020-03-28 14:29:27,927 INFO    MainThread:709 [run_manager.py:wrap_existing_process():1144] wrapping existing process 704
-2020-03-28 14:29:28,168 INFO    MainThread:709 [run_manager.py:init_run():924] system metrics and metadata threads started
-2020-03-28 14:29:28,168 INFO    MainThread:709 [run_manager.py:init_run():963] upserting run before process can begin, waiting at most 10 seconds
-2020-03-28 14:29:28,607 INFO    Thread-14 :709 [run_manager.py:_upsert_run():1048] saving patches
-2020-03-28 14:29:28,818 INFO    Thread-14 :709 [run_manager.py:_upsert_run():1052] saving pip packages
-2020-03-28 14:29:28,819 INFO    Thread-14 :709 [run_manager.py:_upsert_run():1054] initializing streaming files api
-2020-03-28 14:29:28,820 INFO    Thread-14 :709 [run_manager.py:_upsert_run():1061] unblocking file change observer, beginning sync with W&B servers
-2020-03-28 14:29:28,820 INFO    MainThread:709 [run_manager.py:wrap_existing_process():1161] informing user process we are ready to proceed
-2020-03-28 14:29:28,823 INFO    MainThread:709 [run_manager.py:_sync_etc():1268] entering loop for messages from user process
-2020-03-28 14:29:28,867 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/config.yaml
-2020-03-28 14:29:29,293 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/requirements.txt
-2020-03-28 14:29:29,293 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:29:29,294 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:29,294 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/diff.patch
-2020-03-28 14:29:29,295 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/code/s2s/s2s_model1.py
-2020-03-28 14:29:29,295 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/code/s2s
-2020-03-28 14:29:29,295 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/code
-2020-03-28 14:29:29,333 INFO    MainThread:709 [run_manager.py:_sync_etc():1291] received message from user process: {"save_policy": {"glob": "model-best.h5", "policy": "live"}}
-2020-03-28 14:29:29,871 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:39,890 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:39,890 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:29:39,891 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/media/graph/graph_summary_b3e83b09.graph.json
-2020-03-28 14:29:39,892 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/media
-2020-03-28 14:29:39,892 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/media/graph
-2020-03-28 14:29:44,896 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:29:45,897 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:45,898 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:29:45,899 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:29:45,900 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:29:52,913 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:56,926 INFO    Thread-3  :709 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-events.jsonl
-2020-03-28 14:29:59,939 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:29:59,939 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:29:59,940 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:29:59,940 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:30:00,939 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:30:08,955 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:15,967 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:15,967 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:30:15,968 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:30:16,971 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:30:23,987 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:27,992 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-events.jsonl
-2020-03-28 14:30:29,998 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:29,998 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:30:29,998 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:30:29,999 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:30:33,004 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:30:37,013 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:43,030 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:43,030 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:30:43,031 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:30:43,031 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:30:49,041 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:49,042 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:30:54,045 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:30:54,046 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:30:54,046 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:30:54,047 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:30:58,049 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-events.jsonl
-2020-03-28 14:31:00,053 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:05,068 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:05,069 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:31:05,069 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:31:05,070 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:31:05,070 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:31:11,075 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:15,083 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:15,083 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:31:15,084 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:31:15,084 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:31:21,092 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:21,093 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:31:26,103 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:26,104 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:31:26,105 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:31:26,106 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/model-best.h5
-2020-03-28 14:31:28,106 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-events.jsonl
-2020-03-28 14:31:34,124 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:37,129 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:31:41,136 INFO    Thread-3  :709 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-uments/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-metadata.json
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [1n3s630i:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [1n3s630i:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-history.jsonl
-2020-03-28 14:31:38,129 INFO    Thread-3  :709 [1n3s630i:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/wandb-summary.json
-2020-03-28 14:31:41,136 INFO    Thread-3  :709 [1n3s630i:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_212927-1n3s630i/output.log
+2020-03-28 16:18:08,029 DEBUG   MainThread:1435 [wandb_config.py:_load_defaults():122] no defaults not found in config-defaults.yaml
+2020-03-28 16:18:08,035 DEBUG   MainThread:1435 [meta.py:setup():97] code probe starting
+2020-03-28 16:18:08,036 DEBUG   MainThread:1435 [meta.py:_setup_code_git():49] probe for git information
+2020-03-28 16:18:08,061 DEBUG   MainThread:1435 [meta.py:_setup_code_program():58] save program starting
+2020-03-28 16:18:08,061 DEBUG   MainThread:1435 [meta.py:_setup_code_program():60] save program starting: /Users/relic/Documents/deepform/s2s/s2s_model1.py
+2020-03-28 16:18:08,062 DEBUG   MainThread:1435 [meta.py:_setup_code_program():65] save program saved: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/code/s2s/s2s_model1.py
+2020-03-28 16:18:08,062 DEBUG   MainThread:1435 [meta.py:_setup_code_program():67] save program
+2020-03-28 16:18:08,062 DEBUG   MainThread:1435 [meta.py:setup():119] code probe done
+2020-03-28 16:18:08,073 DEBUG   MainThread:1435 [run_manager.py:__init__():541] Initialized sync for seq2seq_lstm_char_test/2vkwf53s
+2020-03-28 16:18:08,078 INFO    MainThread:1435 [run_manager.py:wrap_existing_process():1144] wrapping existing process 1430
+2020-03-28 16:18:08,261 INFO    MainThread:1435 [run_manager.py:init_run():924] system metrics and metadata threads started
+2020-03-28 16:18:08,261 INFO    MainThread:1435 [run_manager.py:init_run():963] upserting run before process can begin, waiting at most 10 seconds
+2020-03-28 16:18:08,504 INFO    Thread-14 :1435 [run_manager.py:_upsert_run():1048] saving patches
+2020-03-28 16:18:08,669 INFO    Thread-14 :1435 [run_manager.py:_upsert_run():1052] saving pip packages
+2020-03-28 16:18:08,671 INFO    Thread-14 :1435 [run_manager.py:_upsert_run():1054] initializing streaming files api
+2020-03-28 16:18:08,671 INFO    Thread-14 :1435 [run_manager.py:_upsert_run():1061] unblocking file change observer, beginning sync with W&B servers
+2020-03-28 16:18:08,672 INFO    MainThread:1435 [run_manager.py:wrap_existing_process():1161] informing user process we are ready to proceed
+2020-03-28 16:18:08,675 INFO    MainThread:1435 [run_manager.py:_sync_etc():1268] entering loop for messages from user process
+2020-03-28 16:18:09,038 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/config.yaml
+2020-03-28 16:18:09,124 INFO    MainThread:1435 [run_manager.py:_sync_etc():1291] received message from user process: {"save_policy": {"glob": "model-best.h5", "policy": "live"}}
+2020-03-28 16:18:09,292 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:09,293 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/requirements.txt
+2020-03-28 16:18:09,293 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/code/s2s/s2s_model1.py
+2020-03-28 16:18:09,293 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/diff.patch
+2020-03-28 16:18:09,293 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:18:09,294 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/code
+2020-03-28 16:18:09,294 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/code/s2s
+2020-03-28 16:18:10,041 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:19,054 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:19,055 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/media/graph/graph_summary_7d81feed.graph.json
+2020-03-28 16:18:19,055 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-summary.json
+2020-03-28 16:18:19,056 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/media
+2020-03-28 16:18:19,056 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/media/graph
+2020-03-28 16:18:25,076 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-history.jsonl
+2020-03-28 16:18:25,076 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:25,077 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:18:25,077 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-summary.json
+2020-03-28 16:18:25,077 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/model-best.h5
+2020-03-28 16:18:31,086 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:35,091 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/model-best.h5
+2020-03-28 16:18:35,091 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-history.jsonl
+2020-03-28 16:18:35,092 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:35,092 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-summary.json
+2020-03-28 16:18:37,097 INFO    Thread-3  :1435 [run_manager.py:_on_file_created():677] file/dir created: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:18:41,106 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:41,106 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:18:47,121 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/model-best.h5
+2020-03-28 16:18:47,121 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-history.jsonl
+2020-03-28 16:18:47,121 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:47,122 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-summary.json
+2020-03-28 16:18:50,129 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:52,136 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:55,139 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:57,143 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:18:57,144 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:19:00,147 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:02,154 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:05,165 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:07,168 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:07,169 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:19:10,174 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:12,177 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:13,179 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:19:15,188 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:17,192 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:20,197 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:22,204 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:25,214 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:27,217 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:29,219 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:29,220 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:19:32,231 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:34,237 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:37,246 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:38,248 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:19:39,249 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:42,257 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:44,259 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:45,259 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:19:46,260 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:48,262 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:51,274 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:53,280 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:55,287 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:19:58,291 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:00,295 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:01,296 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:20:02,297 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:05,309 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:07,316 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:08,319 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:20:09,320 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:12,326 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:14,335 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:16,342 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:17,346 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:20:19,354 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:22,362 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:24,370 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:26,377 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:29,386 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:31,391 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:33,396 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:20:34,401 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:36,406 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:38,412 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:39,414 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:20:40,416 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:43,423 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:45,426 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:47,432 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:49,438 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:49,439 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:20:52,446 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:54,454 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:56,458 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:20:58,464 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:01,475 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:03,480 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:05,489 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:05,489 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:21:08,498 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:10,506 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:10,506 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:21:12,510 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:14,519 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:16,521 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:19,532 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:21,538 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:21,538 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:21:23,540 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:26,549 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:28,554 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:31,562 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:33,564 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:35,566 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:37,573 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:21:38,574 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:40,582 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:40,582 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-events.jsonl
+2020-03-28 16:21:42,588 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:45,596 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:47,601 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:50,607 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:52,610 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:53,612 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:21:54,613 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:57,618 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:59,624 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:22:01,625 INFO    Thread-3  :1435 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+-03-28 16:21:50,607 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:52,610 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:53,612 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/wandb-metadata.json
+2020-03-28 16:21:54,613 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:57,618 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:21:59,624 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log
+2020-03-28 16:22:01,625 INFO    Thread-3  :1435 [2vkwf53s:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200328_231807-2vkwf53s/output.log

@@ -39,15 +39,20 @@ print(df_group.shape)
 print ('number of documents')
 
 df_group['text'] = df_group['token'].str.slice(0,truncate_length)
+df_group['committee'] = '\t'+ df_group['committee'] +'\n'
+
 df_group.drop(['token'], axis = 1)
 
 
+print(df_group['committee'][:3])
+
 batch_size = 64  # Batch size for training.
-epochs = 10  # Number of epochs to train for.
+epochs = 3  # Number of epochs to train for.
 latent_dim = 256  # Latent dimensionality of the encoding space.
 num_samples = 1000  # Number of samples to train on.
+
 # Path to the data txt file on disk.
-data_path = 'fra-eng/fra.txt'
+# data_path = 'fra-eng/fra.txt'
 
 input_texts = []
 input_texts = df_group['text'][:num_samples]
@@ -185,10 +190,13 @@ model.save('s2s_politics1.h5')
 
 # Define sampling models
 encoder_model = Model(encoder_inputs, encoder_states)
+print('Encoder Model:')
+encoder_model.summary()
 
 decoder_state_input_h = Input(shape=(latent_dim,))
 decoder_state_input_c = Input(shape=(latent_dim,))
 decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
+
 decoder_outputs, state_h, state_c = decoder_lstm(
     decoder_inputs, initial_state=decoder_states_inputs)
 decoder_states = [state_h, state_c]
@@ -196,6 +204,8 @@ decoder_outputs = decoder_dense(decoder_outputs)
 decoder_model = Model(
     [decoder_inputs] + decoder_states_inputs,
     [decoder_outputs] + decoder_states)
+print('Decoder Model:')
+decoder_model.summary()
 
 # Reverse-lookup token index to decode sequences back to
 # something readable.
@@ -229,9 +239,20 @@ def decode_sequence(input_seq):
 
         # Exit condition: either hit max length
         # or find stop character.
-        if (sampled_char == '\n' or
-           len(decoded_sentence) > max_decoder_seq_length):
+
+        # old version, no print statement
+        # if (sampled_char == '\n' or
+        #    len(decoded_sentence) > max_decoder_seq_length):
+        #    stop_condition = True
+
+        if sampled_char == '\n':
+            print("Stop character reached.")
             stop_condition = True
+
+        if len(decoded_sentence) > max_decoder_seq_length:
+            print("Max sentence length reached.")
+            stop_condition = True
+
 
         # Update the target sequence (of length 1).
         target_seq = np.zeros((1, 1, num_decoder_tokens))
@@ -251,7 +272,7 @@ for seq_index in range(100):
     print('-----')
     print('Input sentence:', input_texts[seq_index])
     print('Target Sentence:', target_texts[seq_index])
-    print('Decoded Sentence:', decoded_sentence[seq_index])
+    print('Decoded Sentence:', decoded_sentence)
 
 
 
