@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/relic/Documents/deepform/s2s/s2s_model1.py", line 99, in <module>
+    wandb.init(project="seq2seq_lstm_char_test", entity="gray", config = {""})
+  File "/anaconda3/lib/python3.6/site-packages/wandb/__init__.py", line 1113, in init
+    as_defaults=not allow_val_change)
+  File "/anaconda3/lib/python3.6/site-packages/wandb/wandb_config.py", line 272, in _update
+    elif "__flags" in vars(params):
+TypeError: vars() argument must have __dict__ attribute

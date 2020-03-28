@@ -1,0 +1,129 @@
+diff --git a/s2s/s2s_model1.py b/s2s/s2s_model1.py
+index cb50fdc..0dfc271 100644
+--- a/s2s/s2s_model1.py
++++ b/s2s/s2s_model1.py
+@@ -1,7 +1,11 @@
+ #!pip install tensorflow
+ #!pip install keras
++#!pip install wandb
+ 
+ from __future__ import print_function
++import sys
++print (sys.executable)
++
+ import pandas as pd
+ 
+ 
+@@ -9,13 +13,16 @@ from tensorflow.python.keras.models import Model
+ from tensorflow.python.keras.layers import Input, LSTM, Dense
+ import numpy as np
+ 
++import wandb
++from wandb.keras import WandbCallback
+ # add training.csv to source folder
+ 
+ 
++
+ train = "../source/training.csv"
+ filings = "../source/ftf-all-filings.tsv"
+-docs = 100000
+-truncate_length = 1000
++docs = 200000
++truncate_length = 2000
+ 
+ dft = pd.read_csv(train, nrows = docs)
+ dft.head()
+@@ -34,39 +41,6 @@ print ('number of documents')
+ df_group['text'] = df_group['token'].str.slice(0,truncate_length)
+ df_group.drop(['token'], axis = 1)
+ 
+-#---------------------------------
+-# translator code
+-
+-# batch_size = 64  # Batch size for training.
+-# epochs = 100  # Number of epochs to train for.
+-# latent_dim = 256  # Latent dimensionality of the encoding space.
+-# num_samples = 10000  # Number of samples to train on.
+-# # Path to the data txt file on disk.
+-# data_path = 'fra-eng/fra.txt'
+-
+-# # Vectorize the data.
+-# input_texts = []
+-# target_texts = []
+-# input_characters = set()
+-# target_characters = set()
+-# with open(data_path, 'r', encoding='utf-8') as f:
+-#     lines = f.read().split('\n')
+-# for line in lines[: min(num_samples, len(lines) - 1)]:
+-#     input_text, target_text, _ = line.split('\t')
+-#     # We use "tab" as the "start sequence" character
+-#     # for the targets, and "\n" as "end sequence" character.
+-#     target_text = '\t' + target_text + '\n'
+-#     input_texts.append(input_text)
+-#     target_texts.append(target_text)
+-#     for char in input_text:
+-#         if char not in input_characters:
+-#             input_characters.add(char)
+-#     for char in target_text:
+-#         if char not in target_characters:
+-#             target_characters.add(char)
+-
+-#---------------------------------
+-# Deepform Code
+ 
+ batch_size = 64  # Batch size for training.
+ epochs = 10  # Number of epochs to train for.
+@@ -123,6 +97,8 @@ print('Max sequence length for outputs:', max_decoder_seq_length)
+ #print(input_texts[:10])
+ #print(input_characters)
+ 
++wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
++
+ 
+ input_token_index = dict(
+     [(char, i) for i, char in enumerate(input_characters)])
+@@ -180,18 +156,6 @@ decoder_outputs, _, _ = decoder_lstm(decoder_inputs,
+ decoder_dense = Dense(num_decoder_tokens, activation='softmax')
+ decoder_outputs = decoder_dense(decoder_outputs)
+ 
+-# Set up the decoder, using `encoder_states` as initial state.
+-decoder_inputs = Input(shape=(None, num_decoder_tokens))
+-
+-# We set up our decoder to return full output sequences,
+-# and to return internal states as well. We don't use the
+-# return states in the training model, but we will use them in inference.
+-decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True)
+-decoder_outputs, _, _ = decoder_lstm(decoder_inputs,
+-                                     initial_state=encoder_states)
+-decoder_dense = Dense(num_decoder_tokens, activation='softmax')
+-decoder_outputs = decoder_dense(decoder_outputs)
+-
+ # Define the model that will turn
+ # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+ model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+@@ -205,7 +169,7 @@ model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
+ model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+           batch_size=batch_size,
+           epochs=epochs,
+-          validation_split=0.2)
++          validation_split=0.2, callbacks=[WandbCallback()])
+ 
+ # Save model
+ model.save('s2s_politics1.h5')
+@@ -284,11 +248,10 @@ for seq_index in range(100):
+     # for trying out decoding.
+     input_seq = encoder_input_data[seq_index: seq_index + 1]
+     decoded_sentence = decode_sequence(input_seq)
+-    print('-')
++    print('-----')
+     print('Input sentence:', input_texts[seq_index])
+     print('Target Sentence:', target_texts[seq_index])
+-    print('Decoded sentence:', decoded_sentence)
+-
++    print('Decoded Sentence:', decoded_sentence[seq_index])
+ 
+ 
+ 
+diff --git a/s2s/s2s_politics1.h5 b/s2s/s2s_politics1.h5
+index 42c1233..297d95d 100644
+Binary files a/s2s/s2s_politics1.h5 and b/s2s/s2s_politics1.h5 differ
