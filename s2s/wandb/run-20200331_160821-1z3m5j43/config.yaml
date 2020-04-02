@@ -1,0 +1,20 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.30
+    code_path: code/s2s/s2s_model1.py
+    framework: tensorflow
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.6.3
+batch_size:
+  desc: null
+  value: 50
+model_type:
+  desc: null
+  value: lstm_seq2seq_char_test
+vocab_size:
+  desc: null
+  value: 101

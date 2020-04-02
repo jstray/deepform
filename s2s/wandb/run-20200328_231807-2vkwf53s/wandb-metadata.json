@@ -15,10 +15,11 @@
     "python": "3.6.3",
     "cpu_count": 8,
     "args": [],
-    "state": "running",
+    "state": "failed",
     "jobType": null,
     "mode": "run",
     "name": "test1",
     "project": "seq2seq_lstm_char_test",
-    "heartbeatAt": "2020-03-28T23:21:52.667590"
+    "heartbeatAt": "2020-03-28T23:22:33.759166",
+    "exitcode": 1
 }

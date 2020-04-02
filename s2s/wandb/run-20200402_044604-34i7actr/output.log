@@ -1,0 +1,43 @@
+2020-04-01 21:46:12.948186: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2020-04-01 21:46:12.969196: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7f99a4d306a0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-04-01 21:46:12.969232: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+Encoder Model:
+Model: "model_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         [(None, None, 101)]       0         
+_________________________________________________________________
+lstm (LSTM)                  [(None, 256), (None, 256) 366592    
+=================================================================
+Total params: 366,592
+Trainable params: 366,592
+Non-trainable params: 0
+_________________________________________________________________
+Decoder Model:
+Model: "model_2"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+input_2 (InputLayer)            [(None, None, 62)]   0                                            
+__________________________________________________________________________________________________
+input_3 (InputLayer)            [(None, 256)]        0                                            
+__________________________________________________________________________________________________
+input_4 (InputLayer)            [(None, 256)]        0                                            
+__________________________________________________________________________________________________
+lstm_1 (LSTM)                   [(None, None, 256),  326656      input_2[0][0]                    
+                                                                 input_3[0][0]                    
+                                                                 input_4[0][0]                    
+__________________________________________________________________________________________________
+dense (Dense)                   (None, None, 62)     15934       lstm_1[1][0]                     
+==================================================================================================
+Total params: 342,590
+Trainable params: 342,590
+Non-trainable params: 0
+__________________________________________________________________________________________________
+Max sentence length reached.
+-----
+Traceback (most recent call last):
+  File "/Users/relic/Documents/deepform/s2s/s2s_inference.py", line 282, in <module>
+    print('Input sentence:', input_texts[seq_index])
+NameError: name 'input_texts' is not defined
