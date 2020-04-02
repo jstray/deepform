@@ -47,8 +47,8 @@ def BuildInputTensor ():
     df_group.drop(['token'], axis = 1)
 
 
-    print(df_group['committee'][:3])
-
+    print(df_group[['committee', 'slug']][:3])
+    #print(df_group.head(20))
 
     # Path to the data txt file on disk.
     # data_path = 'fra-eng/fra.txt'
@@ -140,6 +140,7 @@ def BuildInputTensor ():
         decoder_input_data[i, t + 1:, target_token_index[' ']] = 1.
         decoder_target_data[i, t:, target_token_index[' ']] = 1.
 
+    print("Target Character Set:")
     print (target_characters)
     return encoder_input_data, num_decoder_tokens, max_decoder_seq_length, num_encoder_tokens, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_token_index, target_token_index, input_texts, target_texts
 
