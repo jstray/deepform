@@ -146,10 +146,22 @@
 2020-04-01 21:56:22,223 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
 2020-04-01 21:56:24,227 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
 2020-04-01 21:56:27,238 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-metadata.json
-2020-04-01 21:56:14,206 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-2020-04-01 21:56:17,210 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-2020-04-01 21:56:19,217 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-2020-04-01 21:56:22,223 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-2020-04-01 21:56:24,227 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
-2020-04-01 21:56:27,238 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
+2020-04-01 21:56:28,867 INFO    MainThread:12619 [run_manager.py:_sync_etc():1291] received message from user process: {"exitcode": 0}
+2020-04-01 21:56:28,869 INFO    MainThread:12619 [run_manager.py:_sync_etc():1377] closing log streams and sending exitcode to W&B
+2020-04-01 21:56:28,869 INFO    MainThread:12619 [run_manager.py:shutdown():1068] shutting down system stats and metadata service
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-metadata.json
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-events.jsonl
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
+2020-04-01 21:56:29,405 INFO    MainThread:12619 [run_manager.py:shutdown():1080] stopping streaming files and file change observer
+2020-04-01 21:56:30,252 INFO    MainThread:12619 [run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-metadata.json
+2020-04-01 21:56:31,437 INFO    MainThread:12619 [run_manager.py:_sync_etc():1429] syncing files to cloud storage
+2020-04-01 21:56:33,959 INFO    MainThread:12619 [run_manager.py:_sync_etc():1444] syncing complete: https://app.wandb.ai/deepform/seq2seq_lstm_char_test/runs/4n1307i3
+sync_etc():1377] closing log streams and sending exitcode to W&B
+2020-04-01 21:56:28,869 INFO    MainThread:12619 [4n1307i3:run_manager.py:shutdown():1068] shutting down system stats and metadata service
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-metadata.json
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-events.jsonl
+2020-04-01 21:56:29,245 INFO    Thread-3  :12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/output.log
+2020-04-01 21:56:29,405 INFO    MainThread:12619 [4n1307i3:run_manager.py:shutdown():1080] stopping streaming files and file change observer
+2020-04-01 21:56:30,252 INFO    MainThread:12619 [4n1307i3:run_manager.py:_on_file_modified():688] file/dir modified: /Users/relic/Documents/deepform/s2s/wandb/run-20200402_045226-4n1307i3/wandb-metadata.json
+2020-04-01 21:56:31,437 INFO    MainThread:12619 [4n1307i3:run_manager.py:_sync_etc():1429] syncing files to cloud storage
+2020-04-01 21:56:33,959 INFO    MainThread:12619 [4n1307i3:run_manager.py:_sync_etc():1444] syncing complete: https://app.wandb.ai/deepform/seq2seq_lstm_char_test/runs/4n1307i3
