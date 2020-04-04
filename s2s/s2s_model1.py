@@ -20,9 +20,10 @@ import string
 
 
 batch_size = 100  # Batch size for training.
-epochs = 2  # Number of epochs to train for.
+epochs = 50  # Number of epochs to train for.
 latent_dim = 256  # Latent dimensionality of the encoding space.
-num_samples = 10  # Number of samples to train on.
+num_samples = 4000  # Number of samples to train on.
+test_outputs = 20
 
 saved_model = 's2s_politics1_3_31_20.h5'
 mode = 'train'
@@ -101,7 +102,6 @@ def BuildInputTensor ():
 	print('Max sequence length for inputs:', max_encoder_seq_length)
 	print('Max sequence length for outputs:', max_decoder_seq_length)
 
-	wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
 
 	encoder_input_data = np.zeros(
 	    (len(input_texts), max_encoder_seq_length, num_encoder_tokens),
@@ -114,11 +114,11 @@ def BuildInputTensor ():
 	    dtype='float32')
 
 	for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
-	    clean_text(input_text)
+	    input_text = clean_text(input_text)
 	    for t, char in enumerate(input_text):
 	        encoder_input_data[i, t, input_token_index[char]] = 1.
 	    encoder_input_data[i, t + 1:, input_token_index[' ']] = 1.
-	    clean_text(target_text)
+	    target_text = clean_text(target_text)
 	    for t, char in enumerate(target_text):
 	        #decoder_target_data is ahead of decoder_input_data by one timestep
 	        decoder_input_data[i, t, target_token_index[char]] = 1.
@@ -133,6 +133,8 @@ def BuildInputTensor ():
 	return encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts
 
 encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor ()
+
+wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
 
 
 # Define an input sequence and process it.
@@ -256,7 +258,7 @@ def decode_sequence(input_seq):
     return decoded_sentence
 
 
-for seq_index in range(100):
+for seq_index in range(test_outputs):
     # Take one sequence (part of the training set)
     # for trying out decoding.
     input_seq = encoder_input_data[seq_index: seq_index + 1]
