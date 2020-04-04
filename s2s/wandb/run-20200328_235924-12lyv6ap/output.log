@@ -1,0 +1,7 @@
+2020-03-28 16:59:28.428793: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2020-03-28 16:59:28.443015: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7f988b9428b0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-03-28 16:59:28.443039: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+Traceback (most recent call last):
+  File "/Users/relic/Documents/deepform/s2s/s2s_model1.py", line 181, in <module>
+    model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+NameError: name 'encoder_input_data' is not defined

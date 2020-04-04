@@ -1,0 +1,44 @@
+2020-04-01 21:47:28.723708: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2020-04-01 21:47:28.749625: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fa7d0e37700 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-04-01 21:47:28.749647: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+Encoder Model:
+Model: "model_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+input_1 (InputLayer)         [(None, None, 101)]       0         
+_________________________________________________________________
+lstm (LSTM)                  [(None, 256), (None, 256) 366592    
+=================================================================
+Total params: 366,592
+Trainable params: 366,592
+Non-trainable params: 0
+_________________________________________________________________
+Decoder Model:
+Model: "model_2"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+input_2 (InputLayer)            [(None, None, 62)]   0                                            
+__________________________________________________________________________________________________
+input_3 (InputLayer)            [(None, 256)]        0                                            
+__________________________________________________________________________________________________
+input_4 (InputLayer)            [(None, 256)]        0                                            
+__________________________________________________________________________________________________
+lstm_1 (LSTM)                   [(None, None, 256),  326656      input_2[0][0]                    
+                                                                 input_3[0][0]                    
+                                                                 input_4[0][0]                    
+__________________________________________________________________________________________________
+dense (Dense)                   (None, None, 62)     15934       lstm_1[1][0]                     
+==================================================================================================
+Total params: 342,590
+Trainable params: 342,590
+Non-trainable params: 0
+__________________________________________________________________________________________________
+Max sentence length reached.
+-----
+Input sentence: Print Date 08/09/12 Page 1 of 9 WCPO ORDER Flight Dates08/03/12-09/03/12 Order Sep 00:05:00 Product Estimate # 1522 Sked A Contract / Revision 306317 / Candidate. Obama for America Alt Order # Original Date / Revision Agency Com 15% Billing Type Cash 08/09/12 08/09/12 Order Type GENERAL Billing Contact Billing Cycle EOM/EOC AdvertiserObama / Democrat / President 1010 Wisconsin Avenue - Suite #800 Billing CalendarBROADCAST Washington, DC 20007 Demographic A35+ Agency GMMB Inc Rev Codes POL POL CAND Buying Contact Sales Office EWSDC Product Codes PL Sales Region NAT Priority P-1 1010 Wisconsin Avenue - Suite #800 Washington, DC 20007 Agency Ref 2 Advertiser Ref Primary Account Executive Daniel Baylog Account Executive Order% Start Date End Date Daniel Baylog 100% Order Share % Market Value Competing Station % of Order Amount CABLE % UNKWN 100% WBQC % WCET % WCVN % WKON % WKRC % WLWT % WPTO % WSTR % WXIX % Order Totals Billing Plan Month # of Spots Net Amount Gross Amount Rating Start Date End Date # Spots Net AmountGross Amount August 2012 672 $359,154.75 $422,535.00 0.00 07/30/12 08/26/12 672 $359,154.75 $422,535.00 September 2012 226 $130,789.50 $153,870.00 0.00 08/27/12 09/03/12 226 $130,789.50 $153,870.00 Totals 898 $489,944.25 $576,405.00 0.00 Totals Ln Ch Start End Inventory Code Break Start/End Time Days Len Spots Rate Pri RtgType Spots Amount 1 WCPO 08/03/12 09/03/12 M-F 430am News CM 430-5a MTWTF-- :30 8 $125.00P-3 0.00 NM 25 $3,125.00 M-F 430am News Start Date End Date Weekdays Spots/Week Rate Rating Week: 07/31/12 08/06/12 M---F-- 2 $125.00 0.00 Week: 08/07/12 08/13/12 MTWTF-- 8 $125.00 0.00 Week: 08/14/12 08/20/12 MTWTF-- 5 $125.00 0.00 Week: 08/21/12 08/27/12 MTWTF-- 5 $125.00 0.00 Week: 08/28/12 09/03/12 MTWTF-- 5 $125.00 0.00 2 WCPO 08/03/12 09/03/12 M-F GMTS 5-6a CM 5-6a MTWTF-- :30 15 $200.00P-3 0.00 NM 44 $8,800.00 M-F GMTS 5-6a Start Date End Date Weekdays Spots/Week Rate Rating Print Date:08/09/12 Page 2 of 9 WCPO Contract / Revision 306317 Flight Dates08/03/12-09/03/12 Hiatus Dates Original Date / Revision 08/09/12/ 08/09/12 Order Sep 00:05:00 Advertiser Obama / Democrat / PresidePnrtoductCandidate. Obama for AmerEicsatimate # 1522 Sked A Totals Ln Ch Start End Inventory Code Break Start/End Time Days Len Spots Rate Pri RtgType Spots Amount 2 WCPO 08/03/12 09/03/12 M-F GMTS 5-6a CM 5-6a MTWTF-- :30 15 $200.00P-3 0.00 NM 44 $8,800.00 M-F GMTS 5-6a Start Date End Date Weekdays Spots/Week Rate Rating Week: 07/31/12 08/06/12 M---F-- 4 $200.00 0.00 Week: 08/07/12 08/13/12 MTWTF-- 10 $200.00 0.00 Week: 08/14/12 08/20/12 MTWTF-- 10 $200.00 0.00 Week: 08/21/12 08/27/12 MTWTF-- 10 $200.00 0.00 Week: 08/28/12 09/03/12 MTWTF-- 10 $200.00 0.00 3 WCPO 08/03/12 09/03/12 M-F GMTS 6-7a CM 6-7a MTWTF-- :30 15 $400.00P-3 0.00 NM 43 $17,200.00 M-F GMTS 6-7a Start Date End Date Weekdays Spots/Week Rate Rating Week: 07/31/12 08/06/12 M---F-- 3 $400.00 0.00 Week: 08/07/12 08/13/12 MTWTF-- 10 $400.00 0.00 Week: 08/14/12 08/20/12 MTWTF-- 10 $400.00 0.
+Traceback (most recent call last):
+  File "/Users/relic/Documents/deepform/s2s/s2s_inference.py", line 283, in <module>
+    print('Target Sentence:', target_texts[seq_index])
+NameError: name 'target_texts' is not defined

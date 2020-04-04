@@ -3,4 +3,5 @@ data
 *.csv
 .DS_Store
 .ipynb_checkpoints
+s2s/wandb/
 
