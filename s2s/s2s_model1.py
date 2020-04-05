@@ -136,7 +136,7 @@ def BuildInputTensor ():
 
 encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor ()
 
-# wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
+wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
 
 
 # Define an input sequence and process it.
@@ -259,9 +259,10 @@ def decode_sequence(input_seq):
 
     return decoded_sentence
 
+
 def decode_sequence_beam(input_seq):
     
-    beamwidth = 3
+    beamwidth = 5
     live_strings = [('', 0, 0)]
     dead_strings = []
 
@@ -279,8 +280,8 @@ def decode_sequence_beam(input_seq):
     step_counter = 0
     
     while len(live_strings) > 0 and step_counter < max_decoder_seq_length:
-        print(f'step {step_counter}')
-        print(f'{len(live_strings)} live strings')
+        # print(f'step {step_counter}')
+        # print(f'{len(live_strings)} live strings')
 
         output_tokens, h, c = decoder_model.predict(
             [target_seq] + states_value)
@@ -306,17 +307,18 @@ def decode_sequence_beam(input_seq):
         states_h = np.zeros((len(new_live_strings), latent_dim))
         states_c = np.zeros((len(new_live_strings), latent_dim))
         
-        print(f'states_h[0].shape {states_h[0].shape}')
+        # print(f'type(states_h[0]) {type(states_h[0])}')
+        # print(f'states_h[0].shape {states_h[0].shape}')
 
-        print(f'type(h[0]) {type(h[0])}')
-        print(f'h[0].shape {h[0].shape}')
-        print(f'h[0] {h[0]}')
+        # print(f'type(h[0]) {type(h[0])}')
+        # print(f'h[0].shape {h[0].shape}')
+        # print(f'h[0] {h[0]}')
 
         for i in range(len(new_live_strings)):
             string, prob, index = new_live_strings[i]
             target_seq[i, 0, target_token_index[string[-1]]] = 1.
-            states_h[i] = [h[index]]
-            states_c[i] = [c[index]]
+            states_h[i] = h[index]
+            states_c[i] = c[index]
         states_value = [states_h,states_c]
 
         # Update states
@@ -324,9 +326,9 @@ def decode_sequence_beam(input_seq):
         step_counter += 1
 
     # length normalization
-    dead_strings = [(s,p/len(s)) for (s,p) in dead_strings]
+    dead_strings = [(s,p/len(s)) for (s,p,i) in dead_strings]
 
-    return sorted(dead_strings, key = lambda x: x[1], reverse = True)
+    return sorted(dead_strings, key = lambda x: x[1], reverse = True)[:beamwidth]
 
 
 for seq_index in range(test_outputs):
@@ -340,9 +342,9 @@ for seq_index in range(test_outputs):
     if beamsearch:
         decoded_sentences = decode_sequence_beam(input_seq)
 
+        print('Decoded Sentences:')
         for sentence, prob in decoded_sentences:
-            print('Decoded Sentences:')
-            print(sentence + ' ' + str(prob))
+            print(sentence + ' ' + str(math.exp(prob)))
 
     else: 
         decoded_sentence = decode_sequence(input_seq)
