@@ -136,7 +136,7 @@ def BuildInputTensor ():
 
 encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor ()
 
-wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
+#wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
 
 
 # Define an input sequence and process it.
@@ -282,7 +282,10 @@ def decode_sequence_beam(input_seq):
     while len(live_strings) > 0 and step_counter < max_decoder_seq_length:
         # print(f'step {step_counter}')
         # print(f'{len(live_strings)} live strings')
-
+        #print('Current Sentences:')
+        #for sentence, prob, idx in live_strings:
+        #    print(sentence + ' ' + str(math.exp(prob)))
+        
         output_tokens, h, c = decoder_model.predict(
             [target_seq] + states_value)
 
@@ -306,13 +309,6 @@ def decode_sequence_beam(input_seq):
         target_seq = np.zeros((len(new_live_strings), 1, num_decoder_tokens))
         states_h = np.zeros((len(new_live_strings), latent_dim))
         states_c = np.zeros((len(new_live_strings), latent_dim))
-        
-        # print(f'type(states_h[0]) {type(states_h[0])}')
-        # print(f'states_h[0].shape {states_h[0].shape}')
-
-        # print(f'type(h[0]) {type(h[0])}')
-        # print(f'h[0].shape {h[0].shape}')
-        # print(f'h[0] {h[0]}')
 
         for i in range(len(new_live_strings)):
             string, prob, index = new_live_strings[i]
@@ -325,9 +321,8 @@ def decode_sequence_beam(input_seq):
         live_strings = new_live_strings
         step_counter += 1
 
-    # length normalization
+    # length normalization, and drop state index
     dead_strings = [(s,p/len(s)) for (s,p,i) in dead_strings]
-
     return sorted(dead_strings, key = lambda x: x[1], reverse = True)[:beamwidth]
 
 
