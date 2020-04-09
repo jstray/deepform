@@ -3,20 +3,15 @@
 #!pip install wandb
 
 from __future__ import print_function
-import sys
-print (sys.executable)
-
-import pandas as pd
-
-
-from tensorflow.python.keras.models import Model
-from tensorflow.python.keras.layers import Input, LSTM, Dense
-import numpy as np
-
-import wandb
-from wandb.keras import WandbCallback
-
 import string
+from wandb.keras import WandbCallback
+import wandb
+import numpy as np
+from tensorflow.python.keras.layers import Input, LSTM, Dense
+from tensorflow.python.keras.models import Model
+import pandas as pd
+import sys
+print(sys.executable)
 
 
 batch_size = 100  # Batch size for training.
@@ -30,7 +25,8 @@ mode = 'train'
 
 
 # Fixed character set for 1-hot encoding of inputs and outputs
-charset = string.printable + '\t\n\x00' # \t=start, \n=stop, \x00=unknown character
+# \t=start, \n=stop, \x00=unknown character
+charset = string.printable + '\t\n\x00'
 
 num_encoder_tokens = len(charset)
 num_decoder_tokens = num_encoder_tokens
@@ -50,91 +46,90 @@ reverse_target_char_index = dict(
 
 
 def clean_text(text):
-	def clean_char(c):
-		if c in charset:
-			return c
-		else:
-			return '\x00'
+    def clean_char(c):
+        if c in charset:
+            return c
+        else:
+            return '\x00'
 
-	return [clean_char(x) for x in text]
+    return [clean_char(x) for x in text]
 
 
 # Load training data and encode into 1-hot tensors
-def BuildInputTensor ():
+def BuildInputTensor():
 
-	train = "../source/training.csv"
-	filings = "../source/ftf-all-filings.tsv"
+    train = "../source/training.csv"
+    filings = "../source/ftf-all-filings.tsv"
 
-	#docs = 200000
-	truncate_length = 3000
+    #docs = 200000
+    truncate_length = 3000
 
-	dft = pd.read_csv(train)#, nrows = docs)
-	dff = pd.read_csv(filings, sep='\t')
+    dft = pd.read_csv(train)  # , nrows = docs)
+    dff = pd.read_csv(filings, sep='\t')
 
-	df_all = pd.merge(left=dft, right=dff, how='left', left_on='slug', right_on='dc_slug')
-	#df_all = df_all[['slug', 'page', 'x0', 'y0', 'x1', 'y1', 'token', 'gross_amount_x', 'committee']]
-	df_all = df_all[['slug', 'token', 'committee']]
+    df_all = pd.merge(left=dft, right=dff, how='left',
+                      left_on='slug', right_on='dc_slug')
+    #df_all = df_all[['slug', 'page', 'x0', 'y0', 'x1', 'y1', 'token', 'gross_amount_x', 'committee']]
+    df_all = df_all[['slug', 'token', 'committee']]
 
-	df_group = df_all.groupby(['slug','committee'])['token'].apply(lambda a: ' '.join([str(x) for x in a])).reset_index()
-	print(df_group.shape)
-	print ('number of documents')
+    df_group = df_all.groupby(['slug', 'committee'])['token'].apply(
+        lambda a: ' '.join([str(x) for x in a])).reset_index()
+    print(df_group.shape)
+    print('number of documents')
 
-	df_group['text'] = df_group['token'].str.slice(0,truncate_length)
-	df_group['committee'] = '\t'+ df_group['committee'] +'\n'
+    df_group['text'] = df_group['token'].str.slice(0, truncate_length)
+    df_group['committee'] = '\t' + df_group['committee'] + '\n'
 
-	df_group.drop(['token'], axis = 1)
+    df_group.drop(['token'], axis=1)
 
+    print(df_group['committee'][:3])
 
-	print(df_group['committee'][:3])
+    target_texts = df_group['committee'][:num_samples]
+    input_texts = df_group['text'][:num_samples]
 
+    # ---------------------------------
 
-	target_texts = df_group['committee'][:num_samples]
-	input_texts = df_group['text'][:num_samples]
+    max_encoder_seq_length = max([len(txt) for txt in input_texts])
+    max_decoder_seq_length = max([len(txt) for txt in target_texts])
 
+    print('Number of unique input chars:', num_encoder_tokens)
+    print('Number of unique output cahrs:', num_decoder_tokens)
+    print('Max sequence length for inputs:', max_encoder_seq_length)
+    print('Max sequence length for outputs:', max_decoder_seq_length)
 
-	#---------------------------------
+    encoder_input_data = np.zeros(
+        (len(input_texts), max_encoder_seq_length, num_encoder_tokens),
+        dtype='float32')
+    decoder_input_data = np.zeros(
+        (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
+        dtype='float32')
+    decoder_target_data = np.zeros(
+        (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
+        dtype='float32')
 
-	max_encoder_seq_length = max([len(txt) for txt in input_texts])
-	max_decoder_seq_length = max([len(txt) for txt in target_texts])
+    for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
+        input_text = clean_text(input_text)
+        for t, char in enumerate(input_text):
+            encoder_input_data[i, t, input_token_index[char]] = 1.
+        encoder_input_data[i, t + 1:, input_token_index[' ']] = 1.
+        target_text = clean_text(target_text)
+        for t, char in enumerate(target_text):
+            # decoder_target_data is ahead of decoder_input_data by one timestep
+            decoder_input_data[i, t, target_token_index[char]] = 1.
+            if t > 0:
+                # decoder_target_data will be ahead by one timestep
+                # and will not include the start character.
+                decoder_target_data[i, t - 1, target_token_index[char]] = 1.
+        decoder_input_data[i, t + 1:, target_token_index[' ']] = 1.
+        decoder_target_data[i, t:, target_token_index[' ']] = 1.
 
-	print('Number of unique input chars:', num_encoder_tokens)
-	print('Number of unique output cahrs:', num_decoder_tokens)
-	print('Max sequence length for inputs:', max_encoder_seq_length)
-	print('Max sequence length for outputs:', max_decoder_seq_length)
-
-
-	encoder_input_data = np.zeros(
-	    (len(input_texts), max_encoder_seq_length, num_encoder_tokens),
-	    dtype='float32')
-	decoder_input_data = np.zeros(
-	    (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
-	    dtype='float32')
-	decoder_target_data = np.zeros(
-	    (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
-	    dtype='float32')
-
-	for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
-	    input_text = clean_text(input_text)
-	    for t, char in enumerate(input_text):
-	        encoder_input_data[i, t, input_token_index[char]] = 1.
-	    encoder_input_data[i, t + 1:, input_token_index[' ']] = 1.
-	    target_text = clean_text(target_text)
-	    for t, char in enumerate(target_text):
-	        #decoder_target_data is ahead of decoder_input_data by one timestep
-	        decoder_input_data[i, t, target_token_index[char]] = 1.
-	        if t > 0:
-	            # decoder_target_data will be ahead by one timestep
-	            # and will not include the start character.
-	            decoder_target_data[i, t - 1, target_token_index[char]] = 1.
-	    decoder_input_data[i, t + 1:, target_token_index[' ']] = 1.
-	    decoder_target_data[i, t:, target_token_index[' ']] = 1.
+    return encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts
 
 
-	return encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts
+encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor()
 
-encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor ()
-
-wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
+wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config={
+           "model_type": "lstm_seq2seq_char_test", "batch_size": 50, "vocab_size": num_encoder_tokens})
 
 
 # Define an input sequence and process it.
@@ -160,26 +155,24 @@ decoder_outputs = decoder_dense(decoder_outputs)
 
 
 if mode == 'train':
-	# Define the model that will turn
-	# `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
-	model = Model([encoder_inputs, decoder_inputs], decoder_outputs, )
+    # Define the model that will turn
+    # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+    model = Model([encoder_inputs, decoder_inputs], decoder_outputs, )
 
+    # Run training
+    model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
+                  metrics=['accuracy'])
 
+    model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
+              batch_size=batch_size,
+              epochs=epochs,
+              validation_split=0.2, callbacks=[WandbCallback()])
 
-	# Run training
-	model.compile(optimizer='rmsprop', loss='categorical_crossentropy',
-	              metrics=['accuracy'])
-
-	model.fit([encoder_input_data, decoder_input_data], decoder_target_data,
-	          batch_size=batch_size,
-	          epochs=epochs,
-	          validation_split=0.2, callbacks=[WandbCallback()])
-
-	# Save model
-	model.save('s2s_politics1.h5')
+    # Save model
+    model.save('s2s_politics1.h5')
 
 else:
-	model.load_weights(saved_model, by_name=True)
+    model.load_weights(saved_model, by_name=True)
 
 # Next: inference mode (sampling).
 # Here's the drill:
@@ -247,7 +240,6 @@ def decode_sequence(input_seq):
             print("Max sentence length reached.")
             stop_condition = True
 
-
         # Update the target sequence (of length 1).
         target_seq = np.zeros((1, 1, num_decoder_tokens))
         target_seq[0, 0, sampled_token_index] = 1.
@@ -267,6 +259,3 @@ for seq_index in range(test_outputs):
     print('Input sentence:', input_texts[seq_index])
     print('Target Sentence:', target_texts[seq_index])
     print('Decoded Sentence:', decoded_sentence)
-
-
-
