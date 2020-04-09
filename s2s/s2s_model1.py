@@ -1,21 +1,12 @@
-#!pip install tensorflow
-#!pip install keras
-#!pip install wandb
-
 from __future__ import print_function
 import sys
-print (sys.executable)
-
 import pandas as pd
 import math
-
 from tensorflow.python.keras.models import Model
 from tensorflow.python.keras.layers import Input, LSTM, Dense
 import numpy as np
-
 import wandb
 from wandb.keras import WandbCallback
-
 import string
 
 
@@ -26,11 +17,12 @@ num_samples = 4000  # Number of samples to train on.
 test_outputs = 20
 
 saved_model = 's2s_politics1_4_2_20_first_model_outputting_committees.h5'
-trainmode = False 
+trainmode = False
 beamsearch = True
 
 # Fixed character set for 1-hot encoding of inputs and outputs
-charset = string.printable + '\t\n\x00' # \t=start, \n=stop, \x00=unknown character
+# \t=start, \n=stop, \x00=unknown character
+charset = string.printable + '\t\n\x00'
 
 num_encoder_tokens = len(charset)
 num_decoder_tokens = num_encoder_tokens
@@ -62,7 +54,7 @@ def clean_text(text):
 
 
 # Load training data and encode into 1-hot tensors
-def BuildInputTensor ():
+def BuildInputTensor():
 
     train = "../source/training.csv"
     filings = "../source/ftf-all-filings.tsv"
@@ -70,31 +62,30 @@ def BuildInputTensor ():
     #docs = 200000
     truncate_length = 3000
 
-    dft = pd.read_csv(train)#, nrows = docs)
+    dft = pd.read_csv(train)  # , nrows = docs)
     dff = pd.read_csv(filings, sep='\t')
 
-    df_all = pd.merge(left=dft, right=dff, how='left', left_on='slug', right_on='dc_slug')
+    df_all = pd.merge(left=dft, right=dff, how='left',
+                      left_on='slug', right_on='dc_slug')
     #df_all = df_all[['slug', 'page', 'x0', 'y0', 'x1', 'y1', 'token', 'gross_amount_x', 'committee']]
     df_all = df_all[['slug', 'token', 'committee']]
 
-    df_group = df_all.groupby(['slug','committee'])['token'].apply(lambda a: ' '.join([str(x) for x in a])).reset_index()
+    df_group = df_all.groupby(['slug', 'committee'])['token'].apply(
+        lambda a: ' '.join([str(x) for x in a])).reset_index()
     print(df_group.shape)
-    print ('number of documents')
+    print('number of documents')
 
-    df_group['text'] = df_group['token'].str.slice(0,truncate_length)
-    df_group['committee'] = '\t'+ df_group['committee'] +'\n'
+    df_group['text'] = df_group['token'].str.slice(0, truncate_length)
+    df_group['committee'] = '\t' + df_group['committee'] + '\n'
 
-    df_group.drop(['token'], axis = 1)
-
+    df_group.drop(['token'], axis=1)
 
     print(df_group['committee'][:3])
-
 
     target_texts = df_group['committee'][:num_samples]
     input_texts = df_group['text'][:num_samples]
 
-
-    #---------------------------------
+    # ---------------------------------
 
     max_encoder_seq_length = max([len(txt) for txt in input_texts])
     max_decoder_seq_length = max([len(txt) for txt in target_texts])
@@ -103,7 +94,6 @@ def BuildInputTensor ():
     print('Number of unique output cahrs:', num_decoder_tokens)
     print('Max sequence length for inputs:', max_encoder_seq_length)
     print('Max sequence length for outputs:', max_decoder_seq_length)
-
 
     encoder_input_data = np.zeros(
         (len(input_texts), max_encoder_seq_length, num_encoder_tokens),
@@ -115,14 +105,16 @@ def BuildInputTensor ():
         (len(input_texts), max_decoder_seq_length, num_decoder_tokens),
         dtype='float32')
 
-    for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
+    for i, (input_text, target_text) in enumerate(
+            zip(input_texts, target_texts)):
         input_text = clean_text(input_text)
         for t, char in enumerate(input_text):
             encoder_input_data[i, t, input_token_index[char]] = 1.
         encoder_input_data[i, t + 1:, input_token_index[' ']] = 1.
         target_text = clean_text(target_text)
         for t, char in enumerate(target_text):
-            #decoder_target_data is ahead of decoder_input_data by one timestep
+            # decoder_target_data is ahead of decoder_input_data by one
+            # timestep
             decoder_input_data[i, t, target_token_index[char]] = 1.
             if t > 0:
                 # decoder_target_data will be ahead by one timestep
@@ -131,10 +123,10 @@ def BuildInputTensor ():
 #       decoder_input_data[i, t + 1:, target_token_index[' ']] = 1.
 #       decoder_target_data[i, t:, target_token_index[' ']] = 1.
 
-
     return encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts
 
-encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor ()
+
+encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor()
 
 #wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config = {"model_type" : "lstm_seq2seq_char_test", "batch_size" : 50, "vocab_size": num_encoder_tokens})
 
@@ -160,10 +152,8 @@ decoder_outputs, _, _ = decoder_lstm(decoder_inputs,
 decoder_dense = Dense(num_decoder_tokens, activation='softmax')
 decoder_outputs = decoder_dense(decoder_outputs)
 
-
-
-    # Define the model that will turn
-    # `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
+# Define the model that will turn
+# `encoder_input_data` & `decoder_input_data` into `decoder_target_data`
 model = Model([encoder_inputs, decoder_inputs], decoder_outputs, )
 
 
@@ -249,7 +239,6 @@ def decode_sequence(input_seq):
             print("Max sentence length reached.")
             stop_condition = True
 
-
         # Update the target sequence (of length 1).
         target_seq = np.zeros((1, 1, num_decoder_tokens))
         target_seq[0, 0, sampled_token_index] = 1.
@@ -261,7 +250,7 @@ def decode_sequence(input_seq):
 
 
 def decode_sequence_beam(input_seq):
-    
+
     beamwidth = 5
     live_strings = [('', 0, 0)]
     dead_strings = []
@@ -278,14 +267,14 @@ def decode_sequence_beam(input_seq):
     # (to simplify, here we assume a batch of size beamwidth).
 
     step_counter = 0
-    
+
     while len(live_strings) > 0 and step_counter < max_decoder_seq_length:
         # print(f'step {step_counter}')
         # print(f'{len(live_strings)} live strings')
         #print('Current Sentences:')
-        #for sentence, prob, idx in live_strings:
+        # for sentence, prob, idx in live_strings:
         #    print(sentence + ' ' + str(math.exp(prob)))
-        
+
         output_tokens, h, c = decoder_model.predict(
             [target_seq] + states_value)
 
@@ -297,13 +286,14 @@ def decode_sequence_beam(input_seq):
 
             # Loop over output chars
             for j in range(num_decoder_tokens):
-                new_live_strings.append((prefix+reverse_target_char_index[j], logprob + math.log(1e-100 + output_tokens[i, -1, j]), i))
+                new_live_strings.append(
+                    (prefix + reverse_target_char_index[j], logprob + math.log(1e-100 + output_tokens[i, -1, j]), i))
 
-        dead_strings.extend([l for l in new_live_strings if l[0][-1] == '\n'])        
+        dead_strings.extend([l for l in new_live_strings if l[0][-1] == '\n'])
 
         new_live_strings = [k for k in new_live_strings if k[0][-1] != '\n']
-        new_live_strings = sorted(new_live_strings, key = lambda x: x[1], reverse = True)[:beamwidth]
-
+        new_live_strings = sorted(
+            new_live_strings, key=lambda x: x[1], reverse=True)[:beamwidth]
 
         # Update the target sequence (of length 1).
         target_seq = np.zeros((len(new_live_strings), 1, num_decoder_tokens))
@@ -315,15 +305,15 @@ def decode_sequence_beam(input_seq):
             target_seq[i, 0, target_token_index[string[-1]]] = 1.
             states_h[i] = h[index]
             states_c[i] = c[index]
-        states_value = [states_h,states_c]
+        states_value = [states_h, states_c]
 
         # Update states
         live_strings = new_live_strings
         step_counter += 1
 
     # length normalization, and drop state index
-    dead_strings = [(s,p/len(s)) for (s,p,i) in dead_strings]
-    return sorted(dead_strings, key = lambda x: x[1], reverse = True)[:beamwidth]
+    dead_strings = [(s, p / len(s)) for (s, p, i) in dead_strings]
+    return sorted(dead_strings, key=lambda x: x[1], reverse=True)[:beamwidth]
 
 
 for seq_index in range(test_outputs):
@@ -341,9 +331,6 @@ for seq_index in range(test_outputs):
         for sentence, prob in decoded_sentences:
             print(sentence + ' ' + str(math.exp(prob)))
 
-    else: 
+    else:
         decoded_sentence = decode_sequence(input_seq)
         print('Decoded Sentence:', decoded_sentence)
-
-
-
