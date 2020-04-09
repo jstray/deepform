@@ -56,13 +56,9 @@ def clean_text(text):
 
 
 # Load training data and encode into 1-hot tensors
-def BuildInputTensor():
-
-    train = "../source/training.csv"
-    filings = "../source/ftf-all-filings.tsv"
-
-    #docs = 200000
-    truncate_length = 3000
+def BuildInputTensor(train="../source/training.csv",
+                     filings="../source/ftf-all-filings.tsv",
+                     truncate_length=3000):
 
     dft = pd.read_csv(train)  # , nrows = docs)
     dff = pd.read_csv(filings, sep='\t')
@@ -74,6 +70,7 @@ def BuildInputTensor():
 
     df_group = df_all.groupby(['slug', 'committee'])['token'].apply(
         lambda a: ' '.join([str(x) for x in a])).reset_index()
+
     print(df_group.shape)
     print('number of documents')
 
@@ -128,8 +125,15 @@ def BuildInputTensor():
 
 encoder_input_data, max_decoder_seq_length, max_encoder_seq_length, decoder_input_data, decoder_target_data, input_texts, target_texts = BuildInputTensor()
 
-wandb.init(project="seq2seq_lstm_char_test", entity="deepform", name="test1", config={
-           "model_type": "lstm_seq2seq_char_test", "batch_size": 50, "vocab_size": num_encoder_tokens})
+wandb_config = {
+ "model_type": "lstm_seq2seq_char_test",
+ "batch_size": 50,
+ "vocab_size": num_encoder_tokens
+}
+wandb.init(project="seq2seq_lstm_char_test",
+           entity="deepform",
+           name="test1",
+           config=wandb_config)
 
 
 # Define an input sequence and process it.
