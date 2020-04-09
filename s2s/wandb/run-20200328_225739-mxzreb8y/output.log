@@ -1,8 +1,0 @@
-{'E': 0, 'i': 1, '/': 2, 'c': 3, 'H': 4, '8': 5, 'Q': 6, ' ': 7, 'h': 8, 'u': 9, '6': 10, 'Y': 11, 'l': 12, 'o': 13, 'L': 14, '-': 15, 'M': 16, ',': 17, 'S': 18, ':': 19, 'x': 20, 'F': 21, 'N': 22, 'k': 23, 'G': 24, 'n': 25, 'j': 26, ']': 27, 'U': 28, 'y': 29, '[': 30, '\n': 31, ')': 32, '(': 33, '#': 34, 'z': 35, '$': 36, 'r': 37, 'A': 38, '+': 39, 'R': 40, 't': 41, 'K': 42, 'T': 43, 'O': 44, 'P': 45, '3': 46, '<': 47, 'X': 48, '9': 49, '@': 50, "'": 51, 'g': 52, 'f': 53, '=': 54, 'W': 55, '1': 56, 'd': 57, 'D': 58, 'B': 59, 'q': 60, '4': 61, '5': 62, 'J': 63, '\t': 64, 'v': 65, 'V': 66, '7': 67, '&': 68, '%': 69, 's': 70, 'w': 71, '2': 72, 'p': 73, 'm': 74, 'b': 75, 'e': 76, 'C': 77, '.': 78, 'Z': 79, '0': 80, '*': 81, 'I': 82, 'a': 83}
-2020-03-28 15:57:41.025448: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2020-03-28 15:57:41.040670: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fb062ed79f0 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
-2020-03-28 15:57:41.040691: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
-Train on 76 samples, validate on 20 samples
-Epoch 1/10
-64/76 [========================>.....] - ETA: 1s - loss: 3.5807 - accuracy: 0.005376/76 [==============================] - 13s 171ms/sample - loss: 3.5097 - accuracy: 0.1287 - val_loss: 1.5275 - val_accuracy: 0.8017
-Epoch 2/10
