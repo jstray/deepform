@@ -1,0 +1,46 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.30
+    framework: keras
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.6.3
+batch_size:
+  desc: null
+  value: 10000
+doc_acc_sample_size:
+  desc: null
+  value: 25
+epochs:
+  desc: null
+  value: 50
+penalize_missed:
+  desc: null
+  value: 5
+positive_fraction:
+  desc: null
+  value: 0.5
+read_docs:
+  desc: null
+  value: 100
+steps_per_epoch:
+  desc: null
+  value: 10
+target_thresh:
+  desc: null
+  value: 0.9
+token_dims:
+  desc: null
+  value: 7
+val_split:
+  desc: null
+  value: 0.2
+vocab_size:
+  desc: null
+  value: 500
+window_len:
+  desc: null
+  value: 30

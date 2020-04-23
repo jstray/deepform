@@ -1,0 +1,51 @@
+diff --git a/sweep.yaml b/sweep.yaml
+index 539bb81..6ef64c1 100644
+--- a/sweep.yaml
++++ b/sweep.yaml
+@@ -1,27 +1,21 @@
+-sweep.yaml in same folder
+-
+-wandb.sweep(sfuisdgu.yaml)
+-wandb.agent
+-
+-Example YAML
++# sweep.yaml
+ program: train.py
+-method: grid
++method: bayes
+ metric:
+-  goal: minimize
+-  name: loss
++ name: acc #val_acc?
++ goal: maximize
+ parameters:
+-  dropout:
+-    values: [0.1, 0.2, 0.4, 0.5, 0.7]
+-  channels_one:
+-    values: [10, 12, 14, 16, 18, 20]
+-  channels_two:
+-    values: [24, 28, 32, 36, 40, 44]
+-  learning_rate:
+-    values: [0.001, 0.005, 0.0005]
+-  epochs:
+-    value: 27
++ #learning-rate:
++   #min: 0.00001
++   #max: 0.1
++ #optimizer:
++   #values: ["adam", "sgd"]
++ #hidden_layer_size:
++   #values: [96, 128, 148]
++ epochs:
++   value: 50
+ early_terminate:
+-  type: hyperband
+-  s: 2
+-  eta: 3
+-  max_iter: 27
+\ No newline at end of file
++   type: hyperband
++   s: 2
++   eta: 3
++   max_iter: 25
+\ No newline at end of file

@@ -1,0 +1,96 @@
+Configuration:
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.8.30
+    code_path: code/train.py
+    framework: keras
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.6.3
+batch_size:
+  desc: null
+  value: 10000
+doc_acc_sample_size:
+  desc: null
+  value: 25
+epochs:
+  desc: null
+  value: 50
+len_train:
+  desc: null
+  value: 100
+penalize_missed:
+  desc: null
+  value: 5
+positive_fraction:
+  desc: null
+  value: 0.5
+read_docs:
+  desc: null
+  value: 150
+steps_per_epoch:
+  desc: null
+  value: 10
+target_thresh:
+  desc: null
+  value: 0.9
+token_dims:
+  desc: null
+  value: 7
+val_split:
+  desc: null
+  value: 0.2
+vocab_size:
+  desc: null
+  value: 500
+window_len:
+  desc: null
+  value: 30
+
+Loading training data from cache...
+Loaded 100
+Max document size 9873
+Average document size 1710.75
+Training on 81, validating on 19
+2020-04-22 22:50:39.580681: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
+2020-04-22 22:50:39.594358: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7fab75906d30 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2020-04-22 22:50:39.594374: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
+Model: "model_1"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to                     
+==================================================================================================
+input_1 (InputLayer)            (None, 30, 7)        0                                            
+__________________________________________________________________________________________________
+lambda_1 (Lambda)               (None, 30)           0           input_1[0][0]                    
+__________________________________________________________________________________________________
+embedding_1 (Embedding)         (None, 30, 32)       16000       lambda_1[0][0]                   
+__________________________________________________________________________________________________
+lambda_2 (Lambda)               (None, 30, 6)        0           input_1[0][0]                    
+__________________________________________________________________________________________________
+concatenate_1 (Concatenate)     (None, 30, 38)       0           embedding_1[0][0]                
+                                                                 lambda_2[0][0]                   
+__________________________________________________________________________________________________
+flatten_1 (Flatten)             (None, 1140)         0           concatenate_1[0][0]              
+__________________________________________________________________________________________________
+dense_1 (Dense)                 (None, 1050)         1198050     flatten_1[0][0]                  
+__________________________________________________________________________________________________
+dropout_1 (Dropout)             (None, 1050)         0           dense_1[0][0]                    
+__________________________________________________________________________________________________
+dense_2 (Dense)                 (None, 210)          220710      dropout_1[0][0]                  
+__________________________________________________________________________________________________
+dropout_2 (Dropout)             (None, 210)          0           dense_2[0][0]                    
+__________________________________________________________________________________________________
+dense_3 (Dense)                 (None, 30)           6330        dropout_2[0][0]                  
+==================================================================================================
+Total params: 1,441,090
+Trainable params: 1,441,090
+Non-trainable params: 0
+__________________________________________________________________________________________________
+None
+/anaconda3/lib/python3.6/site-packages/tensorflow_core/python/framework/indexed_slices.py:433: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
+  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
+Epoch 1/50
+ 1/10 [==>...........................] - ETA: 11s - loss: 1.4409 - acc: 0.0200 2/10 [=====>........................] - ETA: 7s - loss: 1.2497 - acc: 0.0251  3/10 [========>.....................] - ETA: 6s - loss: 1.1370 - acc: 0.0277 4/10 [===========>..................] - ETA: 5s - loss: 1.0555 - acc: 0.0286 5/10 [==============>...............] - ETA: 4s - loss: 0.9956 - acc: 0.0286 6/10 [=================>............] - ETA: 3s - loss: 0.9476 - acc: 0.0287 7/10 [====================>.........] - ETA: 2s - loss: 0.9064 - acc: 0.0286

@@ -1,0 +1,104 @@
+diff --git a/sweep.yaml b/sweep.yaml
+index 539bb81..ab6d0f0 100644
+--- a/sweep.yaml
++++ b/sweep.yaml
+@@ -1,27 +1,23 @@
+-sweep.yaml in same folder
+-
+-wandb.sweep(sfuisdgu.yaml)
+-wandb.agent
+-
+-Example YAML
++# sweep.yaml
+ program: train.py
+-method: grid
++method: bayes
+ metric:
+-  goal: minimize
+-  name: loss
++ name: acc #val_acc?
++ goal: maximize
+ parameters:
+-  dropout:
+-    values: [0.1, 0.2, 0.4, 0.5, 0.7]
+-  channels_one:
+-    values: [10, 12, 14, 16, 18, 20]
+-  channels_two:
+-    values: [24, 28, 32, 36, 40, 44]
+-  learning_rate:
+-    values: [0.001, 0.005, 0.0005]
+-  epochs:
+-    value: 27
++ #learning-rate:
++   #min: 0.00001
++   #max: 0.1
++ #optimizer:
++   #values: ["adam", "sgd"]
++ #hidden_layer_size:
++   #values: [96, 128, 148]
++ epochs:
++   value: 50
++ read_docs: 
++   values: [250, 500, 1000, 2000, 4000]
+ early_terminate:
+-  type: hyperband
+-  s: 2
+-  eta: 3
+-  max_iter: 27
+\ No newline at end of file
++   type: hyperband
++   s: 2
++   eta: 3
++   max_iter: 25
+\ No newline at end of file
+diff --git a/train.py b/train.py
+index 3795c0f..29c5b2d 100644
+--- a/train.py
++++ b/train.py
+@@ -28,7 +28,7 @@ from wandb.keras import WandbCallback
+ run = wandb.init(project="jonathan_summer_1", entity="deepform", name="testing")
+ 
+ config = run.config
+-config.read_docs = 100 # how many docs to load, at most
++config.read_docs = 150 # how many docs to load, at most
+ config.window_len = 30 # size of token sequences to train on (and network size!)
+ config.vocab_size = 500
+ config.token_dims = 7 # number of features per token, including token hash
+@@ -40,11 +40,10 @@ config.steps_per_epoch = 10
+ config.doc_acc_sample_size = 25 # how many documents to check extraction on after each epoch
+ config.penalize_missed = 5 # how much more a missed 1 counts than a missed 0 in output
+ config.val_split = 0.2
+-
++config.len_train = 100
+ 
+ source_data = 'source/training.csv'
+ pickle_destination = 'source/cached_features.p'
+-source_rows = 2000
+ 
+ # ---- Load data and generate features ----
+ 
+@@ -116,16 +115,21 @@ def load_training_data_nocache(config):
+ def load_training_data(config):
+ 	if os.path.isfile(pickle_destination):
+ 		print('Loading training data from cache...')
+-		slugs, token_text, features,labels = pickle.load(open(pickle_destination, 'rb'))
++		slugs, token_text, features, labels = pickle.load(open(pickle_destination, 'rb'))
+ 	else:
+ 		print('Loading training data...')
+ 		slugs, token_text, features, labels = load_training_data_nocache(config)
+ 		print('Saving training data to cache...')
+ 		pickle.dump((slugs, token_text, features, labels), open(pickle_destination, 'wb'))
+ 
+-	return slugs, token_text, features,labels
++	# Trim the training data so we can sweep across various training data sizes
++	slugs = slugs[:len_train]
++	token_text = token_text[:len_train]
++	features = features[:len_train]
++	labels = labels[:len_train]
++
++	return slugs, token_text, features, labels
+ 
+-	
+ # ---- Resample features,labels as windows ----
+ 
+ # returns a window of tokens, labels at a random position in a random document
