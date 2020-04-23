@@ -25,10 +25,9 @@ import wandb
 from wandb.keras import WandbCallback
 
 # Configuration
-run = wandb.init(project="jonathan_summer_1", entity="deepform", name="testing")
-
+run = wandb.init()
 config = run.config
-config.read_docs = 100 # how many docs to load, at most
+config.read_docs = 10000 # how many docs to load, at most
 config.window_len = 30 # size of token sequences to train on (and network size!)
 config.vocab_size = 500
 config.token_dims = 7 # number of features per token, including token hash
@@ -41,17 +40,12 @@ config.doc_acc_sample_size = 25 # how many documents to check extraction on afte
 config.penalize_missed = 5 # how much more a missed 1 counts than a missed 0 in output
 config.val_split = 0.2
 
-
-source_data = 'source/training.csv'
-pickle_destination = 'source/cached_features.p'
-source_rows = 2000
-
 # ---- Load data and generate features ----
 
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
 def input_docs(max_docs=None):
-	incsv = csv.DictReader(open(source_data, mode='r'))
+	incsv = csv.DictReader(open('data/training.csv', mode='r'))
 		
 	# Reconstruct documents by concatenating all rows with the same slug
 	active_slug = None
@@ -114,14 +108,14 @@ def load_training_data_nocache(config):
 	
 # Because generating the list of features is so expensive, we cache it on disk
 def load_training_data(config):
-	if os.path.isfile(pickle_destination):
+	if os.path.isfile('data/cached_features.p'):
 		print('Loading training data from cache...')
-		slugs, token_text, features,labels = pickle.load(open(pickle_destination, 'rb'))
+		slugs, token_text, features,labels = pickle.load(open('data/cached_features.p', 'rb'))
 	else:
 		print('Loading training data...')
 		slugs, token_text, features, labels = load_training_data_nocache(config)
 		print('Saving training data to cache...')
-		pickle.dump((slugs, token_text, features, labels), open(pickle_destination, 'wb'))
+		pickle.dump((slugs, token_text, features, labels), open('data/cached_features.p', 'wb'))
 
 	return slugs, token_text, features,labels
 
@@ -160,10 +154,10 @@ def windowed_generator(features, labels, config):
 def missed_token_loss(one_penalty):
    
 	def _missed_token_loss(y_true, y_pred):
-	  expected_zero = tf.cast(tf.math.equal(y_true,0), tf.float32)
+	  expected_zero = tf.to_float(tf.math.equal(y_true,0))
 	  s = y_pred*expected_zero
 	  zero_loss = K.backend.mean(K.backend.square(s))
-	  expected_one = tf.cast(tf.math.equal(y_true,1), tf.float32)
+	  expected_one = tf.to_float(tf.math.equal(y_true,1))
 	  t = one_penalty*(1-y_pred)*expected_one
 	  one_loss = K.backend.mean(K.backend.square(t))
 	  return zero_loss + one_loss
