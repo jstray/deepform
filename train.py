@@ -165,11 +165,11 @@ def one_window_unbalanced(features, labels, window_len):
 
 
 def one_window(features, labels, window_len, positive_fraction):
-    f, l = one_window_unbalanced(features, labels, window_len)
+    f, label_set = one_window_unbalanced(features, labels, window_len)
     if random.random() > positive_fraction:  # mostly positive examples
-        while not 1 in l:
-            f, l = one_window_unbalanced(features, labels, window_len)
-    return f, l
+        while not (1 in label_set):
+            f, label_set = one_window_unbalanced(features, labels, window_len)
+    return f, label_set
 
 
 def windowed_generator(features, labels, config):
@@ -313,7 +313,8 @@ class DocAccCallback(K.callbacks.Callback):
                                self.token_text,
                                self.features,
                                self.labels,
-                               self.num_to_test + epoch)  # test more docs later in training, for more precise acc
+                               self.num_to_test + epoch)
+        # test more docs later in training, for more precise acc
         print(f'This epoch {self.logname}: {acc}')
         wandb.log({self.logname: acc})
 
