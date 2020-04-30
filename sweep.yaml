@@ -1,8 +1,8 @@
 # sweep.yaml
 program: train.py
-method: bayes
+method: grid
 metric:
- name: acc #val_acc?
+ name: doc_val_acc #acc #val_acc
  goal: maximize
 parameters:
  #learning-rate:
@@ -13,12 +13,11 @@ parameters:
  #hidden_layer_size:
    #values: [96, 128, 148]
  epochs:
-   value: 50 
+   value: 50
  len_train: 
-   #values: [250, 500, 1000, 2000, 4000]
-   values: [20, 40, 60, 80, 100]
-early_terminate:
-   type: hyperband
-   s: 2
-   eta: 3
-   max_iter: 25
+   values: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
+#early_terminate:
+#   type: hyperband
+#   s: 2
+#   eta: 3
+#   max_iter: 25

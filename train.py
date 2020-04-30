@@ -19,28 +19,38 @@ import random
 import pdfplumber
 import os
 import pickle
+import random
 from decimal import Decimal
 
 import wandb
 from wandb.keras import WandbCallback
 
 # Configuration
-run = wandb.init(project="jonathan_summer_1", entity="deepform", name="testing")
 
+default_config = {
+"read_docs" : 9019, # how many docs to load, at most
+"window_len" : 30, # size of token sequences to train on (and network size!)
+"vocab_size" : 500,
+"token_dims" : 7, # number of features per token, including token hash
+"positive_fraction" : 0.5,
+"target_thresh" : 0.9, # target match scores larger than this will becomes positive labels
+"epochs" : 50,
+"batch_size" : 10000,
+"steps_per_epoch" : 10,
+"doc_acc_sample_size" : 25, # how many documents to check extraction on after each epoch
+"penalize_missed" : 5, # how much more a missed 1 counts than a missed 0 in output
+"val_split" : 0.2,
+"len_train" : 80
+}
+
+seed = 42
+
+run = wandb.init(project="jonathan_summer_1", entity="deepform", name="arg_max sweep")
 config = run.config
-config.read_docs = 150 # how many docs to load, at most
-config.window_len = 30 # size of token sequences to train on (and network size!)
-config.vocab_size = 500
-config.token_dims = 7 # number of features per token, including token hash
-config.positive_fraction = 0.5
-config.target_thresh = 0.9 # target match scores larger than this will becomes positive labels
-config.epochs = 50
-config.batch_size=10000
-config.steps_per_epoch = 10
-config.doc_acc_sample_size = 25 # how many documents to check extraction on after each epoch
-config.penalize_missed = 5 # how much more a missed 1 counts than a missed 0 in output
-config.val_split = 0.2
-config.len_train = 80
+config.setdefaults(default_config)
+
+run.name = str(config.len_train)
+run.save()
 
 source_data = 'source/training.csv'
 pickle_destination = 'source/cached_features.p'
@@ -106,8 +116,12 @@ def load_training_data_nocache(config):
 
 		features.append([token_features(row, config.vocab_size) for row in doc_tokens])
 		
-		# threshold fuzzy matching score with our target field, to get binary labels 
-		labels.append([(0 if float(row['gross_amount']) < config.target_thresh else 1) for row in doc_tokens])
+		# takes the token with the highest fuzzy string matching score as the correct answer
+		match_scores = [float(row['gross_amount']) for row in doc_tokens]
+		best_match_idx = np.argmax(match_scores)
+		row_labels = [1 if idx==best_match_idx else 0 for idx in range(len(match_scores))]
+		labels.append(row_labels)
+
 	print("Length of slugs in load_training_data_nocache = ", len(slugs))
 	return slugs, token_text, features, labels
 	
@@ -124,11 +138,16 @@ def load_training_data(config):
 
 	# Trim the training data so we can sweep across various training data sizes
 	print("Length of slugs in load_training_data before modification = ", len(slugs))
-	slugs = slugs[:config.len_train]
+	random.seed(seed)
+	slugs = random.sample(slugs, config.len_train)
 	print("Length of slugs in load_training_data after modification = ", len(slugs))
-	token_text = token_text[:config.len_train]
-	features = features[:config.len_train]
-	labels = labels[:config.len_train]
+	
+	random.seed(seed)
+	token_text = random.sample(token_text, config.len_train)
+	random.seed(seed)
+	features = random.sample(features, config.len_train)
+	random.seed(seed)
+	labels = random.sample(labels, config.len_train)
 
 	return slugs, token_text, features, labels
 
@@ -238,9 +257,12 @@ def compute_accuracy(model, window_len, slugs, token_text, features, labels, num
 		doc_idx = random.randint(0, len(slugs)-1)
 		predict_text, predict_score = predict_answer(model, features[doc_idx], token_text[doc_idx], window_len)
 		answer_text = correct_answer(features[doc_idx], labels[doc_idx], token_text[doc_idx])
-		print(f'{slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+		
 		if predict_text==answer_text:
+			print(f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
 			acc+=1
+		else: 
+			print(f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
 	return acc/num_to_test
 
 
