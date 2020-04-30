@@ -9,21 +9,20 @@ from keras.engine.input_layer import Input
 from keras.models import Model
 from keras.layers import Dense, Flatten, Dropout, Lambda, concatenate
 from keras.layers.embeddings import Embedding
-from keras.backend import expand_dims, squeeze
+from keras.backend import squeeze
 import tensorflow as tf
-import pandas as pd
 import numpy as np
-import csv
-import re
 import random
 import os
 import pickle
-import random
 import math
+from source import input_docs
+import util
 from decimal import Decimal
 
 import wandb
 from wandb.keras import WandbCallback
+
 
 seed = 42
 random.seed(seed)
@@ -37,41 +36,10 @@ source_data = 'source/training.csv'
 pickle_destination = 'source/cached_features.p'
 
 # ---- Load data and generate features ----
+pickle_destination = 'source/cached_features.p'
 
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
-
-
-def input_docs(max_docs=None):
-    incsv = csv.DictReader(open(source_data, mode='r'))
-
-    # Reconstruct documents by concatenating all rows with the same slug
-    active_slug = None
-    doc_rows = []
-    num_docs = 0
-
-    for row in incsv:
-        # throw out tokens that are too short, they won't help us
-        token = row['token']
-        if len(token) < 3:
-            continue
-
-        if row['slug'] != active_slug:
-            if active_slug:
-                yield doc_rows
-                num_docs += 1
-                if max_docs and num_docs >= max_docs:
-                    return
-            doc_rows = [row]
-            active_slug = row['slug']
-        else:
-            doc_rows.append(row)
-
-    yield doc_rows
-
-
-def is_dollar_amount(s):
-    return re.search(r'\$?\d[\d,]+(\.\d\d)?', s) is not None
 
 
 def token_features(row, vocab_size):
@@ -82,7 +50,7 @@ def token_features(row, vocab_size):
             float(row['y0']),
             float(len(tokstr)),
             float(np.mean([c.isdigit() for c in tokstr])),
-            float(is_dollar_amount(tokstr))]
+            float(util.is_dollar_amount(tokstr))]
 
 # Load raw training data, create our per-token features and binary labels
 
@@ -298,6 +266,13 @@ class DocAccCallback(K.callbacks.Callback):
 
 
 if __name__ == "__main__":
+    run = wandb.init(
+        project="jonathan_summer_1",
+        entity="deepform",
+        name="testing")
+
+    config = run.config
+
     print('Configuration:')
     print(config)
 

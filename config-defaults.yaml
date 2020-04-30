@@ -22,7 +22,7 @@ steps_per_epoch:
   desc: how many documents to check extraction on after each epoch
   value: 10
 doc_acc_sample_size:
-  value: 25
+  value: 150
 penalize_missed:
   desc: how much more a missed 1 counts than a missed 0 in outputs
   value: 5
