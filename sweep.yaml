@@ -15,7 +15,7 @@ parameters:
  epochs:
    value: 50
  len_train: 
-   values: [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
+   values: [10, 100, 250, 500, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000]
 #early_terminate:
 #   type: hyperband
 #   s: 2
