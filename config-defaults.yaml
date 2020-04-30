@@ -1,0 +1,32 @@
+read_docs:
+  desc: how many docs to load, at most
+  value: 9019
+window_len:
+  desc: size of token sequences to train on (and network size!)
+  value: 30
+vocab_size:
+  value: 500
+token_dims:
+  desc: number of features per token, including token hash
+  value: 7
+positive_fraction:
+  desc: target match scores larger than this will becomes positive labels
+  value: 0.5
+target_thresh:
+  value: 0.9
+epochs:
+  value: 50
+batch_size:
+  value: 10000
+steps_per_epoch:
+  desc: how many documents to check extraction on after each epoch
+  value: 10
+doc_acc_sample_size:
+  value: 25
+penalize_missed:
+  desc: how much more a missed 1 counts than a missed 0 in outputs
+  value: 5
+val_split:
+  value: 0.2
+len_train:
+  value: 80

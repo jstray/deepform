@@ -16,7 +16,6 @@ import numpy as np
 import csv
 import re
 import random
-import pdfplumber
 import os
 import pickle
 import random
@@ -26,30 +25,11 @@ from decimal import Decimal
 import wandb
 from wandb.keras import WandbCallback
 
-# Configuration
-
-default_config = {
-    "read_docs" : 9019, # how many docs to load, at most
-    "window_len" : 30, # size of token sequences to train on (and network size!)
-    "vocab_size" : 500,
-    "token_dims" : 7, # number of features per token, including token hash
-    "positive_fraction" : 0.5,
-    "epochs" : 50,
-    "batch_size" : 10000,
-    "steps_per_epoch" : 10,
-    "doc_acc_sample_size" : 150, # how many documents to check extraction on after each epoch
-    "penalize_missed" : 5, # how much more a missed 1 counts than a missed 0 in output
-    "val_split" : 0.2,
-    "len_train" : 80
-}
-
 seed = 42
 random.seed(seed)
 
 run = wandb.init(project="jonathan_summer_1", entity="deepform", name="arg_max sweep")
 config = run.config
-config.setdefaults(default_config)
-
 run.name = str(config.len_train)
 run.save()
 
@@ -224,9 +204,7 @@ def create_model(config):
 
     f = Flatten()(merged)
     d1 = Dense(
-        config.window_len *
-        config.token_dims *
-        5,
+        config.window_len * config.token_dims * 5,
         activation='sigmoid')(f)
     d2 = Dropout(0.3)(d1)
     d3 = Dense(config.window_len * config.token_dims, activation='sigmoid')(d2)
@@ -318,8 +296,6 @@ class DocAccCallback(K.callbacks.Callback):
         print(f'This epoch {self.logname}: {acc}')
         wandb.log({self.logname: acc})
 
-
-# --- MAIN ----
 
 if __name__ == "__main__":
     print('Configuration:')
