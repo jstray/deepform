@@ -20,6 +20,7 @@ import pdfplumber
 import os
 import pickle
 import random
+import math
 from decimal import Decimal
 
 import wandb
@@ -33,11 +34,10 @@ default_config = {
 "vocab_size" : 500,
 "token_dims" : 7, # number of features per token, including token hash
 "positive_fraction" : 0.5,
-"target_thresh" : 0.9, # target match scores larger than this will becomes positive labels
 "epochs" : 50,
 "batch_size" : 10000,
 "steps_per_epoch" : 10,
-"doc_acc_sample_size" : 25, # how many documents to check extraction on after each epoch
+"doc_acc_sample_size" : 150, # how many documents to check extraction on after each epoch
 "penalize_missed" : 5, # how much more a missed 1 counts than a missed 0 in output
 "val_split" : 0.2,
 "len_train" : 80
@@ -117,9 +117,8 @@ def load_training_data_nocache(config):
 		features.append([token_features(row, config.vocab_size) for row in doc_tokens])
 		
 		# takes the token with the highest fuzzy string matching score as the correct answer
-		match_scores = [float(row['gross_amount']) for row in doc_tokens]
-		best_match_idx = np.argmax(match_scores)
-		row_labels = [1 if idx==best_match_idx else 0 for idx in range(len(match_scores))]
+		max_score = math.max([float(row['gross_amount']) for row in doc_tokens])
+		row_labels = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
 		labels.append(row_labels)
 
 	print("Length of slugs in load_training_data_nocache = ", len(slugs))
