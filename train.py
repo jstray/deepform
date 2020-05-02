@@ -22,7 +22,7 @@ from decimal import Decimal
 
 import wandb
 from wandb.keras import WandbCallback
-
+from source import load_training_data
 
 seed = 42
 random.seed(seed)
@@ -31,77 +31,12 @@ run = wandb.init(project="jonathan_summer_1", entity="deepform", name="arg_max s
 config = run.config
 run.name = str(config.len_train)
 run.save()
-
-source_data = 'source/training.csv'
-pickle_destination = 'source/cached_features.p'
-
-# ---- Load data and generate features ----
-pickle_destination = 'source/cached_features.p'
-
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
-
-
-def token_features(row, vocab_size):
-    tokstr = row['token'].upper()
-    return [hash(tokstr) % vocab_size,
-            float(row['page']),
-            float(row['x0']),
-            float(row['y0']),
-            float(len(tokstr)),
-            float(np.mean([c.isdigit() for c in tokstr])),
-            float(util.is_dollar_amount(tokstr))]
-
-# Load raw training data, create our per-token features and binary labels
-
-
-def load_training_data_nocache(config):
-	slugs = []
-	token_text = []
-	features = []
-	labels = []
-    for doc_tokens in input_docs(max_docs=config.read_docs):
-        if len(doc_tokens) < config.window_len:
-            continue  # TODO pad shorter docs
-		# Not training data, but used for evaluating results later
-		slugs.append(doc_tokens[0]['slug']) # unique document ID, also PDF filename
-		token_text.append([row['token'] for row in doc_tokens])
-		features.append([token_features(row, config.vocab_size) for row in doc_tokens])
-		# takes the token with the highest fuzzy string matching score as the correct answer
-		max_score = math.max([float(row['gross_amount']) for row in doc_tokens])
-		row_labels = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
-		labels.append(row_labels)
-	print("Length of slugs in load_training_data_nocache = ", len(slugs))
-	return slugs, token_text, features, labels
-
-
-# Because generating the list of features is so expensive, we cache it on disk
-def load_training_data(config):
-	if os.path.isfile(pickle_destination):
-		print('Loading training data from cache...')
-		slugs, token_text, features, labels = pickle.load(open(pickle_destination, 'rb'))
-    else:
-        print('Loading training data...')
-        slugs, token_text, features, labels = load_training_data_nocache(
-            config)
-        print('Saving training data to cache...')
-        pickle.dump(
-            (slugs, token_text, features, labels), open(
-                pickle_destination, 'wb'))
-	# Trim the training data so we can sweep across various training data sizes
-	print("Length of slugs in load_training_data before modification = ", len(slugs))
-	slugs = random.sample(slugs, config.len_train)
-	print("Length of slugs in load_training_data after modification = ", len(slugs))
-	token_text = random.sample(token_text, config.len_train)
-	features = random.sample(features, config.len_train)
-	labels = random.sample(labels, config.len_train)
-	return slugs, token_text, features, labels
-
 # ---- Resample features,labels as windows ----
 
+
 # returns a window of tokens, labels at a random position in a random document
-
-
 def one_window_unbalanced(features, labels, window_len):
     doc_idx = random.randint(0, len(features) - 1)
     doc_len = len(features[doc_idx])
@@ -224,6 +159,7 @@ def correct_answer(features, labels, token_text):
     answer_text = token_text[answer_idx]
     return answer_text
 
+
 # Calculate accuracy of answer extraction over num_to_test docs, print diagnostics while we do so
 def compute_accuracy(model, window_len, slugs, token_text, features, labels, num_to_test):
 	acc = 0.0
@@ -238,6 +174,7 @@ def compute_accuracy(model, window_len, slugs, token_text, features, labels, num
 		else:
 			print(f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
 	return acc/num_to_test
+
 
 # ---- Custom callback to log document-level accuracy ----
 
