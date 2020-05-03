@@ -30,3 +30,10 @@ val_split:
   value: 0.2
 len_train:
   value: 80
+data_from_db:
+  desc: load from 'db'
+  value: true
+db_user:
+  value: root
+db_password:
+  value: changeme

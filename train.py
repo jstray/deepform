@@ -214,11 +214,13 @@ if __name__ == "__main__":
     print(config)
 
     slugs, token_text, features, labels = load_training_data(config)
-    print(f'Loaded {len(features)}')
-    max_length = max([len(x) for x in labels])
-    print(f'Max document size {max_length}')
-    avg_length = sum([len(x) for x in labels]) / len(labels)
-    print(f'Average document size {avg_length}')
+
+    # DF: commenting out because these are just diagnostic and rely on in-mem data
+    # print(f'Loaded {len(features)}')
+    # max_length = max([len(x) for x in labels])
+    # print(f'Max document size {max_length}')
+    # avg_length = sum([len(x) for x in labels]) / len(labels)
+    # print(f'Average document size {avg_length}')
 
     # split into train and test
     slugs_train = []
