@@ -23,9 +23,9 @@ def clean_text(text):
     return [clean_char(x) for x in text]
 
 
-def input_generator(conn, num_samples=10, truncate_length=3000):
+def input_generator(conn, max_docs=10, truncate_length=3000):
     documents = pd.read_sql(
-        f"select * from document where committee != '' order by rand() limit {num_samples};",
+        f"select * from document where committee != '' order by rand() limit {max_docs};",
         conn
     )
     for document in documents.itertuples():
@@ -39,19 +39,35 @@ def input_generator(conn, num_samples=10, truncate_length=3000):
         yield text, document.committee
 
 
-def dataset(conn, buffer_size=100):
-    gen = lambda: input_generator(conn)
-    ds = tf.data.Dataset.from_generator(
-        gen,
-        args=[],
-        output_types=(tf.string, tf.string),
-    )
-    return ds.prefetch(buffer_size)
+def input_docs(conn, max_docs=10, minimum_doc_length=30):
+    try:
+        emitted_docs = 0
+        raw_conn = conn.engine.raw_connection()
+        cursor = raw_conn.cursor()
+        cursor.execute("select dc_slug, committee, gross_amount_usd from document where committee \
+            != '' order by rand()")
+        while emitted_docs < max_docs:
+            doc = cursor.fetchone()
+            if doc:
+                dc_slug, committee, gross_amount_usd = (doc[0], doc[1], doc[2])
+                rows = pd.read_sql(
+                    f"select * from token where dc_slug = '{dc_slug}';",
+                    conn
+                )
+                if len(rows) < minimum_doc_length:
+                    continue
+                else:
+                    yield dc_slug, committee, gross_amount_usd, rows
+                    emitted_docs += 1
+            else:
+                break
+    finally:
+        conn.close()
 
 
 if __name__ == '__main__':
     conn = connection("root", "changeme")
-    ds = dataset(conn)
-    for d in ds.take(10):
-        print(d)
+    docs = input_docs(conn)
+    for doc in docs:
+        print(doc)
         print("*****")

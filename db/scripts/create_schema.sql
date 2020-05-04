@@ -28,6 +28,7 @@ CREATE TABLE `token` (
   `x1` double DEFAULT NULL,
   `y1` double DEFAULT NULL,
   `token` varchar(256) DEFAULT NULL,
+  `gross_amount` double DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `origin_document` (`dc_slug`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14024491 DEFAULT CHARSET=latin1;
