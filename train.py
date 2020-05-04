@@ -27,7 +27,10 @@ from source import load_training_data
 seed = 42
 random.seed(seed)
 
-run = wandb.init(project="jonathan_summer_1", entity="deepform", name="arg_max sweep")
+run = wandb.init(
+    project="jonathan_summer_1",
+    entity="deepform",
+    name="arg_max sweep")
 config = run.config
 run.name = str(config.len_train)
 run.save()
@@ -160,20 +163,28 @@ def correct_answer(features, labels, token_text):
     return answer_text
 
 
-# Calculate accuracy of answer extraction over num_to_test docs, print diagnostics while we do so
-def compute_accuracy(model, window_len, slugs, token_text, features, labels, num_to_test):
-	acc = 0.0
-	for i in range(num_to_test):
-		doc_idx = random.randint(0, len(slugs)-1)
-		predict_text, predict_score = predict_answer(model, features[doc_idx], token_text[doc_idx], window_len)
-		answer_text = correct_answer(features[doc_idx], labels[doc_idx], token_text[doc_idx])
+# Calculate accuracy of answer extraction over num_to_test docs, print
+# diagnostics while we do so
+def compute_accuracy(model, window_len, slugs, token_text,
+                     features, labels, num_to_test):
+    acc = 0.0
+    for i in range(num_to_test):
+        doc_idx = random.randint(0, len(slugs) - 1)
+        predict_text, predict_score = predict_answer(
+            model, features[doc_idx], token_text[doc_idx], window_len)
+        answer_text = correct_answer(
+            features[doc_idx],
+            labels[doc_idx],
+            token_text[doc_idx])
 
-		if predict_text==answer_text:
-			print(f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
-			acc+=1
-		else:
-			print(f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
-	return acc/num_to_test
+        if predict_text == answer_text:
+            print(
+                f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+            acc += 1
+        else:
+            print(
+                f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+    return acc / num_to_test
 
 
 # ---- Custom callback to log document-level accuracy ----
@@ -243,7 +254,8 @@ if __name__ == "__main__":
             features_train.append(features[i])
             labels_train.append(labels[i])
 
-    print(f'Training on {len(features_train)}, validating on {len(features_val)}')
+    print(
+        f'Training on {len(features_train)}, validating on {len(features_val)}')
 
     model = create_model(config)
     print(model.summary())

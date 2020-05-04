@@ -53,15 +53,18 @@ def load_training_data_nocache(config):
 
         # threshold fuzzy matching score with our target field, to get binary
         # labels
-		max_score = math.max([float(row['gross_amount']) for row in doc_tokens])
-		row_labels = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
-		labels.append(row_labels)
+        max_score = math.max([float(row['gross_amount'])
+                              for row in doc_tokens])
+        row_labels = [1 if float(row['gross_amount'])
+                      == max_score else 0 for row in doc_tokens]
+        labels.append(row_labels)
     print("Length of slugs in load_training_data_nocache = ", len(slugs))
     return slugs, token_text, features, labels  # arrays with an element per doc
 
 
 # Because generating the list of features is so expensive, we cache it on disk
-def load_training_data_from_files(config, pickle_destination="source/cached_features.p"):
+def load_training_data_from_files(
+        config, pickle_destination="source/cached_features.p"):
     if os.path.isfile(pickle_destination):
         print('Loading training data from cache...')
         slugs, token_text, features, labels = pickle.load(
@@ -75,13 +78,18 @@ def load_training_data_from_files(config, pickle_destination="source/cached_feat
             (slugs, token_text, features, labels), open(
                 pickle_destination, 'wb'))
 
-	# Trim the training data so we can sweep across various training data sizes
-	print("Length of slugs in load_training_data before modification = ", len(slugs))
-	slugs = random.sample(slugs, config.len_train)
-	print("Length of slugs in load_training_data after modification = ", len(slugs))
-	token_text = random.sample(token_text, config.len_train)
-	features = random.sample(features, config.len_train)
-	labels = random.sample(labels, config.len_train)
+        # Trim the training data so we can sweep across various training data
+        # sizes
+        print(
+            "Length of slugs in load_training_data before modification = ",
+            len(slugs))
+        slugs = random.sample(slugs, config.len_train)
+        print(
+            "Length of slugs in load_training_data after modification = ",
+            len(slugs))
+        token_text = random.sample(token_text, config.len_train)
+        features = random.sample(features, config.len_train)
+        labels = random.sample(labels, config.len_train)
 
     return slugs, token_text, features, labels
 
@@ -97,7 +105,8 @@ def load_training_data_from_db(config):
         dc_slug, committee, gross_amount_usd, rows = doc
         slugs.append(dc_slug)
         token_text.append([token for token in rows.token])
-        features.append([token_features(row, config.vocab_size) for idx, row in rows.iterrows()])
+        features.append([token_features(row, config.vocab_size)
+                         for idx, row in rows.iterrows()])
         # threshold fuzzy matching score with our target field, to get binary
         # labels
         labels.append([(0 if float(row['gross_amount']) <
