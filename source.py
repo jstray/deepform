@@ -33,39 +33,54 @@ def input_docs(max_docs=None, source_data="source/training.csv"):
 
     yield doc_rows
 
-
+# Load raw training data, create our per-token features and binary labels   
 def load_training_data_nocache(config):
     slugs = []
     token_text = []
     features = []
     labels = []
-    for doc_tokens in input_docs(max_docs=config.read_docs):
-        if len(doc_tokens) < config.window_len:
-            continue  # TODO pad shorter docs
+    for doc_tokens in input_docs(max_docs=config.read_docs):    
+        if not config.pad_windows and len(doc_tokens) < config.window_len:
+            continue # this doc is too short
+        
+        token_row = [row['token'] for row in doc_tokens]
+        feature_row = [token_features(row, config.vocab_size) for row in doc_tokens]
 
-        # Not training data, but used for evaluating results later
-        # unique document ID, also PDF filename
-        slugs.append(doc_tokens[0]['slug'])
-        token_text.append([row['token'] for row in doc_tokens])
+        # takes the token with the highest fuzzy string matching score as the correct answer
+        max_score = max([float(row['gross_amount']) for row in doc_tokens])
+        label_row = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
 
-        features.append([token_features(row, config.vocab_size)
-                         for row in doc_tokens])
+        # Optionally pad document with a window of blanks at start and end, to avoid edge effects
+        if config.pad_windows:
+            n = config.window_len - 1
+            
+            token_padding = ['' for i in range(n)]
+            token_row = token_padding + token_row
+            token_row.extend(token_padding)
 
-        # threshold fuzzy matching score with our target field, to get binary
-        # labels
-        max_score = math.max([float(row['gross_amount'])
-                              for row in doc_tokens])
-        row_labels = [1 if float(row['gross_amount'])
-                      == max_score else 0 for row in doc_tokens]
-        labels.append(row_labels)
+            feature_padding = [token_features(None, None) for i in range(n)]
+            feature_row = feature_padding + feature_row
+            feature_row.extend(feature_padding)
+
+            label_padding = [0 for i in range(n)]
+            label_row = label_padding + label_row
+            label_row.extend(label_padding)
+
+        # Slugs and token text are not training data, but used for evaluating results later
+        slugs.append(doc_tokens[0]['slug']) # unique document ID, also PDF filename
+        token_text.append(token_row)
+
+        features.append(feature_row)
+        labels.append(label_row)
+
     print("Length of slugs in load_training_data_nocache = ", len(slugs))
-    return slugs, token_text, features, labels  # arrays with an element per doc
+    return slugs, token_text, features, labels
 
 
 # Because generating the list of features is so expensive, we cache it on disk
 def load_training_data_from_files(
         config, pickle_destination="source/cached_features.p"):
-    if os.path.isfile(pickle_destination):
+    if config.use_cache and os.path.isfile(pickle_destination):
         print('Loading training data from cache...')
         slugs, token_text, features, labels = pickle.load(
             open(pickle_destination, 'rb'))

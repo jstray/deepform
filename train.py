@@ -28,12 +28,11 @@ seed = 42
 random.seed(seed)
 
 run = wandb.init(
-    project="jonathan_summer_1",
+    project="extract_total",
     entity="deepform",
     name="arg_max sweep")
 config = run.config
-run.name = str(config.len_train)
-run.save()
+
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
 # ---- Resample features,labels as windows ----
@@ -133,7 +132,7 @@ def create_model(config):
 
 def predict_scores(model, features, window_len):
     doc_len = len(features)
-    num_windows = doc_len - window_len
+    num_windows = doc_len - window_len+1
 
     windowed_features = np.array(
         [features[i:i + window_len] for i in range(num_windows)])

@@ -1,14 +1,20 @@
 read_docs:
   desc: how many docs to load, at most
-  value: 9019
+  value: 9018
 window_len:
   desc: size of token sequences to train on (and network size!)
   value: 30
+pad_windows:
+  desc: zero pad beginning and end of doc token stream
+  value: 1
+amount_feature:
+  desc: use dollar value directly as feature?
+  value: 1
 vocab_size:
   value: 500
 token_dims:
   desc: number of features per token, including token hash
-  value: 7
+  value: 8
 positive_fraction:
   desc: target match scores larger than this will becomes positive labels
   value: 0.5
@@ -29,7 +35,10 @@ penalize_missed:
 val_split:
   value: 0.2
 len_train:
-  value: 80
+  value: 3000
+use_data_cache:
+  desc: use pickled saved training data (freezes options like padding, amount_feature)
+  value: 0
 data_from_db:
   desc: load from 'db'
   value: false
