@@ -35,7 +35,7 @@ penalize_missed:
 val_split:
   value: 0.2
 len_train:
-  value: 3000
+  value: 100 #Not more than the value of read_docs
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 0

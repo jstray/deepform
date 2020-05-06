@@ -24,13 +24,10 @@ import wandb
 from wandb.keras import WandbCallback
 from source import load_training_data
 
-seed = 42
-random.seed(seed)
-
 run = wandb.init(
     project="extract_total",
     entity="deepform",
-    name="arg_max sweep")
+    name="padding sweep")
 config = run.config
 
 # Generator that reads raw training data
@@ -165,7 +162,7 @@ def correct_answer(features, labels, token_text):
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
 def compute_accuracy(model, window_len, slugs, token_text,
-                     features, labels, num_to_test):
+                     features, labels, num_to_test, print_results):
     acc = 0.0
     for i in range(num_to_test):
         doc_idx = random.randint(0, len(slugs) - 1)
@@ -177,12 +174,14 @@ def compute_accuracy(model, window_len, slugs, token_text,
             token_text[doc_idx])
 
         if predict_text == answer_text:
-            print(
-                f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+            if print_results:
+                print(
+                    f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
             acc += 1
         else:
-            print(
-                f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+            if print_results:
+                print(
+                    f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
     return acc / num_to_test
 
 
@@ -206,7 +205,9 @@ class DocAccCallback(K.callbacks.Callback):
                                self.token_text,
                                self.features,
                                self.labels,
-                               self.num_to_test + epoch)
+                               self.num_to_test + epoch,
+                               epoch >= config.epochs - 1) # print results only at the final epoch
+
         # test more docs later in training, for more precise acc
         print(f'This epoch {self.logname}: {acc}')
         wandb.log({self.logname: acc})
