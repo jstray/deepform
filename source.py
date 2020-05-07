@@ -49,8 +49,14 @@ def load_training_data_nocache(config):
         feature_row = [token_features(row, config) for row in doc_tokens]
 
         # takes the token with the highest fuzzy string matching score as the correct answer
+        
+
         max_score = max([float(row['gross_amount']) for row in doc_tokens])
+        
+        if max_score < config.target_thresh:
+            continue # The document's best score isn't good enough
         label_row = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
+        
 
         # Optionally pad document with a window of blanks at start and end, to avoid edge effects
         if config.pad_windows:

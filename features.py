@@ -1,5 +1,6 @@
 import util
 import numpy as np
+import math
 
 
 
@@ -13,6 +14,6 @@ def token_features(row, config):
                  float(len(tokstr)),
                  float(np.mean([c.isdigit() for c in tokstr])),
                  float(util.is_dollar_amount(tokstr)),
-                 util.dollar_amount(tokstr) if config.amount_feature else 0 ]
+                 math.log(util.dollar_amount(tokstr) + 1) if config.amount_feature else 0 ]
     else:
         return [0 for i in range(config.token_dims)]

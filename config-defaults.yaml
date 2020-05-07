@@ -36,6 +36,9 @@ val_split:
   value: 0.2
 len_train:
   value: 100 #Not more than the value of read_docs
+trim_low_scores:
+  desc: used to trim away low scores (scores below target_thresh) 
+  value: true
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 0

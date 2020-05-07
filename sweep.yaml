@@ -12,14 +12,18 @@ parameters:
    #values: ["adam", "sgd"]
  #hidden_layer_size:
    #values: [96, 128, 148]
+ target_thresh:
+   values: [0, .75, .9, .95]
  epochs:
    value: 50
  len_train: 
-   values: [1000, 5000, 9000]
+   values: [5000, 9000]
  amount_feature:
    values: [0, 1]
- pad_windows:
-   values: [0, 1]
+ #pad_windows:
+ #  values: [0, 1]
+ #trim_low_scores:
+ #  values: [0, 1]
 #early_terminate:
 #   type: hyperband
 #   s: 2

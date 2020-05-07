@@ -30,6 +30,11 @@ run = wandb.init(
     name="padding sweep")
 config = run.config
 
+
+run.name = str(f"target_thresh: {config.target_thresh}, len_train: {config.len_train}, amount_feature{config.amount_feature}")
+run.save()
+
+
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
 # ---- Resample features,labels as windows ----
@@ -44,8 +49,6 @@ def one_window_unbalanced(features, labels, window_len):
                              window_len], labels[doc_idx][tok_idx: tok_idx + window_len]
 
 # control the fraction of windows that include a positive label. not efficient.
-
-
 def one_window(features, labels, window_len, positive_fraction):
     f, label_set = one_window_unbalanced(features, labels, window_len)
     if random.random() > positive_fraction:  # mostly positive examples
@@ -71,8 +74,6 @@ def windowed_generator(features, labels, config):
         yield batch_features, batch_labels
 
 # ---- Custom loss function is basically MSE but high penalty for missing a 1 label ---
-
-
 def missed_token_loss(one_penalty):
 
     def _missed_token_loss(y_true, y_pred):
