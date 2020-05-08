@@ -31,7 +31,7 @@ run = wandb.init(
 config = run.config
 
 
-run.name = str(f"target_thresh: {config.target_thresh}, len_train: {config.len_train}, amount_feature{config.amount_feature}")
+run.name = str(f"target_thresh: {config.target_thresh}, len_train: {config.len_train}, amount_feature: {config.amount_feature}")
 run.save()
 
 

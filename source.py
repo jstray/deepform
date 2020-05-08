@@ -106,17 +106,18 @@ def load_training_data_from_files(
         print(
             "Length of slugs in load_training_data before modification = ",
             len(slugs))
+        n_docs = min(len(slugs), config.len_train)
         random.seed(seed)
-        slugs = random.sample(slugs, config.len_train)
+        slugs = random.sample(slugs, n_docs)
         print(
             "Length of slugs in load_training_data after modification = ",
             len(slugs))
         random.seed(seed)
-        token_text = random.sample(token_text, config.len_train)
+        token_text = random.sample(token_text, n_docs)
         random.seed(seed)
-        features = random.sample(features, config.len_train)
+        features = random.sample(features, n_docs)
         random.seed(seed)
-        labels = random.sample(labels, config.len_train)
+        labels = random.sample(labels, n_docs)
 
     return slugs, token_text, features, labels
 
