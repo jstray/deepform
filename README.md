@@ -57,9 +57,15 @@ The `slug` is a unique document identifier, ultimately from the source TSV. The 
 
 Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
 
+You will also need to pass a Weights and Biases API key to the docker container as an environment variable named `WANDB_API_KEY`. Add a `.env` such as the following and then pass that argument to the docker command.
+
+```
+WANDB_API_KEY=MY_API_KEY
+```
+
 ```
 docker build -t projectdeepform/deepform .
-docker run -m 7g projectdeepform/deepform:latest
+docker run -m 7g --env-file=.env projectdeepform/deepform:latest
 ```
 
 ## A research data set

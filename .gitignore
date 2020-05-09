@@ -1,6 +1,7 @@
 
 pdfs
 data
+logs
 *.csv
 .DS_Store
 .ipynb_checkpoints
@@ -8,3 +9,4 @@ wandb
 __pycache__
 source/cached_features.p
 .
+.env
