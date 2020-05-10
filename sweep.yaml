@@ -1,31 +1,43 @@
 # sweep.yaml
 program: train.py
-method: grid
+method: bayes
 metric:
  name: doc_val_acc #acc #val_acc
  goal: maximize
 parameters:
- #learning-rate:
-   #min: 0.00001
-   #max: 0.1
+ learning-rate:
+   min: 0.0001
+   max: 0.05
+ steps_per_epoch:
+   min: 5
+   max: 20
  #optimizer:
    #values: ["adam", "sgd"]
  #hidden_layer_size:
    #values: [96, 128, 148]
+ window_len:
+   min: 5
+   max: 60
  target_thresh:
-   values: [0, .75, .9, .95]
+   min: 0.5
+   max: 1.0
  epochs:
    value: 50
  len_train: 
-   values: [5000, 9000]
+   values: [4000, 8000]
  amount_feature:
    values: [0, 1]
- #pad_windows:
- #  values: [0, 1]
- #trim_low_scores:
- #  values: [0, 1]
-#early_terminate:
-#   type: hyperband
-#   s: 2
-#   eta: 3
-#   max_iter: 25
+ penalize_missed:
+   min: 1.0
+   max: 10.0
+ positive_fraction:
+   min: .5
+   max: .9
+ pad_windows:
+   values: [0, 1]
+early_terminate:
+   #min_iter #specify the iteration for the first bracket
+   type: hyperband
+   s: 2 #specify the total number of brackets (required for max_iter)
+   eta: 3 #specify the bracket multiplier schedule (default: 3)
+   max_iter: 27 #specify the maximum number of iterations for the program
