@@ -1,6 +1,6 @@
 read_docs:
   desc: how many docs to load, at most
-  value: 9018
+  value: 20000
 window_len:
   desc: size of token sequences to train on (and network size!)
   value: 30
@@ -11,7 +11,19 @@ amount_feature:
   desc: use dollar value directly as feature?
   value: 1
 vocab_size:
+  desc: token strings are hashed mod this before embedding
   value: 500
+vocab_embed_size:
+  desc: number of outputs in token hash embedding
+  value: 32
+layer_1_size_factor:
+  desc: layer 1 size = this factor * window_len
+  value: 5
+layer_2_size_factor:
+  desc: layer 2 size = this factor * window_len
+  value: 1  
+dropout:
+  value: 0.3
 token_dims:
   desc: number of features per token, including token hash
   value: 8
@@ -21,24 +33,27 @@ positive_fraction:
 target_thresh:
   value: 0.9
 epochs:
-  value: 50
+  value: 2
 batch_size:
   value: 10000
 steps_per_epoch:
   desc: how many documents to check extraction on after each epoch
   value: 10
 doc_acc_sample_size:
-  value: 150
+  desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
+  value: 10
+render_results_size:
+  desc: log this many PDF images on last epoch
+  value: 20
 penalize_missed:
   desc: how much more a missed 1 counts than a missed 0 in outputs
   value: 5
 val_split:
   value: 0.2
 len_train:
-  value: 100 #Not more than the value of read_docs
-trim_low_scores:
-  desc: used to trim away low scores (scores below target_thresh) 
-  value: true
+  value: 100 # Not more than the value of read_docs
+learning_rate:
+  value: 0.001
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 0

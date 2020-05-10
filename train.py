@@ -18,6 +18,7 @@ import pickle
 import math
 from source import input_docs
 import util
+import pdfplumber
 from decimal import Decimal
 
 import wandb
@@ -27,11 +28,10 @@ from source import load_training_data
 run = wandb.init(
     project="extract_total",
     entity="deepform",
-    name="padding sweep")
+    name="hypersweep")
 config = run.config
 
-
-run.name = str(f"target_thresh: {config.target_thresh}, len_train: {config.len_train}, amount_feature: {config.amount_feature}")
+run.name = str(f"len:{config.len_train} win:{config.window_len} thrs:{config.target_thresh} amt:{config.amount_feature} f1:{config.layer_1_size_factor} f2:{config.layer_2_size_factor} drop:{config.dropout} rate:{config.learning_rate}")
 run.save()
 
 
@@ -102,32 +102,96 @@ def create_model(config):
     tok_features = Lambda(
         lambda x: K.backend.slice(
             x, (0, 0, 1), (-1, -1, -1)))(indata)
-    embed = Embedding(config.vocab_size, 32)(tok_hash)
+    embed = Embedding(config.vocab_size, config.vocab_embed_size)(tok_hash)
     merged = concatenate([embed, tok_features], axis=2)
 
     f = Flatten()(merged)
     d1 = Dense(
-        config.window_len * config.token_dims * 5,
+        config.window_len * config.token_dims * config.layer_1_size_factor,
         activation='sigmoid')(f)
-    d2 = Dropout(0.3)(d1)
-    d3 = Dense(config.window_len * config.token_dims, activation='sigmoid')(d2)
-    d4 = Dropout(0.3)(d3)
+    d2 = Dropout(config.dropout)(d1)
+    d3 = Dense(config.window_len * config.token_dims * config.layer_2_size_factor, 
+        activation='sigmoid')(d2)
+    d4 = Dropout(config.dropout)(d3)
     d5 = Dense(config.window_len, activation='elu')(d4)
 
     model = Model(inputs=[indata], outputs=[d5])
     model.compile(
-        optimizer='adam',
-        loss=missed_token_loss(config.penalize_missed),
-        metrics=['acc'])
+        optimizer = K.optimizers.Adam(learning_rate=config.learning_rate),
+        loss = missed_token_loss(config.penalize_missed),
+        metrics = ['acc'])
 
     return model
+
+# -- Render visualization of output on PDF pages --
+
+# convert a single row of document data (one token) to bbox format needed
+# for drawing
+
+def docrow_to_bbox(t):
+    return [Decimal(t['x0']), Decimal(t['y0']),
+            Decimal(t['x1']), Decimal(t['y1'])]
+
+
+# make page number matches robust to floating point dirt
+def same_page(pagetok, current_page):
+    return abs(float(pagetok)-current_page)<0.01
+
+
+def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
+    fname = 'pdfs/' + slug + '.pdf'
+    try:
+        pdf = pdfplumber.open(fname)
+    except Exception as e:
+        # If the file's not there, that's fine -- we use available PDFs to
+        # define what to see
+        print('Cannot open pdf ' + fname)
+        return
+
+    print('Rendering output for ' + fname)
+
+    # Get the correct answers: find the indices of the token(s) labelled 1
+    target_idx = [idx for (idx, val) in enumerate(labels) if val == 1]
+
+    # Draw the machine output: get a score for each token
+    page_images = []
+    for pagenum, page in enumerate(pdf.pages):
+        im = page.to_image(resolution=300)
+
+        # training data has 0..1 for page range (see create-training-data.py)
+        num_pages = len(pdf.pages)
+        if num_pages > 1:
+            current_page = pagenum / float(num_pages - 1)
+        else:
+            current_page = 0.0
+
+        # Draw guesses
+        for idx, tok in enumerate(tokens):
+            #print(f"tok['page']:{tok['page']} current_page:{current_page}")
+            if scores[idx]/score > 0.5 and same_page(tok['page'],current_page):
+                im.draw_rect(docrow_to_bbox(tok),
+                             stroke='red',
+                             stroke_width=2 if scores[idx]/score >= 0.75 else 1,
+                             fill=None)
+
+        # Draw target tokens
+        target_toks = [tokens[i]
+                       for i in target_idx if same_page(tokens[i]['page'],current_page)]
+        rects = [docrow_to_bbox(t) for t in target_toks]
+        im.draw_rects(rects, stroke='blue', stroke_width=3, fill=None)
+
+        page_images.append(
+            wandb.Image(
+                im.annotated,
+                caption = 'page ' + str(pagenum)))
+
+    name = f'{slug} {"CORRECT" if predict_text == answer_text else "INCORRECT"} guessed: {predict_text} answer: {answer_text}'
+    wandb.log({ name: page_images })
 
 # --- Predict ---
 # Our network is windowed, so we have to aggregate windows to get a final score
 
 # Returns vector of token scores
-
-
 def predict_scores(model, features, window_len):
     doc_len = len(features)
     num_windows = doc_len - window_len+1
@@ -142,143 +206,153 @@ def predict_scores(model, features, window_len):
         scores[i:i + window_len] += window_scores[i]
     return scores
 
-# returns text, score of best answer
 
-
-def predict_answer(model, features, token_text, window_len):
+# returns text, score of best answer, plus all scores
+def predict_answer(model, features, tokens, window_len):
     scores = predict_scores(model, features, window_len)
     best_score_idx = np.argmax(scores)
-    best_score_text = token_text[best_score_idx]
-    return best_score_text, scores[best_score_idx]
+    best_score_text = tokens[best_score_idx]['token']
+    return best_score_text, scores[best_score_idx], scores
+
 
 # returns text of correct answer,
-
-
-def correct_answer(features, labels, token_text):
+def correct_answer(features, labels, tokens):
     answer_idx = np.argmax(labels)
-    answer_text = token_text[answer_idx]
+    answer_text = tokens[answer_idx]['token']
     return answer_text
 
 
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
-def compute_accuracy(model, window_len, slugs, token_text,
+def compute_accuracy(model, window_len, slugs, tokens,
                      features, labels, num_to_test, print_results):
+    n_print = config.render_results_size
+
+    n_docs = len(slugs)
+    doc_idxs = random.sample(range(n_docs), min(num_to_test,n_docs))
+
     acc = 0.0
-    for i in range(num_to_test):
-        doc_idx = random.randint(0, len(slugs) - 1)
-        predict_text, predict_score = predict_answer(
-            model, features[doc_idx], token_text[doc_idx], window_len)
+    for doc_idx in doc_idxs:
+        slug = slugs[doc_idx]
+        predict_text, predict_score, token_scores = predict_answer(
+            model, features[doc_idx], tokens[doc_idx], window_len)
         answer_text = correct_answer(
             features[doc_idx],
             labels[doc_idx],
-            token_text[doc_idx])
+            tokens[doc_idx])
 
         if predict_text == answer_text:
             if print_results:
                 print(
-                    f'Correct: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+                    f'Correct: {slug}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
             acc += 1
         else:
             if print_results:
                 print(
-                    f'***Incorrect: {slugs[doc_idx]}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+                    f'***Incorrect: {slug}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+
+        if print_results and n_print>0:
+            log_pdf(slug, tokens[doc_idx], labels[doc_idx], predict_score, token_scores, predict_text, answer_text)
+            n_print -= 1
+
     return acc / num_to_test
 
 
 # ---- Custom callback to log document-level accuracy ----
 
 class DocAccCallback(K.callbacks.Callback):
-    def __init__(self, window_len, slugs, token_text,
+    def __init__(self, window_len, slugs, tokens,
                  features, labels, num_to_test, logname):
         self.window_len = window_len
         self.slugs = slugs
-        self.token_text = token_text
+        self.tokens = tokens
         self.features = features
         self.labels = labels
         self.num_to_test = num_to_test
         self.logname = logname
 
     def on_epoch_end(self, epoch, logs):
+        if epoch >= config.epochs - 1:
+            # last epoch, sample from all docs and print inference results (for validation set)
+            print_results = self.logname == 'doc_val_acc'
+            test_size = len(self.slugs)
+        else:
+            # intermediate epoch, small sample (getting gradually more accurate) and no logging
+            print_results = False
+            test_size = self.num_to_test + epoch
+
         acc = compute_accuracy(self.model,
                                self.window_len,
                                self.slugs,
-                               self.token_text,
+                               self.tokens,
                                self.features,
                                self.labels,
-                               self.num_to_test + epoch,
-                               epoch >= config.epochs - 1) # print results only at the final epoch
+                               test_size,
+                               print_results) 
 
-        # test more docs later in training, for more precise acc
         print(f'This epoch {self.logname}: {acc}')
         wandb.log({self.logname: acc})
 
 
-if __name__ == "__main__":
-    run = wandb.init(
-        project="jonathan_summer_1",
-        entity="deepform",
-        name="testing")
+# --- Main ---
 
-    config = run.config
+print('Configuration:')
+print(config)
 
-    print('Configuration:')
-    print(config)
+slugs, token_text, features, labels = load_training_data(config)
 
-    slugs, token_text, features, labels = load_training_data(config)
+# DF: commenting out because these are just diagnostic and rely on in-mem data
+# print(f'Loaded {len(features)}')
+# max_length = max([len(x) for x in labels])
+# print(f'Max document size {max_length}')
+# avg_length = sum([len(x) for x in labels]) / len(labels)
+# print(f'Average document size {avg_length}')
 
-    # DF: commenting out because these are just diagnostic and rely on in-mem data
-    # print(f'Loaded {len(features)}')
-    # max_length = max([len(x) for x in labels])
-    # print(f'Max document size {max_length}')
-    # avg_length = sum([len(x) for x in labels]) / len(labels)
-    # print(f'Average document size {avg_length}')
+# split into train and test
+slugs_train = []
+token_text_train = []
+features_train = []
+labels_train = []
+slugs_val = []
+token_text_val = []
+features_val = []
+labels_val = []
+for i in range(len(features)):
+    if random.random() < config.val_split:
+        slugs_val.append(slugs[i])
+        token_text_val.append(token_text[i])
+        features_val.append(features[i])
+        labels_val.append(labels[i])
+    else:
+        slugs_train.append(slugs[i])
+        token_text_train.append(token_text[i])
+        features_train.append(features[i])
+        labels_train.append(labels[i])
 
-    # split into train and test
-    slugs_train = []
-    token_text_train = []
-    features_train = []
-    labels_train = []
-    slugs_val = []
-    token_text_val = []
-    features_val = []
-    labels_val = []
-    for i in range(len(features)):
-        if random.random() < config.val_split:
-            slugs_val.append(slugs[i])
-            token_text_val.append(token_text[i])
-            features_val.append(features[i])
-            labels_val.append(labels[i])
-        else:
-            slugs_train.append(slugs[i])
-            token_text_train.append(token_text[i])
-            features_train.append(features[i])
-            labels_train.append(labels[i])
+print(
+    f'Training on {len(features_train)}, validating on {len(features_val)}')
 
-    print(
-        f'Training on {len(features_train)}, validating on {len(features_val)}')
+model = create_model(config)
+print(model.summary())
 
-    model = create_model(config)
-    print(model.summary())
-
-    model.fit_generator(
-        windowed_generator(features_train, labels_train, config),
-        steps_per_epoch=config.steps_per_epoch,
-        epochs=config.epochs,
-        callbacks=[
-            WandbCallback(),
-            DocAccCallback(	config.window_len,
-                            slugs_train,
-                            token_text_train,
-                            features_train,
-                            labels_train,
-                            config.doc_acc_sample_size,
-                            'doc_train_acc'),
-            DocAccCallback(	config.window_len,
-                            slugs_val,
-                            token_text_val,
-                            features_val,
-                            labels_val,
-                            config.doc_acc_sample_size,
-                            'doc_val_acc')
-        ])
+model.fit_generator(
+    windowed_generator(features_train, labels_train, config),
+    steps_per_epoch=config.steps_per_epoch,
+    epochs=config.epochs,
+    callbacks=[
+        WandbCallback(),
+        DocAccCallback(	config.window_len,
+                        slugs_train,
+                        token_text_train,
+                        features_train,
+                        labels_train,
+                        config.doc_acc_sample_size,
+                        'doc_train_acc'),
+        DocAccCallback(	config.window_len,
+                        slugs_val,
+                        token_text_val,
+                        features_val,
+                        labels_val,
+                        config.doc_acc_sample_size,
+                        'doc_val_acc')
+    ])
