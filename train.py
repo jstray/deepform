@@ -31,7 +31,7 @@ run = wandb.init(
     name="hypersweep")
 config = run.config
 
-run.name = str(f"len:{config.len_train} win:{config.window_len} thrs:{config.target_thresh} amt:{config.amount_feature} f1:{config.layer_1_size_factor} f2:{config.layer_2_size_factor} drop:{config.dropout} rate:{config.learning_rate}")
+run.name = str(f"len:{config.len_train} win:{config.window_len} thrs:{config.target_thresh} amt:{config.amount_feature} emb:{config.vocab_embed_size} f1:{config.layer_1_size_factor} f2:{config.layer_2_size_factor} drop:{config.dropout} rate:{config.learning_rate}")
 run.save()
 
 
@@ -171,7 +171,7 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
             if scores[idx]/score > 0.5 and same_page(tok['page'],current_page):
                 im.draw_rect(docrow_to_bbox(tok),
                              stroke='red',
-                             stroke_width=2 if scores[idx]/score >= 0.75 else 1,
+                             stroke_width=3 if scores[idx]/score >= 0.75 else 1,
                              fill=None)
 
         # Draw target tokens
