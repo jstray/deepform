@@ -107,10 +107,10 @@ def create_model(config):
 
     f = Flatten()(merged)
     d1 = Dense(
-        config.window_len * config.token_dims * config.layer_1_size_factor,
+        int(config.window_len * config.token_dims * config.layer_1_size_factor),
         activation='sigmoid')(f)
     d2 = Dropout(config.dropout)(d1)
-    d3 = Dense(config.window_len * config.token_dims * config.layer_2_size_factor, 
+    d3 = Dense(int(config.window_len * config.token_dims * config.layer_2_size_factor), 
         activation='sigmoid')(d2)
     d4 = Dropout(config.dropout)(d3)
     d5 = Dense(config.window_len, activation='elu')(d4)
