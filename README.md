@@ -9,6 +9,7 @@ For results and discussion, see [this talk](https://www.youtube.com/watch?v=uNN5
 Full thanks to my collaborator Nicholas Bardy of Weights & Biases.
 
 ## Why?
+
 TV stations are required to disclose their sale of political advertising, but there is no requirement that this disclosure is machine readable. Every election, tens of thousands of PDFs are posted to the FCC Public File, available at [https://publicfiles.fcc.gov/](https://publicfiles.fcc.gov/) in hundreds of different formats.
 
 In 2012, ProPublica ran the Free The Files project (you can [read how it worked](https://www.niemanlab.org/2012/12/crowdsourcing-campaign-spending-what-propublica-learned-from-free-the-files/)) and hundreds of volunteers hand-entered information for over 17,000 of these forms. That data drove a bunch of campaign finance [coverage](https://www.propublica.org/series/free-the-files) and is now [available](https://www.propublica.org/datastore/dataset/free-the-files-filing-data) from their data store.
@@ -16,6 +17,7 @@ In 2012, ProPublica ran the Free The Files project (you can [read how it worked]
 Can we replicate this data extraction using modern deep learning techniques? This project aimed to find out, and successfully extracted the easiest of the fields (total amount) at 90% accuracy using a relatively simple network.
 
 ## How it works
+
 I settled on a relatively simple design, using a fully connected three-layer network trained on 20 token windows of the data. Each token is hashed to an integer mod 500, then converted to 1-hot representation and embedded into 32 dimensions. This embedding is combined with geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as whether the token matches a regular expression for dollar amounts. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
 Although 90% is a good result, it's probably not high enough for production use. However, I believe this approach has lots of room for improvement. The advantage of this type of system is that it can elegantly integrate multiple manual extraction methods — the "hint" features — each of which can be individually crappy. The network actually learns when to trust each method. In ML speak this is "boosting over weak learners."
@@ -37,6 +39,7 @@ If you wish to reproduce this result, there are multple steps in the data prepar
 - `baseline.py` is a hand coded total extractor for comparison, which achieves 61% accuracy.
 
 ## Training data format
+
 The main training data file is `data/training.csv` but it's too big to post in github, so you can download it [here](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
 
 There is data from 9018 labelled documents. It's formatted as "tokens plus geometry" like this:
@@ -57,7 +60,7 @@ The `slug` is a unique document identifier, ultimately from the source TSV. The 
 
 Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
 
-You will also need to pass a Weights and Biases API key to the docker container as an environment variable named `WANDB_API_KEY`. Add a `.env` such as the following and then pass that argument to the docker command.
+The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). You will also need to pass a Weights and Biases API key to the docker container as an environment variable named `WANDB_API_KEY`. Add a `.env` such as the following and then pass that argument to the docker command.
 
 ```
 WANDB_API_KEY=MY_API_KEY
@@ -65,10 +68,11 @@ WANDB_API_KEY=MY_API_KEY
 
 ```
 docker build -t projectdeepform/deepform .
-docker run -m 7g --env-file=.env projectdeepform/deepform:latest
+docker run -m 7g --mount type=bind,source="$(pwd)"/source,target=/source --env-file=.env projectdeepform/deepform:latest
 ```
 
 ## A research data set
+
 There is a great deal left to do! For example, we still need to try extracting the other fields such as advertiser and TV station call sign. This will probably be harder than totals as it's harder to identify tokens which "look like" the correct answer.
 
 There is still more data preparation work to do. We discovered that about 30% of the PDFs documents still need OCR, which should increase our training data set from 9k to ~17k documents.

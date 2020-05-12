@@ -1,8 +1,7 @@
-FROM tensorflow/tensorflow:2.1.0-py3
-COPY source /source
-COPY db /db
-COPY *.py ./
-COPY *.yaml ./
-COPY requirements.txt requirements.txt
+FROM tensorflow/tensorflow:2.2.0-gpu
+COPY docker-requirements.txt requirements.txt
 RUN pip install -r requirements.txt
+COPY db/source.py db/source.py
+COPY *.py ./
+COPY config-defaults.yaml .
 CMD python train.py
