@@ -31,7 +31,8 @@ run = wandb.init(
     name="hypersweep")
 config = run.config
 
-run.name = str(f"len:{config.len_train} win:{config.window_len} thrs:{config.target_thresh} amt:{config.amount_feature} emb:{config.vocab_embed_size} f1:{config.layer_1_size_factor} f2:{config.layer_2_size_factor} drop:{config.dropout} rate:{config.learning_rate}")
+c_ = config
+run.name = f'len:{c_.len_train} win:{c_.window_len} str:{c_.use_string} page:{c_.use_page} geom:{c_.use_geom} amt:{c_.use_amount} voc:{c_.vocab_size} emb:{c_.vocab_embed_size} steps:{c_.steps_per_epoch}'
 run.save()
 
 
@@ -167,11 +168,20 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
 
         # Draw guesses
         for idx, tok in enumerate(tokens):
-            #print(f"tok['page']:{tok['page']} current_page:{current_page}")
-            if scores[idx]/score > 0.5 and same_page(tok['page'],current_page):
+            rel_score = scores[idx]/score
+            if rel_score>=0.5 and same_page(tok['page'],current_page):
+                if rel_score == 1:
+                    w = 5
+                    s = 'magenta'
+                elif rel_score >= 0.75:
+                    w = 3
+                    s = 'red'
+                else:
+                    w = 1
+                    s = 'red'
                 im.draw_rect(docrow_to_bbox(tok),
-                             stroke='red',
-                             stroke_width=3 if scores[idx]/score >= 0.75 else 1,
+                             stroke=s,
+                             stroke_width=w,
                              fill=None)
 
         # Draw target tokens
@@ -185,8 +195,14 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
                 im.annotated,
                 caption = 'page ' + str(pagenum)))
 
-    name = f'{slug} {"CORRECT" if predict_text == answer_text else "INCORRECT"} guessed: {predict_text} answer: {answer_text}'
-    wandb.log({ name: page_images })
+    # get best matching score of any token in the training data
+    match = max([tok['match'] for tok in tokens])
+    caption = f'{slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}'
+    if predict_text==answer_text:
+        caption = "CORRECT " + caption
+    else:
+        caption = "INCORRECT " + caption
+    wandb.log({ caption: page_images })
 
 # --- Predict ---
 # Our network is windowed, so we have to aggregate windows to get a final score
@@ -244,16 +260,16 @@ def compute_accuracy(model, window_len, slugs, tokens,
         if predict_text == answer_text:
             if print_results:
                 print(
-                    f'Correct: {slug}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+                    f'Correct: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"')
             acc += 1
         else:
             if print_results:
                 print(
-                    f'***Incorrect: {slug}: guessed "{predict_text}" with score {predict_score}, correct "{answer_text}"')
+                    f'***Incorrect: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"')
 
-        if print_results and n_print>0:
-            log_pdf(slug, tokens[doc_idx], labels[doc_idx], predict_score, token_scores, predict_text, answer_text)
-            n_print -= 1
+                if n_print>0:
+                    log_pdf(slug, tokens[doc_idx], labels[doc_idx], predict_score, token_scores, predict_text, answer_text)
+                    n_print -= 1
 
     return acc / num_to_test
 

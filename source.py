@@ -47,7 +47,8 @@ def load_training_data_nocache(config):
                    'y0':0, 
                    'x1':0, 
                    'y1':0, 
-                   'page':0 }
+                   'page':0,
+                   'match':0}
 
 
     for doc_tokens in input_docs(max_docs=config.read_docs):    
@@ -59,16 +60,14 @@ def load_training_data_nocache(config):
                       'y0': row['y0'],
                       'x1': row['x1'],
                       'y1': row['y1'],
-                      'page': row['page']}
-
+                      'page': row['page'],
+                      'match': float(row['gross_amount'])}
                     for row in doc_tokens]
+
         feature_row = [token_features(row, config) for row in doc_tokens]
 
         # takes the token with the highest fuzzy string matching score as the correct answer
-        
-
         max_score = max([float(row['gross_amount']) for row in doc_tokens])
-        
         if max_score < config.target_thresh:
             continue # The document's best score isn't good enough
         label_row = [1 if float(row['gross_amount'])==max_score else 0 for row in doc_tokens]
@@ -79,16 +78,13 @@ def load_training_data_nocache(config):
             n = config.window_len - 1
             
             token_padding = [blank_token for i in range(n)]
-            token_row = token_padding + token_row
-            token_row.extend(token_padding)
+            token_row = token_padding + token_row + token_padding
 
             feature_padding = [token_features(None, config) for i in range(n)]
-            feature_row = feature_padding + feature_row
-            feature_row.extend(feature_padding)
+            feature_row = feature_padding + feature_row + feature_padding
 
             label_padding = [0 for i in range(n)]
-            label_row = label_padding + label_row
-            label_row.extend(label_padding)
+            label_row = label_padding + label_row + label_padding
 
         # Slugs and token text are not training data, but used for evaluating results later
         slugs.append(doc_tokens[0]['slug']) # unique document ID, also PDF filename

@@ -1,62 +1,94 @@
 read_docs:
-  desc: how many docs to load, at most
-  value: 20000
+  desc: how many docs to load from file, at most
+  value: 200
+
+len_train:
+  dec: training data length (train+val), subsampled from read_docs
+  value: 100 # Not more than the value of read_docs
+
+val_split:
+  value: 0.2
+
+# sweeps suggest these are reasonable hyperparameter defaults
 window_len:
   desc: size of token sequences to train on (and network size!)
   value: 30
+
+# feature generation
 pad_windows:
   desc: zero pad beginning and end of doc token stream
   value: 1
-amount_feature:
-  desc: use dollar value directly as feature?
+use_amount:
+  desc: use token dollar value directly as feature?
   value: 1
+use_page:
+  desc: use token page number as feature?
+  value: 1
+use_geom:
+  desc: use token geometry (bbox corner) as feature?
+  value: 1
+use_string:
+  desc: use token string as feature?
+  value: 1
+
 vocab_size:
   desc: token strings are hashed mod this before embedding
   value: 500
 vocab_embed_size:
   desc: number of outputs in token hash embedding
-  value: 32
+  value: 64
+
+target_thresh:
+  desc: throw away token matches to PP crowdsourced data that aren't at least this good 
+  value: 0.8
+
+# network size
 layer_1_size_factor:
   desc: layer 1 size = this factor * window_len
-  value: 5
+  value: 4
 layer_2_size_factor:
   desc: layer 2 size = this factor * window_len
-  value: 1  
+  value: 2  
 dropout:
-  value: 0.3
-token_dims:
-  desc: number of features per token, including token hash
-  value: 8
+  value: 0.2
+
+# training config
+epochs:
+  value: 2
+steps_per_epoch:
+  value: 25
+batch_size:
+  desc: batch size in windows (not docs)
+  value: 10000  
 positive_fraction:
   desc: target match scores larger than this will becomes positive labels
   value: 0.5
-target_thresh:
-  value: 0.9
-epochs:
-  value: 2
-batch_size:
-  value: 10000
-steps_per_epoch:
-  desc: how many documents to check extraction on after each epoch
-  value: 10
-doc_acc_sample_size:
-  desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
-  value: 10
-render_results_size:
-  desc: log this many PDF images on last epoch
-  value: 20
+
 penalize_missed:
   desc: how much more a missed 1 counts than a missed 0 in outputs
   value: 5
-val_split:
-  value: 0.2
-len_train:
-  value: 100 # Not more than the value of read_docs
+
 learning_rate:
   value: 0.001
+
+
+# These do not affect the training but control various setup and reportieng
+render_results_size:
+  desc: log this many PDF images on last epoch
+  value: 20
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 0
+doc_acc_sample_size:
+  desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
+  value: 10
+
+
+# the rest of these are not hyperparamters, but config settings 
+# meaning it may break things if you change them
+token_dims:
+  desc: number of features per token, including token hash
+  value: 8
 data_from_db:
   desc: load from 'db'
   value: false
