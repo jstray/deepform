@@ -1,14 +1,13 @@
 
-pdfs
+pdfs/
 data
 logs
 *.csv
+*.png
 .DS_Store
 .ipynb_checkpoints
 wandb
 __pycache__
 source/cached_features.p
-.
 .env
 .vscode/
-pdfs
