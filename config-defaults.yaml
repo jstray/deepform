@@ -1,6 +1,6 @@
 read_docs:
   desc: how many docs to load from file, at most
-  value: 200
+  value: 9000
 
 len_train:
   dec: training data length (train+val), subsampled from read_docs
