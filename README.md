@@ -68,7 +68,8 @@ WANDB_API_KEY=MY_API_KEY
 
 ```
 docker build -t projectdeepform/deepform .
-docker run -m 7g --mount type=bind,source="$(pwd)"/source,target=/source --env-file=.env projectdeepform/deepform:latest
+docker run -m 7g --mount type=bind,source="$(pwd)"/source,target=/source --mount type=bind,source="$(pwd)"/pdfs,target=/pdfs --env-file=.env projectdeepform/deepform:latest
+
 ```
 
 ## A research data set

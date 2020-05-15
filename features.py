@@ -11,7 +11,7 @@ def token_features(row, config):
         return [ (hash(tokstr) % config.vocab_size) if c.use_string else 0,
                  float(row['page']) if c.use_page else 0, 
                  float(row['x0']) if c.use_geom else 0,
-                 float(row['y0']) if c.use_string else 0, 
+                 float(row['y0']) if c.use_geom else 0, 
                  float(len(tokstr)),
                  float(np.mean([c.isdigit() for c in tokstr])),
                  float(util.is_dollar_amount(tokstr)),
