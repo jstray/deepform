@@ -1,12 +1,15 @@
 # Deepform
 
-An experiment to extract information from TV station political advertising disclosure forms using deep learning, and a challenging journalism-relevant dataset for NLP/AI researchers. Orignal data from ProPublica's [Free The Files](https://projects.propublica.org/free-the-files/) project.
+An project to extract information from TV and cable political advertising disclosure forms using deep learning, and a challenging journalism-relevant dataset for NLP/AI researchers. This public data is valuable to journalists but locked in PDFs. This work uses models fthat are able to generalize over form types and "learn" how to find four fields:
 
-This model achieves 90% accuracy extracting total spending from the PDFs in the (held out) test set, which shows that deep learning can generalize surprisingly well to previously unseen form types. I expect it could be made much more accurate through some feature engineering (see below.)
+- Contract number (multipe documents can have the same number as a contract for future air dates is revised)
+- Advertiser name (offen the name of a political [comittee](https://www.fec.gov/data/browse-data/?tab=committees) but not always)
+- Start and end air dates dates (often known as "flight dates")
+- Total amount paid for the ads
 
-For results and discussion, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
+This model achieves 90% accuracy extracting total spending from the PDFs in the (held out) test set, which shows that deep learning can generalize surprisingly well to previously unseen form types. 
 
-Full thanks to my collaborator Nicholas Bardy of Weights & Biases.
+For a discussion of how the 2019 prototype works, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
 ## Why?
 
@@ -14,25 +17,37 @@ TV stations are required to disclose their sale of political advertising, but th
 
 In 2012, ProPublica ran the Free The Files project (you can [read how it worked](https://www.niemanlab.org/2012/12/crowdsourcing-campaign-spending-what-propublica-learned-from-free-the-files/)) and hundreds of volunteers hand-entered information for over 17,000 of these forms. That data drove a bunch of campaign finance [coverage](https://www.propublica.org/series/free-the-files) and is now [available](https://www.propublica.org/datastore/dataset/free-the-files-filing-data) from their data store.
 
-Can we replicate this data extraction using modern deep learning techniques? This project aimed to find out, and successfully extracted the easiest of the fields (total amount) at 90% accuracy using a relatively simple network.
+In 2014 Alex Byrnes [automated](https://github.com/alexbyrnes/FCC-Political-Ads) this extraction by hand-coding form layouts. This works for the dozen or so most common form types, but there are hundreds of different PDF layouts in the long tail. Also, we would like a solution that doesn't require so much hand tuning for each election.
+
+This project replicate this data extraction using modern deep learning techniques.
+
+## Running with Docker
+
+The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
+
+```
+WANDB_API_KEY=MY_API_KEY
+```
+
+You can find your key through your wanddb.com account. Click your face in the upper right and select `Settings` then scroll down.
+
+To run a sweep, use `docker-compose up --build`. To run something else (e.g., `python train.py`, or even just `bash`), you can use `docker-compose run deepform-learner <command>`.
+
+Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
+
 
 ## How it works
 
-I settled on a relatively simple design, using a fully connected three-layer network trained on 20 token windows of the data. Each token is hashed to an integer mod 500, then converted to 1-hot representation and embedded into 32 dimensions. This embedding is combined with geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as whether the token matches a regular expression for dollar amounts. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
+The easiest fields are contract number and total. This uses a fully connected three-layer network trained on a window of tokens from the data, typically 20-30 tokens. Each token is hashed to an integer mod 1000, then converted to 1-hot representation and embedded into 64 dimensions. This embedding is combined with geometry information (bounding box and page number) and also some hand-crafted "hint" features, such as whether the token matches a regular expression for dollar amounts. For details, see [the talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
-Although 90% is a good result, it's probably not high enough for production use. However, I believe this approach has lots of room for improvement. The advantage of this type of system is that it can elegantly integrate multiple manual extraction methods — the "hint" features — each of which can be individually crappy. The network actually learns when to trust each method. In ML speak this is "boosting over weak learners."
+We also incorporate custom "hint" features. For example, the total extractor uses an "amount" feature that is the log of the token value, if the token string is a number.
 
-So the next steps would be something like:
+## Creating the training data
 
-- Add additional hand-crafted features that signal when a token is the total. These don't have to be individually very accurate.
-- Extend the technique to the other fields we wish to extract (advertiser, etc.)
-
-## How to run
-
-If you wish to reproduce this result, there are multple steps in the data preparation:
+There are multple steps in the data preparation:
 
 - The raw data is in `source/ftf-all-filings.tsv`. This file contains the crowdsourced answers and the PDF url.
-- `download-pdfs.py` will read this file and download all the PDFs from DocumentCloud. It takes several days. Also, perhaps 10% of these PDFs are no longer on DocumentCloud. In theory they could be re-collected from the FCC.
+- `download-pdfs.py` will read this file and download all the PDFs from DocumentCloud. It takes hours to days. Also, perhaps 10% of these PDFs are no longer on DocumentCloud. In theory they could be re-collected from the FCC.
 - `tokenize-pdfs.py` will read each PDF and output a list of tokens and their geometry. Also takes several days to run.
 - `create-training-data.py` reads the PDF tokens and matches them against the original data, outputting only documents where the training data is available. Edit this to control which extracted fields appear in the training data.
 - `train.py` loads this data, trains a network, and logs the results using [Weights & Biases](https://www.wandb.com/)
@@ -56,18 +71,6 @@ slug,page,x0,y0,x1,y1,token,gross_amount
 
 The `slug` is a unique document identifier, ultimately from the source TSV. The page number runs from 0 to 1, and the bounding box is in the original PDF coordinate system. The actual token text is reproduced as `token`. The `gross_amount` represents string similarity to the correct answer in the original `gross_amount` column, from 0 to 1. To add other ground-truth fields, edit `create-training-data.py`.
 
-## Running with Docker
-
-Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
-
-The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
-
-```
-WANDB_API_KEY=MY_API_KEY
-```
-
-To run a sweep, use `docker-compose up --build`. To run something else (e.g., `python train.py`, or even just `bash`), you can use `docker-compose run deepform-learner <command>`.
-
 ## Code quality and pre-commit hooks
 
 The code is currently automatically formatted with [black](https://black.readthedocs.io/en/stable/), and using [autoflake](https://pypi.org/project/autoflake/) to remove unused imports and [isort](https://timothycrosley.github.io/isort/) to sort them predictably. These tools are configured in `pyproject.toml` and should Just Work&trade; -- you shouldn't have to worry about them at all!
@@ -76,12 +79,8 @@ To make this as painless as possible, `.pre-commit-config.yaml` contains rules f
 
 ## A research data set
 
-There is a great deal left to do! For example, we still need to try extracting the other fields such as advertiser and TV station call sign. This will probably be harder than totals as it's harder to identify tokens which "look like" the correct answer.
-
-There is still more data preparation work to do. We discovered that about 30% of the PDFs documents still need OCR, which should increase our training data set from 9k to ~17k documents.
-
-But even in its current form, this is a difficult data set that is very relevant to journalism, and improvements in technique will be immediately useful to campaign finance reporting.
+This is a difficult data set that is very relevant to journalism, and improvements in technique will be immediately useful to campaign finance reporting.
 
 The general problem is known as "knowledge base construction" in the research community, and the current state of the art is achieved by multimodal systems such as [Fonduer](https://fonduer.readthedocs.io/en/latest/).
 
-I would love to hear from you! Contact me on [twitter](https://twitter.com/jonathanstray) or through my [blog](http://jonathanstray.com).
+We would love to hear from you! Contact jstray on [twitter](https://twitter.com/jonathanstray) or through his [blog](http://jonathanstray.com).
