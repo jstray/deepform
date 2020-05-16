@@ -1,0 +1,11 @@
+version: "2"
+services:
+  deepform-learner:
+    build: .
+    volumes:
+      - ./pdfs:/pdfs
+      - ./source:/source
+    env_file: .env
+    mem_limit: 7G
+    entrypoint: /bin/sh
+    command: -c "$$(wandb sweep sweep.yaml 2>&1  | tail -1 | cut -d ':' -f 3)"

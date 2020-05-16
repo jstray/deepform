@@ -60,17 +60,13 @@ The `slug` is a unique document identifier, ultimately from the source TSV. The 
 
 Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
 
-The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). You will also need to pass a Weights and Biases API key to the docker container as an environment variable named `WANDB_API_KEY`. Add a `.env` such as the following and then pass that argument to the docker command.
+The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
 
 ```
 WANDB_API_KEY=MY_API_KEY
 ```
 
-```
-docker build -t projectdeepform/deepform .
-docker run -m 7g --mount type=bind,source="$(pwd)"/source,target=/source --mount type=bind,source="$(pwd)"/pdfs,target=/pdfs --env-file=.env projectdeepform/deepform:latest
-
-```
+To run a sweep, use `docker-compose up --build`. To run something else (e.g., `python train.py`, or even just `bash`), you can use `docker-compose run deepform-learner <command>`.
 
 ## Code quality and pre-commit hooks
 
