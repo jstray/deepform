@@ -44,7 +44,7 @@ We also incorporate custom "hint" features. For example, the total extractor use
 
 ## Creating the training data
 
-There are multple steps in the data preparation:
+The training data is a combination of the raw PDFs from 2012 and 2014, and [ProPublica data from 2012](https://www.propublica.org/datastore/dataset/free-the-files-filing-data) and [Alex Byrne's data from 2014](https://github.com/alexbyrnes/FCC-Political-Ads). There are multple steps in the data preparation:
 
 - The raw data is in `source/ftf-all-filings.tsv`. This file contains the crowdsourced answers and the PDF url.
 - `download-pdfs.py` will read this file and download all the PDFs from DocumentCloud. It takes hours to days. Also, perhaps 10% of these PDFs are no longer on DocumentCloud. In theory they could be re-collected from the FCC.
@@ -56,9 +56,9 @@ There are multple steps in the data preparation:
 ## Training data format
 
 The main training data file is `data/training.csv` but it's too big to post in github.
-You can find the prototype version of the 2012 data (does not include any PDFS that needed OCR), and also the 25gb of raw PDFs, in this [folder](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
+You can find the prototype version of the 2012 data (does not include any PDFS that needed OCR), and also the 25gb of raw PDFs from 2012, in this [folder](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
 
-There is data from 9018 labelled documents. It's formatted as "tokens plus geometry" like this:
+It's formatted as "tokens plus geometry" like this:
 
 ```
 slug,page,x0,y0,x1,y1,token,gross_amount
