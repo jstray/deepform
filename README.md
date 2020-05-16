@@ -55,7 +55,8 @@ There are multple steps in the data preparation:
 
 ## Training data format
 
-The main training data file is `data/training.csv` but it's too big to post in github, so you can download it [here](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
+The main training data file is `data/training.csv` but it's too big to post in github.
+You can find the prototype version of the 2012 data (does not include any PDFS that needed OCR), and also the 25gb of raw PDFs, in this [folder](https://drive.google.com/drive/folders/1bsV4A-8A9B7KZkzdbsBnCGKLMZftV2fQ?usp=sharing).
 
 There is data from 9018 labelled documents. It's formatted as "tokens plus geometry" like this:
 
