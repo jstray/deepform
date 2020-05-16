@@ -244,8 +244,8 @@ def compute_accuracy(model, window_len, slugs, tokens,
                      features, labels, num_to_test, print_results):
     n_print = config.render_results_size
 
-    n_docs = len(slugs)
-    doc_idxs = random.sample(range(n_docs), min(num_to_test,n_docs))
+    n_docs = min(num_to_test, len(slugs))
+    doc_idxs = random.sample(range(len(slugs)), n_docs)
 
     acc = 0.0
     for doc_idx in doc_idxs:
@@ -271,7 +271,7 @@ def compute_accuracy(model, window_len, slugs, tokens,
                     log_pdf(slug, tokens[doc_idx], labels[doc_idx], predict_score, token_scores, predict_text, answer_text)
                     n_print -= 1
 
-    return acc / num_to_test
+    return acc / n_docs
 
 
 # ---- Custom callback to log document-level accuracy ----
