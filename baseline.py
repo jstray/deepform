@@ -1,9 +1,10 @@
 # Manual extraction by looking for h/v aligned tokens after a template match
 # Baseline accuracy for this problem
 
-import numpy as np
 import csv
 import re
+
+import numpy as np
 from fuzzywuzzy import fuzz
 
 # ---- Load data and generate features ----
@@ -13,7 +14,7 @@ from fuzzywuzzy import fuzz
 
 
 def input_docs(max_docs=None):
-    incsv = csv.DictReader(open('data/training.csv', mode='r'))
+    incsv = csv.DictReader(open("data/training.csv", mode="r"))
 
     # Reconstruct documents by concatenating all rows with the same slug
     active_slug = None
@@ -22,18 +23,18 @@ def input_docs(max_docs=None):
 
     for row in incsv:
         # throw out tokens that are too short, they won't help us
-        token = row['token']
+        token = row["token"]
         if len(token) < 3:
             continue
 
-        if row['slug'] != active_slug:
+        if row["slug"] != active_slug:
             if active_slug:
                 yield doc_rows
                 num_docs += 1
                 if max_docs and num_docs >= max_docs:
                     return
             doc_rows = [row]
-            active_slug = row['slug']
+            active_slug = row["slug"]
         else:
             doc_rows.append(row)
 
@@ -41,24 +42,18 @@ def input_docs(max_docs=None):
 
 
 def tok_geo(tok):
-    return float(tok['x0']), float(tok['y0']), float(tok['page'])
+    return float(tok["x0"]), float(tok["y0"]), float(tok["page"])
 
 
 def is_dollar_amount(s):
-    return re.search(r'\$?\d[\d,]+(\.\d\d)?', s) is not None
+    return re.search(r"\$?\d[\d,]+(\.\d\d)?", s) is not None
+
 
 # Is this a word that appears next to the total we are looking for?
 
 
 def is_total_marker(tokstr):
-    markers = [
-        'TOTAL',
-        'AMOUNT',
-        'AMT',
-        'GROSS',
-        'TOTALS',
-        'CHARGES'
-    ]
+    markers = ["TOTAL", "AMOUNT", "AMT", "GROSS", "TOTALS", "CHARGES"]
 
     ustr = tokstr.upper()
     ratios = [fuzz.ratio(ustr, m) for m in markers]
@@ -73,7 +68,7 @@ def guess_doc_answer(doc_tokens):
     numtoks = len(doc_tokens)
     # loop over tokens
     for idx, tok in enumerate(doc_tokens):
-        tokstr = tok['token']
+        tokstr = tok["token"]
         if is_total_marker(tokstr):
 
             h_marker, v_marker, p_marker = tok_geo(tok)
@@ -81,7 +76,7 @@ def guess_doc_answer(doc_tokens):
             # loop over all following tokens
             for i in range(idx, numtoks):
                 tok2 = doc_tokens[i]
-                tok2str = tok2['token']
+                tok2str = tok2["token"]
 
                 if not is_dollar_amount(tok2str):
                     continue  # must be a dollar amount
@@ -91,18 +86,19 @@ def guess_doc_answer(doc_tokens):
                 if p != p_marker:
                     continue  # must be on the same page
 
-#				print(f'Comparing marker {tokstr} at {h_marker},{v_marker} to {tok2str} at {h},{v}')
+                # 				print(f'Comparing marker {tokstr} at {h_marker},{v_marker} to {tok2str} at {h},{v}')
                 # if it's more-or-less aligned horizontally (below) or
                 # vertically (to the right), guess it
-                if (abs(h - h_marker) <
-                        align_thresh) or (abs(v - v_marker) < align_thresh):
+                if (abs(h - h_marker) < align_thresh) or (
+                    abs(v - v_marker) < align_thresh
+                ):
                     return tok2str
 
 
 # Correct answer is the token with the highest "gross_amount" score
 def correct_answer(doc_tokens):
-    i = np.argmax([float(t['gross_amount']) for t in doc_tokens])
-    return doc_tokens[i]['token']
+    i = np.argmax([float(t["gross_amount"]) for t in doc_tokens])
+    return doc_tokens[i]["token"]
 
 
 # loop over docs
@@ -117,5 +113,5 @@ for doc_tokens in input_docs(max_docs=10000):
         correct_guesses += 1
     num_docs += 1
 
-print(f'{correct_guesses} correct out of {num_docs}')
-print(f'Accuracy: {correct_guesses/num_docs}')
+print(f"{correct_guesses} correct out of {num_docs}")
+print(f"Accuracy: {correct_guesses/num_docs}")

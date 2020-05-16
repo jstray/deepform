@@ -72,6 +72,12 @@ docker run -m 7g --mount type=bind,source="$(pwd)"/source,target=/source --mount
 
 ```
 
+## Code quality and pre-commit hooks
+
+The code is currently automatically formatted with [black](https://black.readthedocs.io/en/stable/), and using [autoflake](https://pypi.org/project/autoflake/) to remove unused imports and [isort](https://timothycrosley.github.io/isort/) to sort them predictably. These tools are configured in `pyproject.toml` and should Just Work&trade; -- you shouldn't have to worry about them at all!
+
+To make this as painless as possible, `.pre-commit-config.yaml` contains rules for automatically running these tools as part of `git commit`. To turn these git pre-commit hook on, you need run `pre-commit install` (after `pip install`ing `black`, `autoflake`, `isort[pyproject]`, and `pre-commit` itself). After that, whenever you run `git commit`, these tools will run and clean up your code so that "dirty" code never gets committed in the first place.
+
 ## A research data set
 
 There is a great deal left to do! For example, we still need to try extracting the other fields such as advertiser and TV station call sign. This will probably be harder than totals as it's harder to identify tokens which "look like" the correct answer.

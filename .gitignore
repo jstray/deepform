@@ -11,3 +11,5 @@ __pycache__
 source/cached_features.p
 .env
 .vscode/
+*.gz
+*.pq

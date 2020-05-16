@@ -4,35 +4,28 @@
 #
 # jstray 2019-6-12
 
-import keras as K
-from keras.engine.input_layer import Input
-from keras.models import Model
-from keras.layers import Dense, Flatten, Dropout, Lambda, concatenate
-from keras.layers.embeddings import Embedding
-from keras.backend import squeeze
-import tensorflow as tf
-import numpy as np
 import random
-import os
-import pickle
-import math
-from source import input_docs
-import util
-import pdfplumber
 from decimal import Decimal
 
+import keras as K
+import numpy as np
+import pdfplumber
+import tensorflow as tf
 import wandb
+from keras.backend import squeeze
+from keras.engine.input_layer import Input
+from keras.layers import Dense, Dropout, Flatten, Lambda, concatenate
+from keras.layers.embeddings import Embedding
+from keras.models import Model
 from wandb.keras import WandbCallback
+
 from source import load_training_data
 
-run = wandb.init(
-    project="extract_total",
-    entity="deepform",
-    name="hypersweep")
+run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
 config = run.config
 
 c_ = config
-run.name = f'len:{c_.len_train} win:{c_.window_len} str:{c_.use_string} page:{c_.use_page} geom:{c_.use_geom} amt:{c_.use_amount} voc:{c_.vocab_size} emb:{c_.vocab_embed_size} steps:{c_.steps_per_epoch}'
+run.name = f"len:{c_.len_train} win:{c_.window_len} str:{c_.use_string} page:{c_.use_page} geom:{c_.use_geom} amt:{c_.use_amount} voc:{c_.vocab_size} emb:{c_.vocab_embed_size} steps:{c_.steps_per_epoch}"
 run.save()
 
 
@@ -46,8 +39,11 @@ def one_window_unbalanced(features, labels, window_len):
     doc_idx = random.randint(0, len(features) - 1)
     doc_len = len(features[doc_idx])
     tok_idx = random.randint(0, doc_len - window_len)
-    return features[doc_idx][tok_idx: tok_idx +
-                             window_len], labels[doc_idx][tok_idx: tok_idx + window_len]
+    return (
+        features[doc_idx][tok_idx : tok_idx + window_len],
+        labels[doc_idx][tok_idx : tok_idx + window_len],
+    )
+
 
 # control the fraction of windows that include a positive label. not efficient.
 def one_window(features, labels, window_len, positive_fraction):
@@ -60,23 +56,21 @@ def one_window(features, labels, window_len, positive_fraction):
 
 def windowed_generator(features, labels, config):
     # Create empty arrays to contain batch of features and labels#
-    batch_features = np.zeros(
-        (config.batch_size,
-         config.window_len,
-         config.token_dims))
+    batch_features = np.zeros((config.batch_size, config.window_len, config.token_dims))
     batch_labels = np.zeros((config.batch_size, config.window_len))
 
     while True:
         for i in range(config.batch_size):
             features1, labels1 = one_window(
-                features, labels, config.window_len, config.positive_fraction)
+                features, labels, config.window_len, config.positive_fraction
+            )
             batch_features[i, :, :] = features1
             batch_labels[i, :] = labels1
         yield batch_features, batch_labels
 
+
 # ---- Custom loss function is basically MSE but high penalty for missing a 1 label ---
 def missed_token_loss(one_penalty):
-
     def _missed_token_loss(y_true, y_pred):
         expected_zero = tf.cast(tf.math.equal(y_true, 0), tf.float32)
         s = y_pred * expected_zero
@@ -88,6 +82,7 @@ def missed_token_loss(one_penalty):
 
     return _missed_token_loss  # closes over one_penalty
 
+
 # --- Specify network ---
 
 
@@ -97,59 +92,61 @@ def create_model(config):
     # split into the hash and the rest of the token features, embed hash as
     # one-hot, then merge
     tok_hash = Lambda(
-        lambda x: squeeze(
-            K.backend.slice(
-                x, (0, 0, 0), (-1, -1, 1)), axis=2))(indata)
-    tok_features = Lambda(
-        lambda x: K.backend.slice(
-            x, (0, 0, 1), (-1, -1, -1)))(indata)
+        lambda x: squeeze(K.backend.slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
+    )(indata)
+    tok_features = Lambda(lambda x: K.backend.slice(x, (0, 0, 1), (-1, -1, -1)))(indata)
     embed = Embedding(config.vocab_size, config.vocab_embed_size)(tok_hash)
     merged = concatenate([embed, tok_features], axis=2)
 
     f = Flatten()(merged)
     d1 = Dense(
         int(config.window_len * config.token_dims * config.layer_1_size_factor),
-        activation='sigmoid')(f)
+        activation="sigmoid",
+    )(f)
     d2 = Dropout(config.dropout)(d1)
-    d3 = Dense(int(config.window_len * config.token_dims * config.layer_2_size_factor), 
-        activation='sigmoid')(d2)
+    d3 = Dense(
+        int(config.window_len * config.token_dims * config.layer_2_size_factor),
+        activation="sigmoid",
+    )(d2)
     d4 = Dropout(config.dropout)(d3)
-    d5 = Dense(config.window_len, activation='elu')(d4)
+    d5 = Dense(config.window_len, activation="elu")(d4)
 
     model = Model(inputs=[indata], outputs=[d5])
     model.compile(
-        optimizer = K.optimizers.Adam(learning_rate=config.learning_rate),
-        loss = missed_token_loss(config.penalize_missed),
-        metrics = ['acc'])
+        optimizer=K.optimizers.Adam(learning_rate=config.learning_rate),
+        loss=missed_token_loss(config.penalize_missed),
+        metrics=["acc"],
+    )
 
     return model
+
 
 # -- Render visualization of output on PDF pages --
 
 # convert a single row of document data (one token) to bbox format needed
 # for drawing
 
+
 def docrow_to_bbox(t):
-    return [Decimal(t['x0']), Decimal(t['y0']),
-            Decimal(t['x1']), Decimal(t['y1'])]
+    return [Decimal(t["x0"]), Decimal(t["y0"]), Decimal(t["x1"]), Decimal(t["y1"])]
 
 
 # make page number matches robust to floating point dirt
 def same_page(pagetok, current_page):
-    return abs(float(pagetok)-current_page)<0.01
+    return abs(float(pagetok) - current_page) < 0.01
 
 
 def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
-    fname = 'pdfs/' + slug + '.pdf'
+    fname = "pdfs/" + slug + ".pdf"
     try:
         pdf = pdfplumber.open(fname)
-    except Exception as e:
+    except Exception:
         # If the file's not there, that's fine -- we use available PDFs to
         # define what to see
-        print('Cannot open pdf ' + fname)
+        print("Cannot open pdf " + fname)
         return
 
-    print('Rendering output for ' + fname)
+    print("Rendering output for " + fname)
 
     # Get the correct answers: find the indices of the token(s) labelled 1
     target_idx = [idx for (idx, val) in enumerate(labels) if val == 1]
@@ -168,41 +165,37 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
 
         # Draw guesses
         for idx, tok in enumerate(tokens):
-            rel_score = scores[idx]/score
-            if rel_score>=0.5 and same_page(tok['page'],current_page):
+            rel_score = scores[idx] / score
+            if rel_score >= 0.5 and same_page(tok["page"], current_page):
                 if rel_score == 1:
                     w = 5
-                    s = 'magenta'
+                    s = "magenta"
                 elif rel_score >= 0.75:
                     w = 3
-                    s = 'red'
+                    s = "red"
                 else:
                     w = 1
-                    s = 'red'
-                im.draw_rect(docrow_to_bbox(tok),
-                             stroke=s,
-                             stroke_width=w,
-                             fill=None)
+                    s = "red"
+                im.draw_rect(docrow_to_bbox(tok), stroke=s, stroke_width=w, fill=None)
 
         # Draw target tokens
-        target_toks = [tokens[i]
-                       for i in target_idx if same_page(tokens[i]['page'],current_page)]
+        target_toks = [
+            tokens[i] for i in target_idx if same_page(tokens[i]["page"], current_page)
+        ]
         rects = [docrow_to_bbox(t) for t in target_toks]
-        im.draw_rects(rects, stroke='blue', stroke_width=3, fill=None)
+        im.draw_rects(rects, stroke="blue", stroke_width=3, fill=None)
 
-        page_images.append(
-            wandb.Image(
-                im.annotated,
-                caption = 'page ' + str(pagenum)))
+        page_images.append(wandb.Image(im.annotated, caption="page " + str(pagenum)))
 
     # get best matching score of any token in the training data
-    match = max([tok['match'] for tok in tokens])
-    caption = f'{slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}'
-    if predict_text==answer_text:
+    match = max([tok["match"] for tok in tokens])
+    caption = f"{slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}"
+    if predict_text == answer_text:
         caption = "CORRECT " + caption
     else:
         caption = "INCORRECT " + caption
-    wandb.log({ caption: page_images })
+    wandb.log({caption: page_images})
+
 
 # --- Predict ---
 # Our network is windowed, so we have to aggregate windows to get a final score
@@ -210,16 +203,17 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
 # Returns vector of token scores
 def predict_scores(model, features, window_len):
     doc_len = len(features)
-    num_windows = doc_len - window_len+1
+    num_windows = doc_len - window_len + 1
 
     windowed_features = np.array(
-        [features[i:i + window_len] for i in range(num_windows)])
+        [features[i : i + window_len] for i in range(num_windows)]
+    )
     window_scores = model.predict(windowed_features)
 
     scores = np.zeros(doc_len)
     for i in range(num_windows):
         # would max work better than sum?
-        scores[i:i + window_len] += window_scores[i]
+        scores[i : i + window_len] += window_scores[i]
     return scores
 
 
@@ -227,48 +221,58 @@ def predict_scores(model, features, window_len):
 def predict_answer(model, features, tokens, window_len):
     scores = predict_scores(model, features, window_len)
     best_score_idx = np.argmax(scores)
-    best_score_text = tokens[best_score_idx]['token']
+    best_score_text = tokens[best_score_idx]["token"]
     return best_score_text, scores[best_score_idx], scores
 
 
 # returns text of correct answer,
 def correct_answer(features, labels, tokens):
     answer_idx = np.argmax(labels)
-    answer_text = tokens[answer_idx]['token']
+    answer_text = tokens[answer_idx]["token"]
     return answer_text
 
 
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
-def compute_accuracy(model, window_len, slugs, tokens,
-                     features, labels, num_to_test, print_results):
+def compute_accuracy(
+    model, window_len, slugs, tokens, features, labels, num_to_test, print_results
+):
     n_print = config.render_results_size
 
     n_docs = min(num_to_test, len(slugs))
-    doc_idxs = random.sample(range(len(slugs)), n_docs)
-
+    doc_idxs = random.sample(range(n_docs), n_docs)
     acc = 0.0
     for doc_idx in doc_idxs:
         slug = slugs[doc_idx]
         predict_text, predict_score, token_scores = predict_answer(
-            model, features[doc_idx], tokens[doc_idx], window_len)
+            model, features[doc_idx], tokens[doc_idx], window_len
+        )
         answer_text = correct_answer(
-            features[doc_idx],
-            labels[doc_idx],
-            tokens[doc_idx])
+            features[doc_idx], labels[doc_idx], tokens[doc_idx]
+        )
 
         if predict_text == answer_text:
             if print_results:
                 print(
-                    f'Correct: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"')
+                    f'Correct: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"'
+                )
             acc += 1
         else:
             if print_results:
                 print(
-                    f'***Incorrect: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"')
+                    f'***Incorrect: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"'
+                )
 
-                if n_print>0:
-                    log_pdf(slug, tokens[doc_idx], labels[doc_idx], predict_score, token_scores, predict_text, answer_text)
+                if n_print > 0:
+                    log_pdf(
+                        slug,
+                        tokens[doc_idx],
+                        labels[doc_idx],
+                        predict_score,
+                        token_scores,
+                        predict_text,
+                        answer_text,
+                    )
                     n_print -= 1
 
     return acc / n_docs
@@ -276,9 +280,11 @@ def compute_accuracy(model, window_len, slugs, tokens,
 
 # ---- Custom callback to log document-level accuracy ----
 
+
 class DocAccCallback(K.callbacks.Callback):
-    def __init__(self, window_len, slugs, tokens,
-                 features, labels, num_to_test, logname):
+    def __init__(
+        self, window_len, slugs, tokens, features, labels, num_to_test, logname
+    ):
         self.window_len = window_len
         self.slugs = slugs
         self.tokens = tokens
@@ -290,29 +296,31 @@ class DocAccCallback(K.callbacks.Callback):
     def on_epoch_end(self, epoch, logs):
         if epoch >= config.epochs - 1:
             # last epoch, sample from all docs and print inference results (for validation set)
-            print_results = self.logname == 'doc_val_acc'
+            print_results = self.logname == "doc_val_acc"
             test_size = len(self.slugs)
         else:
             # intermediate epoch, small sample (getting gradually more accurate) and no logging
             print_results = False
             test_size = self.num_to_test + epoch
 
-        acc = compute_accuracy(self.model,
-                               self.window_len,
-                               self.slugs,
-                               self.tokens,
-                               self.features,
-                               self.labels,
-                               test_size,
-                               print_results) 
+        acc = compute_accuracy(
+            self.model,
+            self.window_len,
+            self.slugs,
+            self.tokens,
+            self.features,
+            self.labels,
+            test_size,
+            print_results,
+        )
 
-        print(f'This epoch {self.logname}: {acc}')
+        print(f"This epoch {self.logname}: {acc}")
         wandb.log({self.logname: acc})
 
 
 # --- Main ---
 
-print('Configuration:')
+print("Configuration:")
 print(config)
 
 slugs, token_text, features, labels = load_training_data(config)
@@ -345,8 +353,7 @@ for i in range(len(features)):
         features_train.append(features[i])
         labels_train.append(labels[i])
 
-print(
-    f'Training on {len(features_train)}, validating on {len(features_val)}')
+print(f"Training on {len(features_train)}, validating on {len(features_val)}")
 
 model = create_model(config)
 print(model.summary())
@@ -357,18 +364,23 @@ model.fit_generator(
     epochs=config.epochs,
     callbacks=[
         WandbCallback(),
-        DocAccCallback(	config.window_len,
-                        slugs_train,
-                        token_text_train,
-                        features_train,
-                        labels_train,
-                        config.doc_acc_sample_size,
-                        'doc_train_acc'),
-        DocAccCallback(	config.window_len,
-                        slugs_val,
-                        token_text_val,
-                        features_val,
-                        labels_val,
-                        config.doc_acc_sample_size,
-                        'doc_val_acc')
-    ])
+        DocAccCallback(
+            config.window_len,
+            slugs_train,
+            token_text_train,
+            features_train,
+            labels_train,
+            config.doc_acc_sample_size,
+            "doc_train_acc",
+        ),
+        DocAccCallback(
+            config.window_len,
+            slugs_val,
+            token_text_val,
+            features_val,
+            labels_val,
+            config.doc_acc_sample_size,
+            "doc_val_acc",
+        ),
+    ],
+)
