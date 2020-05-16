@@ -47,10 +47,10 @@ We also incorporate custom "hint" features. For example, the total extractor use
 The training data is a combination of the raw PDFs from 2012 and 2014, and [ProPublica data from 2012](https://www.propublica.org/datastore/dataset/free-the-files-filing-data) and [Alex Byrne's data from 2014](https://github.com/alexbyrnes/FCC-Political-Ads). There are multple steps in the data preparation:
 
 - The raw data is in `source/ftf-all-filings.tsv`. This file contains the crowdsourced answers and the PDF url.
-- `download-pdfs.py` will read this file and download all the PDFs from DocumentCloud. It takes hours to days. Also, perhaps 10% of these PDFs are no longer on DocumentCloud. In theory they could be re-collected from the FCC.
+- `download-pdfs.py` will read this file and download all the (currently 2012 only) PDFs from DocumentCloud. It takes hours to days. Also, perhaps 10% of these PDFs are no longer on DocumentCloud. In theory they could be re-collected from the FCC.
 - `tokenize-pdfs.py` will read each PDF and output a list of tokens and their geometry. Also takes several days to run.
 - `create-training-data.py` reads the PDF tokens and matches them against the original data, outputting only documents where the training data is available. Edit this to control which extracted fields appear in the training data.
-- `train.py` loads this data, trains a network, and logs the results using [Weights & Biases](https://www.wandb.com/)
+- `train.py` loads this data, trains a network that extracts the total, and logs the results using [Weights & Biases](https://www.wandb.com/)
 - `baseline.py` is a hand coded total extractor for comparison, which achieves 61% accuracy.
 
 ## Training data format
