@@ -1,10 +1,10 @@
 read_docs:
-  desc: how many docs to load from file, at most
+  desc: how many docs to load from file at most
   value: 9000
 
 len_train:
-  dec: training data length (train+val), subsampled from read_docs
-  value: 100 # Not more than the value of read_docs
+  dec: training data length (train+val) subsampled from read_docs
+  value: 8000
 
 val_split:
   value: 0.2
@@ -33,7 +33,7 @@ use_string:
 
 vocab_size:
   desc: token strings are hashed mod this before embedding
-  value: 500
+  value: 1000
 vocab_embed_size:
   desc: number of outputs in token hash embedding
   value: 64
@@ -54,9 +54,9 @@ dropout:
 
 # training config
 epochs:
-  value: 2
+  value: 100
 steps_per_epoch:
-  value: 25
+  value: 20
 batch_size:
   desc: batch size in windows (not docs)
   value: 10000  
