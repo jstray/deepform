@@ -9,6 +9,10 @@ from features import token_features
 seed = 42
 
 
+def clean_slug(slug):
+    return slug[:-4] if slug.endswith(".pdf") else slug
+
+
 def input_docs(max_docs=None, source_data="source/training.csv"):
     incsv = csv.DictReader(open(source_data, mode="r"))
 
@@ -30,7 +34,7 @@ def input_docs(max_docs=None, source_data="source/training.csv"):
                 if max_docs and num_docs >= max_docs:
                     return
             doc_rows = [row]
-            active_slug = row["slug"]
+            active_slug = clean_slug(row["slug"])
         else:
             doc_rows.append(row)
 
