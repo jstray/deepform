@@ -14,4 +14,5 @@ RUN pip install $(grep -v tensorflow requirements.txt)
 COPY *.py ./
 COPY db /db
 COPY *.yaml ./
+COPY *.sh ./
 CMD python train.py

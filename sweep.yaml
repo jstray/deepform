@@ -1,5 +1,6 @@
 # sweep.yaml
 program: train.py
+project: deepform
 method: bayes
 metric:
  name: doc_val_acc #acc #val_acc
@@ -22,7 +23,7 @@ parameters:
    values: [50, 100]
  steps_per_epoch:
    values: [10, 25, 50]
- len_train: 
+ len_train:
    values: [4000, 8000]
  vocab_size:
    values: [100, 500, 2000]
