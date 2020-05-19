@@ -5,7 +5,6 @@
 # jstray 2019-6-12
 
 import random
-from decimal import Decimal
 
 import keras as K
 import numpy as np
@@ -20,6 +19,7 @@ from keras.models import Model
 from wandb.keras import WandbCallback
 
 from source import load_training_data
+from util import docrow_to_bbox
 
 run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
 config = run.config
@@ -122,14 +122,6 @@ def create_model(config):
 
 
 # -- Render visualization of output on PDF pages --
-
-# convert a single row of document data (one token) to bbox format needed
-# for drawing
-
-
-def docrow_to_bbox(t):
-    return [Decimal(t["x0"]), Decimal(t["y0"]), Decimal(t["x1"]), Decimal(t["y1"])]
-
 
 # make page number matches robust to floating point dirt
 def same_page(pagetok, current_page):
