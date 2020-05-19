@@ -19,7 +19,7 @@ from keras.models import Model
 from wandb.keras import WandbCallback
 
 from source import load_training_data
-from util import docrow_to_bbox
+from util import docrow_to_bbox, is_dollar_amount, normalize_dollars
 
 run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
 config = run.config
@@ -121,6 +121,45 @@ def create_model(config):
     return model
 
 
+# --- Predict ---
+# Our network is windowed, so we have to aggregate windows to get a final score
+
+# Returns vector of token scores
+def predict_scores(model, features, window_len):
+    doc_len = len(features)
+    num_windows = doc_len - window_len + 1
+
+    windowed_features = np.array(
+        [features[i : i + window_len] for i in range(num_windows)]
+    )
+    window_scores = model.predict(windowed_features)
+
+    scores = np.zeros(doc_len)
+    for i in range(num_windows):
+        # would max work better than sum?
+        scores[i : i + window_len] += window_scores[i]
+    return scores
+
+
+# returns text, score of best answer, plus all scores
+def predict_answer(model, features, tokens, window_len):
+    scores = predict_scores(model, features, window_len)
+    best_score_idx = np.argmax(scores)
+    best_score_text = tokens[best_score_idx]["token"]
+    return best_score_text, scores[best_score_idx], scores
+
+
+# returns text of correct answer,
+def correct_answer(features, labels, tokens):
+    answer_idx = np.argmax(labels)
+    answer_text = tokens[answer_idx]["token"]
+    return answer_text
+
+# Match e.g. "$14,123.02" to "14123.02"
+def answer_match(predicted, actual):
+    return is_dollar_amount(predicted) and is_dollar_amount(actual) and (normalize_dollars(predicted) == normalize_dollars(actual))
+
+
 # -- Render visualization of output on PDF pages --
 
 # make page number matches robust to floating point dirt
@@ -182,48 +221,13 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
     # get best matching score of any token in the training data
     match = max([tok["match"] for tok in tokens])
     caption = f"{slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}"
-    if predict_text == answer_text:
+    if answer_match(predict_text, answer_text):
         caption = "CORRECT " + caption
     else:
         caption = "INCORRECT " + caption
     wandb.log({caption: page_images})
 
-
-# --- Predict ---
-# Our network is windowed, so we have to aggregate windows to get a final score
-
-# Returns vector of token scores
-def predict_scores(model, features, window_len):
-    doc_len = len(features)
-    num_windows = doc_len - window_len + 1
-
-    windowed_features = np.array(
-        [features[i : i + window_len] for i in range(num_windows)]
-    )
-    window_scores = model.predict(windowed_features)
-
-    scores = np.zeros(doc_len)
-    for i in range(num_windows):
-        # would max work better than sum?
-        scores[i : i + window_len] += window_scores[i]
-    return scores
-
-
-# returns text, score of best answer, plus all scores
-def predict_answer(model, features, tokens, window_len):
-    scores = predict_scores(model, features, window_len)
-    best_score_idx = np.argmax(scores)
-    best_score_text = tokens[best_score_idx]["token"]
-    return best_score_text, scores[best_score_idx], scores
-
-
-# returns text of correct answer,
-def correct_answer(features, labels, tokens):
-    answer_idx = np.argmax(labels)
-    answer_text = tokens[answer_idx]["token"]
-    return answer_text
-
-
+    
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
 def compute_accuracy(
@@ -243,7 +247,7 @@ def compute_accuracy(
             features[doc_idx], labels[doc_idx], tokens[doc_idx]
         )
 
-        if predict_text == answer_text:
+        if answer_match(predict_text, answer_text):
             if print_results:
                 print(
                     f'Correct: {slug}: guessed "{predict_text}" with score {predict_score:.2f}, correct "{answer_text}"'
