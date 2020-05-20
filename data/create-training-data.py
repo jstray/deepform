@@ -19,12 +19,12 @@ output_docs = 0
 # Other possible targets include 'committee','agency','callsign'
 targets = ["gross_amount"]
 
-filings = pd.read_csv("source/ftf-all-filings.tsv", sep="\t")
+filings = pd.read_csv("../source/ftf-all-filings.tsv", sep="\t")
 
-incsv = csv.DictReader(open("data/filings-tokens.csv", mode="r"))
+incsv = csv.DictReader(open("filings-tokens.csv", mode="r"))
 
 outcols = ["slug", "page", "x0", "y0", "x1", "y1", "token"] + targets
-outcsv = csv.DictWriter(open("data/training.csv", mode="w"), fieldnames=outcols)
+outcsv = csv.DictWriter(open("training.csv", mode="w"), fieldnames=outcols)
 outcsv.writeheader()
 
 
@@ -93,7 +93,7 @@ def process_doc(slug, rows):
     for t in targets:
         df[t] = target_match(answers[t], df["token"])
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
         outcsv.writerow(row.to_dict())
 
     print(f"Processed {slug} with {len(df)} tokens")

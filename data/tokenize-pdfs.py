@@ -19,9 +19,9 @@ def print_stats():
     print("-----")
 
 
-d = pd.read_csv("source/ftf-all-filings.tsv", sep="\t")
+d = pd.read_csv("../source/ftf-all-filings.tsv", sep="\t")
 
-f = open("data/filings-tokens.csv", mode="w")
+f = open("filings-tokens.csv", mode="w")
 csv = csv.writer(f)
 csv.writerow(["slug", "page", "x0", "y0", "x1", "y1", "token"])
 
