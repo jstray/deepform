@@ -5,11 +5,11 @@
 
 import csv
 import decimal
-import re
-from decimal import Decimal
 
 import pandas as pd
 from fuzzywuzzy import fuzz
+
+from util import is_dollar_amount, normalize_dollars
 
 output_docs = 0
 
@@ -30,18 +30,6 @@ outcsv.writeheader()
 
 # computes fuzzy distance from each token in the series to the target answer for the document
 # answer may be multiple tokens, in which case we take the max of matches
-
-
-def is_dollar_amount(s):
-    return re.search(r"\$?\d[\d,]+(\.\d\d)?", s) is not None
-
-
-# take a string like "$56,333.1" and remove punct, round to two decimals,
-# return string
-
-
-def normalize_dollars(s):
-    return str(round(Decimal(s.replace("$", "").replace(",", "")), 2))
 
 
 def target_match_token(anstoks, token):

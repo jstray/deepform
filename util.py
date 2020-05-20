@@ -1,12 +1,12 @@
 import re
 from collections import namedtuple
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 BoundingBox = namedtuple("BoundingBox", ["x0", "y0", "x1", "y1"])
 
 
 def is_dollar_amount(s):
-    return re.match(r"^\$?\d[\d,]+(\.\d\d)?$", s) != None
+    return re.match(r"^\$?[\d,]+(\.\d\d)?$", s) != None
 
 
 def dollar_amount(s):
@@ -15,8 +15,13 @@ def dollar_amount(s):
     else:
         return 0
 
-def normalize_dollars(s):
-    return str(round(Decimal(s.replace("$", "").replace(",", "")), 2))
+
+def normalize_dollars(s) -> str:
+    """Given a string like '$56,333.1' return the string '5633.10'."""
+    try:
+        return str(round(Decimal(s.replace("$", "").replace(",", "")), 2))
+    except InvalidOperation:
+        return ""
 
 
 def docrow_to_bbox(t, min_height=10):
@@ -28,5 +33,5 @@ def docrow_to_bbox(t, min_height=10):
     """
     dims = {k: Decimal(t[k]) for k in ["x0", "y0", "x1", "y1"]}
     if min_height:
-        dims["y0"] = min(dims["y1"] - min_height, dims["y0"])
+        dims["y0"] = min(dims["y1"] - Decimal(min_height), dims["y0"])
     return BoundingBox(**dims)
