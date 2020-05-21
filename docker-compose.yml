@@ -3,9 +3,10 @@ services:
   deepform-learner:
     build: .
     volumes:
+      - ./deepform:/deepform
       - ./pdfs:/pdfs
       - ./source:/source
     env_file: .env
     mem_limit: 7G
-    entrypoint: /bin/bash
-    command: -c "source init_sweep.sh"
+    stdin_open: true
+    tty: true

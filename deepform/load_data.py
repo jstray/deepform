@@ -2,6 +2,7 @@ import logging
 import os
 import pickle
 import random
+from pathlib import Path
 
 import pandas as pd
 
@@ -10,12 +11,16 @@ from features import token_features
 
 seed = 42
 
+SOURCE_DIR = Path().absolute() / "source"
+SOURCE_DATA = SOURCE_DIR / "training.csv"
+CACHE_FILE = SOURCE_DIR / "cached_features.p"
+
 
 def clean_slug(slug):
     return slug[:-4] if slug.endswith(".pdf") else slug
 
 
-def input_docs(source_data="source/training.csv"):
+def input_docs(source_data=SOURCE_DATA):
     docs_df = pd.read_csv(source_data)
 
     # Filter out tokens that are too short.
@@ -104,9 +109,7 @@ def load_training_data_nocache(config):
 
 
 # Because generating the list of features is so expensive, we cache it on disk
-def load_training_data_from_files(
-    config, pickle_destination="source/cached_features.p"
-):
+def load_training_data_from_files(config, pickle_destination=CACHE_FILE):
     if config.use_data_cache and os.path.isfile(pickle_destination):
         logging.info("Loading training data from cache...")
         slugs, tokens, features, labels = pickle.load(open(pickle_destination, "rb"))

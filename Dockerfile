@@ -1,18 +1,29 @@
-FROM tensorflow/tensorflow:2.2.0-gpu
+FROM python:3.8.3
 
+ENV PYTHONFAULTHANDLER=1 \
+    PYTHONHASHSEED=random \
+    PYTHONUNBUFFERED=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    POETRY_VERSION=1.0.5
+
+# Install dependencies for pdfplumber.
 RUN apt-get update && apt-get install -y \
-    libmagickwand-dev ghostscript libgs-dev \
+    libmagickwand-dev ghostscript \
     --no-install-recommends
 
-# This is really stupid but apparently necessary for imagemagick to work correctly.
-RUN sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' /etc/ImageMagick-6/policy.xml
+# Allow imagemagick to read and write PDFs.
+RUN sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' \
+    /etc/ImageMagick-6/policy.xml
 
-# Copy requirements, but filter out tensorflow (it's 500MB and it comes with our image alreaady).
-COPY requirements.txt requirements.txt
-RUN pip install $(grep -v tensorflow requirements.txt)
+# Install Poetry and project dependencies.
+RUN pip install "poetry==$POETRY_VERSION"
+COPY pyproject.toml poetry.lock ./
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
 
-COPY *.py ./
-COPY db /db
+COPY deepform ./
 COPY *.yaml ./
-COPY *.sh ./
-CMD python train.py
+COPY init_sweep.sh .
+ENTRYPOINT ["/bin/bash"]

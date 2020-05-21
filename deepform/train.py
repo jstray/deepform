@@ -18,7 +18,7 @@ from keras.layers.embeddings import Embedding
 from keras.models import Model
 from wandb.keras import WandbCallback
 
-from source import load_training_data
+from load_data import load_training_data
 from util import docrow_to_bbox, is_dollar_amount, normalize_dollars
 
 run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
@@ -155,9 +155,14 @@ def correct_answer(features, labels, tokens):
     answer_text = tokens[answer_idx]["token"]
     return answer_text
 
+
 # Match e.g. "$14,123.02" to "14123.02"
 def answer_match(predicted, actual):
-    return is_dollar_amount(predicted) and is_dollar_amount(actual) and (normalize_dollars(predicted) == normalize_dollars(actual))
+    return (
+        is_dollar_amount(predicted)
+        and is_dollar_amount(actual)
+        and (normalize_dollars(predicted) == normalize_dollars(actual))
+    )
 
 
 # -- Render visualization of output on PDF pages --
@@ -168,7 +173,7 @@ def same_page(pagetok, current_page):
 
 
 def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
-    fname = "pdfs/" + slug + ".pdf"
+    fname = "../pdfs/" + slug + ".pdf"
     try:
         pdf = pdfplumber.open(fname)
     except Exception:
@@ -227,7 +232,7 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
         caption = "INCORRECT " + caption
     wandb.log({caption: page_images})
 
-    
+
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
 def compute_accuracy(

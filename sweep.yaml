@@ -1,5 +1,5 @@
 # sweep.yaml
-program: train.py
+program: deepform/train.py
 project: deepform
 method: bayes
 metric:
