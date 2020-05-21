@@ -1,7 +1,9 @@
-import csv
+import logging
 import os
 import pickle
 import random
+
+import pandas as pd
 
 import db.source as db
 from features import token_features
@@ -13,32 +15,17 @@ def clean_slug(slug):
     return slug[:-4] if slug.endswith(".pdf") else slug
 
 
-def input_docs(max_docs=None, source_data="source/training.csv"):
-    incsv = csv.DictReader(open(source_data, mode="r"))
+def input_docs(source_data="source/training.csv"):
+    docs_df = pd.read_csv(source_data)
 
-    # Reconstruct documents by concatenating all rows with the same slug
-    active_slug = None
-    doc_rows = []
-    num_docs = 0
+    # Filter out tokens that are too short.
+    docs_df = docs_df[docs_df["token"].str.len() >= 3].reset_index(drop=True)
 
-    for row in incsv:
-        # throw out tokens that are too short, they won't help us
-        token = row["token"]
-        if len(token) < 3:
-            continue
+    # Get rid of '.pdf' at the end of slugs (make the new data consistent with the old).
+    docs_df["slug"] = docs_df["slug"].apply(clean_slug)
 
-        if row["slug"] != active_slug:
-            if active_slug:
-                yield doc_rows
-                num_docs += 1
-                if max_docs and num_docs >= max_docs:
-                    return
-            doc_rows = [row]
-            active_slug = clean_slug(row["slug"])
-        else:
-            doc_rows.append(row)
-
-    yield doc_rows
+    for _, group in docs_df.groupby("slug"):
+        yield group.to_dict("records")
 
 
 # Load raw training data, create our per-token features and binary labels
@@ -58,9 +45,16 @@ def load_training_data_nocache(config):
         "match": 0,
     }
 
-    for doc_tokens in input_docs(max_docs=config.read_docs):
+    n_docs = 0
+    for doc_tokens in input_docs():
+
         if not config.pad_windows and len(doc_tokens) < config.window_len:
             continue  # this doc is too short
+
+        n_docs += 1
+        if n_docs > config.read_docs:
+            logging.debug(f"Collected {n_docs} docs, stopping here")
+            break
 
         token_row = [
             {
@@ -105,7 +99,7 @@ def load_training_data_nocache(config):
         features.append(feature_row)
         labels.append(label_row)
 
-    print("Length of slugs in load_training_data_nocache = ", len(slugs))
+    logging.info(f"Length of slugs in load_training_data_nocache = {len(slugs)}")
     return slugs, tokens, features, labels
 
 
@@ -114,13 +108,13 @@ def load_training_data_from_files(
     config, pickle_destination="source/cached_features.p"
 ):
     if config.use_data_cache and os.path.isfile(pickle_destination):
-        print("Loading training data from cache...")
+        logging.info("Loading training data from cache...")
         slugs, tokens, features, labels = pickle.load(open(pickle_destination, "rb"))
     else:
-        print("Loading training data...")
+        logging.info("Loading training data...")
         slugs, tokens, features, labels = load_training_data_nocache(config)
         if config.use_data_cache:
-            print("Saving training data to cache...")
+            logging.info("Saving training data to cache...")
             pickle.dump(
                 (slugs, tokens, features, labels), open(pickle_destination, "wb")
             )
@@ -150,7 +144,7 @@ def load_training_data_from_db(config):
     labels = []
 
     for doc in db.input_docs(conn):
-        dc_slug, committee, gross_amount_usd, rows = doc
+        dc_slug, _committee, _gross_amount_usd, rows = doc
         slugs.append(dc_slug)
         token_text.append([token for token in rows.token])
         features.append([token_features(row, config) for idx, row in rows.iterrows()])
@@ -171,8 +165,3 @@ def load_training_data(config):
         return load_training_data_from_db(config)
     else:
         return load_training_data_from_files(config)
-
-
-if __name__ == "__main__":
-    docs = [doc for doc in input_docs(max_docs=1)]
-    print(docs)
