@@ -19,6 +19,7 @@ from keras.models import Model
 from wandb.keras import WandbCallback
 
 from load_data import load_training_data
+from pdfs import get_pdf_path
 from util import docrow_to_bbox, is_dollar_amount, normalize_dollars
 
 run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
@@ -173,7 +174,7 @@ def same_page(pagetok, current_page):
 
 
 def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
-    fname = "../pdfs/" + slug + ".pdf"
+    fname = get_pdf_path(slug)
     try:
         pdf = pdfplumber.open(fname)
     except Exception:
