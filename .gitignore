@@ -6,6 +6,8 @@ wandb/
 __pycache__
 source/cached_features.p
 .ipynb_checkpoints
+.dvc/
+.hypothesis/
 
 # Local environment files (for e.g. API keys)
 .env
