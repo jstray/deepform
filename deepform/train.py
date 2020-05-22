@@ -20,15 +20,7 @@ from wandb.keras import WandbCallback
 
 from load_data import load_training_data
 from pdfs import get_pdf_path
-from util import docrow_to_bbox, is_dollar_amount, normalize_dollars
-
-run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
-config = run.config
-
-c_ = config
-run.name = f"len:{c_.len_train} win:{c_.window_len} str:{c_.use_string} page:{c_.use_page} geom:{c_.use_geom} amt:{c_.use_amount} voc:{c_.vocab_size} emb:{c_.vocab_embed_size} steps:{c_.steps_per_epoch}"
-run.save()
-
+from util import config_desc, docrow_to_bbox, is_dollar_amount, normalize_dollars
 
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -237,7 +229,7 @@ def log_pdf(slug, tokens, labels, score, scores, predict_text, answer_text):
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
 def compute_accuracy(
-    model, window_len, slugs, tokens, features, labels, num_to_test, print_results
+    model, config, slugs, tokens, features, labels, num_to_test, print_results
 ):
     n_print = config.render_results_size
 
@@ -247,7 +239,7 @@ def compute_accuracy(
     for doc_idx in doc_idxs:
         slug = slugs[doc_idx]
         predict_text, predict_score, token_scores = predict_answer(
-            model, features[doc_idx], tokens[doc_idx], window_len
+            model, features[doc_idx], tokens[doc_idx], config.window_len
         )
         answer_text = correct_answer(
             features[doc_idx], labels[doc_idx], tokens[doc_idx]
@@ -284,10 +276,8 @@ def compute_accuracy(
 
 
 class DocAccCallback(K.callbacks.Callback):
-    def __init__(
-        self, window_len, slugs, tokens, features, labels, num_to_test, logname
-    ):
-        self.window_len = window_len
+    def __init__(self, config, slugs, tokens, features, labels, num_to_test, logname):
+        self.config = config
         self.slugs = slugs
         self.tokens = tokens
         self.features = features
@@ -296,7 +286,7 @@ class DocAccCallback(K.callbacks.Callback):
         self.logname = logname
 
     def on_epoch_end(self, epoch, logs):
-        if epoch >= config.epochs - 1:
+        if epoch >= self.config.epochs - 1:
             # last epoch, sample from all docs and print inference results (for validation set)
             print_results = self.logname == "doc_val_acc"
             test_size = len(self.slugs)
@@ -307,7 +297,7 @@ class DocAccCallback(K.callbacks.Callback):
 
         acc = compute_accuracy(
             self.model,
-            self.window_len,
+            self.config,
             self.slugs,
             self.tokens,
             self.features,
@@ -320,69 +310,70 @@ class DocAccCallback(K.callbacks.Callback):
         wandb.log({self.logname: acc})
 
 
-# --- Main ---
+def main():
+    run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
+    config = run.config
+    config.name = config_desc(config)
+    run.save()
 
-print("Configuration:")
-print(config)
+    print("Configuration:")
+    print(config)
 
-slugs, token_text, features, labels = load_training_data(config)
+    slugs, token_text, features, labels = load_training_data(config)
 
-# DF: commenting out because these are just diagnostic and rely on in-mem data
-# print(f'Loaded {len(features)}')
-# max_length = max([len(x) for x in labels])
-# print(f'Max document size {max_length}')
-# avg_length = sum([len(x) for x in labels]) / len(labels)
-# print(f'Average document size {avg_length}')
+    # split into train and test
+    slugs_train = []
+    token_text_train = []
+    features_train = []
+    labels_train = []
+    slugs_val = []
+    token_text_val = []
+    features_val = []
+    labels_val = []
+    for i in range(len(features)):
+        if random.random() < config.val_split:
+            slugs_val.append(slugs[i])
+            token_text_val.append(token_text[i])
+            features_val.append(features[i])
+            labels_val.append(labels[i])
+        else:
+            slugs_train.append(slugs[i])
+            token_text_train.append(token_text[i])
+            features_train.append(features[i])
+            labels_train.append(labels[i])
 
-# split into train and test
-slugs_train = []
-token_text_train = []
-features_train = []
-labels_train = []
-slugs_val = []
-token_text_val = []
-features_val = []
-labels_val = []
-for i in range(len(features)):
-    if random.random() < config.val_split:
-        slugs_val.append(slugs[i])
-        token_text_val.append(token_text[i])
-        features_val.append(features[i])
-        labels_val.append(labels[i])
-    else:
-        slugs_train.append(slugs[i])
-        token_text_train.append(token_text[i])
-        features_train.append(features[i])
-        labels_train.append(labels[i])
+    print(f"Training on {len(features_train)}, validating on {len(features_val)}")
 
-print(f"Training on {len(features_train)}, validating on {len(features_val)}")
+    model = create_model(config)
+    print(model.summary())
 
-model = create_model(config)
-print(model.summary())
+    model.fit_generator(
+        windowed_generator(features_train, labels_train, config),
+        steps_per_epoch=config.steps_per_epoch,
+        epochs=config.epochs,
+        callbacks=[
+            WandbCallback(),
+            DocAccCallback(
+                config,
+                slugs_train,
+                token_text_train,
+                features_train,
+                labels_train,
+                config.doc_acc_sample_size,
+                "doc_train_acc",
+            ),
+            DocAccCallback(
+                config,
+                slugs_val,
+                token_text_val,
+                features_val,
+                labels_val,
+                config.doc_acc_sample_size,
+                "doc_val_acc",
+            ),
+        ],
+    )
 
-model.fit_generator(
-    windowed_generator(features_train, labels_train, config),
-    steps_per_epoch=config.steps_per_epoch,
-    epochs=config.epochs,
-    callbacks=[
-        WandbCallback(),
-        DocAccCallback(
-            config.window_len,
-            slugs_train,
-            token_text_train,
-            features_train,
-            labels_train,
-            config.doc_acc_sample_size,
-            "doc_train_acc",
-        ),
-        DocAccCallback(
-            config.window_len,
-            slugs_val,
-            token_text_val,
-            features_val,
-            labels_val,
-            config.doc_acc_sample_size,
-            "doc_val_acc",
-        ),
-    ],
-)
+
+if __name__ == "__main__":
+    main()

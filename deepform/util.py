@@ -48,3 +48,18 @@ def docrow_to_bbox(t, min_height=10):
     if min_height:
         dims["y0"] = min(dims["y1"] - Decimal(min_height), dims["y0"])
     return BoundingBox(**dims)
+
+
+def config_desc(config):
+    """A one-line text string describing the configuration of a run."""
+    return (
+        "len:{len_train} "
+        "win:{window_len} "
+        "str:{use_string} "
+        "page:{use_page} "
+        "geom:{use_geom} "
+        "amt:{use_amount} "
+        "voc:{vocab_size} "
+        "emb:{vocab_embed_size} "
+        "steps:{steps_per_epoch}"
+    ).format(**config)
