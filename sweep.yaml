@@ -1,37 +1,39 @@
 # sweep.yaml
 program: deepform/train.py
 project: deepform
-method: bayes
+method: grid
 metric:
  name: doc_val_acc #acc #val_acc
  goal: maximize
 parameters:
- steps_per_epoch:
-   values: [10, 25, 50]
+ random_seed:
+   values: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+ #steps_per_epoch:
+ #  values: [10, 25, 50]
    #max: 50
- use_string:
-   values: [0, 1]
- use_page:
-   values: [0, 1]
- use_geom:
-   values: [0, 1]
- use_amount:
-   values: [0, 1]
- window_len:
-   values: [10, 25, 50]
- epochs:
-   values: [50, 100]
- steps_per_epoch:
-   values: [10, 25, 50]
- len_train:
-   values: [4000, 8000]
- vocab_size:
-   values: [100, 500, 2000]
- vocab_embed_size:
-   values: [16, 32, 64]
-early_terminate:
-   #min_iter #specify the iteration for the first bracket
-   type: hyperband
-   s: 2 #specify the total number of brackets (required for max_iter)
-   eta: 3 #specify the bracket multiplier schedule (default: 3)
-   max_iter: 27 #specify the maximum number of iterations for the program
+ #use_string:
+ #  values: [0, 1]
+ #use_page:
+#   values: [0, 1]
+ #use_geom:
+ #  values: [0, 1]
+ #use_amount:
+  # values: [0, 1]
+ #window_len:
+ #  values: [25, 50]
+ #epochs:
+ # values: [50, 100]
+ #steps_per_epoch:
+ #  values: [25, 50]
+ #len_train:
+ #  values: [4000, 8000]
+ #vocab_size:
+ #  values: [100, 500, 2000]
+ #vocab_embed_size:
+ #  values: [16, 32, 64]
+#early_terminate:
+#   #min_iter #specify the iteration for the first bracket
+#   type: hyperband
+#   s: 2 #specify the total number of brackets (required for max_iter)
+#   eta: 3 #specify the bracket multiplier schedule (default: 3)
+#   max_iter: 27 #specify the maximum number of iterations for the program

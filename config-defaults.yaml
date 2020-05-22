@@ -12,7 +12,7 @@ val_split:
 # sweeps suggest these are reasonable hyperparameter defaults
 window_len:
   desc: size of token sequences to train on (and network size!)
-  value: 30
+  value: 25
 
 # feature generation
 pad_windows:
@@ -33,10 +33,10 @@ use_string:
 
 vocab_size:
   desc: token strings are hashed mod this before embedding
-  value: 1000
+  value: 500
 vocab_embed_size:
   desc: number of outputs in token hash embedding
-  value: 64
+  value: 16
 
 target_thresh:
   desc: throw away token matches to PP crowdsourced data that aren't at least this good 
@@ -52,11 +52,15 @@ layer_2_size_factor:
 dropout:
   value: 0.2
 
+# test-retest reliability
+random_seed:
+    desc: the random seed used to initiate document choices.  This parameter tests how variable the results are regardless of parameters.
+    value: 42
 # training config
 epochs:
-  value: 100
+  value: 50
 steps_per_epoch:
-  value: 20
+  value: 50
 batch_size:
   desc: batch size in windows (not docs)
   value: 10000  
@@ -75,7 +79,7 @@ learning_rate:
 # These do not affect the training but control various setup and reportieng
 render_results_size:
   desc: log this many PDF images on last epoch
-  value: 20
+  value: 0
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 0

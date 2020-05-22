@@ -9,7 +9,7 @@ import pandas as pd
 import db.source as db
 from features import token_features
 
-seed = 42
+# seed = 42
 
 SOURCE_DIR = Path().absolute() / "source"
 SOURCE_DATA = SOURCE_DIR / "training.csv"
@@ -127,13 +127,13 @@ def load_training_data_from_files(config, pickle_destination=CACHE_FILE):
         if len(slugs) <= config.len_train:
             return slugs, tokens, features, labels
 
-        random.seed(seed)
+        random.seed(config.random_seed)
         slugs = random.sample(slugs, config.len_train)
-        random.seed(seed)
+        random.seed(config.random_seed)
         tokens = random.sample(tokens, config.len_train)
-        random.seed(seed)
+        random.seed(config.random_seed)
         features = random.sample(features, config.len_train)
-        random.seed(seed)
+        random.seed(config.random_seed)
         labels = random.sample(labels, config.len_train)
 
     return slugs, tokens, features, labels
