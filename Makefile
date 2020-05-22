@@ -32,3 +32,6 @@ docker-background: docker-stop docker-build
 .PHONY: sweep
 sweep: docker-background
 	docker exec -ti $$(docker ps | grep $(CONTAINER) | cut -d' ' -f1 | head -1) ./init_sweep.sh
+
+source/parquet: source/training.csv
+	python -u deepform/convert_to_parquet.py source/training.csv source/parquet
