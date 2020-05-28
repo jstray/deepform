@@ -2,6 +2,8 @@ import logging
 from pathlib import Path
 
 import boto3
+from botocore import UNSIGNED
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 BUCKET_NAME = "project-deepform"
@@ -25,7 +27,7 @@ def download_from_remote(local_path):
     """Copy a pdf from S3 into the local filesystem."""
     filename = local_path.name
     s3_key = "pdfs/" + filename
-    s3 = boto3.resource("s3")
+    s3 = boto3.resource("s3", config=Config(signature_version=UNSIGNED))
     try:
         s3.Bucket(BUCKET_NAME).download_file(s3_key, str(local_path))
     except ClientError:
