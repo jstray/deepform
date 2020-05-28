@@ -5,6 +5,7 @@
 # jstray 2019-6-12
 
 import argparse
+import os
 import random
 
 import keras as K
@@ -273,11 +274,12 @@ class DocAccCallback(K.callbacks.Callback):
         wandb.log({self.logname: acc})
 
 
-def main():
+def main(use_wandb=False):
     run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
     config = run.config
     config.name = config_desc(config)
-    run.save()
+    if use_wandb:
+        run.save()
 
     print("Configuration:")
     print(config)
@@ -292,21 +294,31 @@ def main():
     model = create_model(config)
     print(model.summary())
 
+    callbacks = [WandbCallback()] if use_wandb else []
+    callbacks.append(DocAccCallback(config, training_set, "doc_train_acc"))
+    callbacks.append(DocAccCallback(config, validation_set, "doc_val_acc"))
+
     model.fit_generator(
         windowed_generator(training_set, config),
         steps_per_epoch=config.steps_per_epoch,
         epochs=config.epochs,
-        callbacks=[
-            WandbCallback(),
-            DocAccCallback(config, training_set, "doc_train_acc",),
-            DocAccCallback(config, validation_set, "doc_val_acc",),
-        ],
+        callbacks=callbacks,
     )
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--no-wandb", dest="use_wandb", action="store_false", default=True
+    )
     parser.add_argument("-v", "--verbose", dest="verbosity", action="count", default=0)
     args = parser.parse_args()
+
     set_global_log_level(args.verbosity + 2)
-    main()
+
+    if not args.use_wandb:
+        os.environ["WANDB_SILENT"] = "true"
+        os.environ["WANDB_MODE"] = "dryrun"
+        wandb.log = lambda *args, **kwargs: None
+
+    main(use_wandb=args.use_wandb)
