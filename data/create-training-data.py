@@ -14,7 +14,8 @@ from util import is_dollar_amount, normalize_dollars
 output_docs = 0
 
 # Data in filings that we want to find.
-# We output a column for each one of these, indicating how close the token is to the correct answer
+# We output a column for each one of these, indicating how close the token is
+# to the correct answer.
 # For our first experiment, just extract gross_amount
 # Other possible targets include 'committee','agency','callsign'
 targets = ["gross_amount"]
@@ -28,17 +29,16 @@ outcsv = csv.DictWriter(open("training.csv", mode="w"), fieldnames=outcols)
 outcsv.writeheader()
 
 
-# computes fuzzy distance from each token in the series to the target answer for the document
-# answer may be multiple tokens, in which case we take the max of matches
+# computes fuzzy distance from each token in the series to the target answer for
+# the document answer may be multiple tokens, in which case we take the max of
+# matches
 
 
 def target_match_token(anstoks, token):
     if len(anstoks) == 1 and is_dollar_amount(anstoks[0]) and is_dollar_amount(token):
         try:
-            return (
-                fuzz.ratio(normalize_dollars(anstoks[0]), normalize_dollars(token))
-                / 100.0
-            )
+            ans, tok = normalize_dollars(anstoks[0]), normalize_dollars(token)
+            return fuzz.ratio(ans, tok) / 100.0
         except decimal.InvalidOperation:
             # not a number, maybe a date?
             return fuzz.ratio(anstoks[0], token) / 100.0
@@ -66,9 +66,8 @@ def process_doc(slug, rows):
     answers = answers.iloc[0]
 
     if answers[targets].isnull().any():
-        print(
-            f"Skipping {slug} because it is missing answers for {[t for t in targets if pd.isnull(answers[t])]}"
-        )
+        ans = [t for t in targets if pd.isnull(answers[t])]
+        print(f"Skipping {slug} because it is missing answers for {ans}")
         return
 
     df = pd.DataFrame(rows)

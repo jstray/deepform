@@ -25,7 +25,8 @@ def clean_text(text):
 
 def input_generator(conn, max_docs=10, truncate_length=3000):
     documents = pd.read_sql(
-        f"select * from document where committee != '' order by rand() limit {max_docs};",
+        f"select * from document "
+        f"where committee != '' order by rand() limit {max_docs};",
         conn,
     )
     for document in documents.itertuples():

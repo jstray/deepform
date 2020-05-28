@@ -1,5 +1,8 @@
 # Deepform
 
+![Python build](https://github.com/project-deepform/deepform/workflows/Python%20application/badge.svg)
+![Docker image](https://github.com/project-deepform/deepform/workflows/Docker%20Image%20CI/badge.svg)
+
 An project to extract information from TV and cable political advertising disclosure forms using deep learning, and a challenging journalism-relevant dataset for NLP/AI researchers. This public data is valuable to journalists but locked in PDFs. This work uses models fthat are able to generalize over form types and "learn" how to find four fields:
 
 - Contract number (multipe documents can have the same number as a contract for future air dates is revised)

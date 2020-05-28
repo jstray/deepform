@@ -29,7 +29,7 @@ def log_dollar_amount(s):
 
 def normalize_dollars(s) -> str:
     """Return a string of a number rounded to two digits (or None if not possible).
-    
+
     Given a string like '$56,333.1' return the string '5633.10'.
     """
     try:
@@ -68,7 +68,7 @@ def config_desc(config):
 
 def sample(items, n=None, seed=None):
     """Get a sample of `n` items without replacement.
-    
+
     If n is None, return the input after shuffling it.
     """
     if seed:

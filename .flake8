@@ -1,0 +1,5 @@
+[flake8]
+ignore = D203,E203,W503
+exclude = __pycache__,.hypothesis,.ipynb_checkpoints,wandb,old,docs/source/conf.py,old
+max-line-length = 88
+max-complexity = 10

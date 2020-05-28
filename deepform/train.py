@@ -1,5 +1,6 @@
-# Data extraction by deep learning, using a fully connected architecture over token windows.
-# Engineered to extract total amounts, using a few custom features.
+# Data extraction by deep learning, using a fully connected architecture over
+# token windows. Engineered to extract total amounts, using a few custom
+# features.
 # Achieves up to 90% accuracy.
 #
 # jstray 2019-6-12
@@ -255,11 +256,11 @@ class DocAccCallback(K.callbacks.Callback):
 
     def on_epoch_end(self, epoch, logs):
         if epoch >= self.config.epochs - 1:
-            # last epoch, sample from all docs and print inference results (for validation set)
+            # last epoch, sample from all docs and print inference results
             print_results = self.logname == "doc_val_acc"
             test_size = len(self.dataset)
         else:
-            # intermediate epoch, small sample (getting gradually more accurate) and no logging
+            # intermediate epoch, small sample and no logging
             print_results = False
             test_size = self.config.doc_acc_sample_size + epoch
 
@@ -312,7 +313,7 @@ if __name__ == "__main__":
     # Then override it with any parameters passed along the command line.
     parser = argparse.ArgumentParser()
 
-    # Anything that's in the config is fair game to be overridden by a command line flag.
+    # Anything in the config is fair game to be overridden by a command line flag.
     for key, info in config.as_dict().items():
         if key.startswith("_"):
             continue

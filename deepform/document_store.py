@@ -61,7 +61,7 @@ class DocumentStore:
         num_docs = min(config.len_train, len(doc_index))
         doc_index = doc_index.sample(n=num_docs).reset_index(drop=True)
 
-        # Load each of the documents in turn, finishing any necessary feature computation.
+        # Load each of the documents, finishing any necessary feature computation.
         slug_to_doc = caching_doc_getter(index_file, config)
         # docs = concurrent.thread_map(slug_to_doc, doc_index["slug"])
 

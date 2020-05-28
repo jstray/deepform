@@ -77,7 +77,7 @@ def doc_count(*dfs):
 
 def line_count(filepath):
     """Count the number of lines in a file as quickly as possible.
-    
+
     This uses the shell built-in which runs much faster than opening a file in Python.
     The main use of this is to see if a file is too large before opening it, but can
     also be used with tqdm to provide decent progress bars.

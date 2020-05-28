@@ -12,7 +12,7 @@ LOCAL_PATH = Path().absolute().parent / "data" / "pdfs"
 
 def get_pdf_path(slug):
     """Return a path to the pdf with the given slug, downloading the file if necessary.
-    
+
     If the pdf isn't in the local file system, download it from an external repository.
     """
     filename = slug + ("" if slug.endswith(".pdf") else ".pdf")
