@@ -30,6 +30,7 @@ isort = {extras = ["pyproject"], version = "^4.3.21"}
 pre-commit = "^2.4.0"
 pytest = "^5.4.2"
 hypothesis = "^5.14.0"
+faker = "^4.1.0"
 
 [tool.isort]
 multi_line_output = 3

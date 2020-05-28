@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from deepform.features import add_base_features
+from deepform.features import add_base_features, fix_dtypes
 
 # Defaults
 ROOT_DIR = Path(__file__).absolute().parents[1]
@@ -60,17 +60,9 @@ def convert_csv_to_parquet(csv_path=INPUT_CSV, pq_path=PARQUET_PATH):
     pd.DataFrame(documents).to_parquet(index_path)
 
 
-def fix_dtypes(df):
-    # Use new-style Pandas string types.
-    df[["slug", "token"]] = df[["slug", "token"]].astype("string")
-
-    # Downcast 64-bit floats to 32 bits to save space.
-    for col in ["page", "x0", "y0", "x1", "y1", "gross_amount"]:
-        df[col] = pd.to_numeric(df[col], downcast="float")
-
-
 def read_with_progess_bar(csv_path, chunksize=4000):
     """Read from a csv while displaying a progress bar, return the chunks."""
+    csv_path = Path(csv_path)
     n_chunks = math.ceil(line_count(csv_path) / chunksize)
     df_list = []
     print(f"Reading {csv_path.absolute()}...")
@@ -90,7 +82,7 @@ def line_count(filepath):
     The main use of this is to see if a file is too large before opening it, but can
     also be used with tqdm to provide decent progress bars.
     """
-    print("Checking file size...", end=" ")
+    print(f"Checking file size of {filepath}...", end=" ")
     ret = subprocess.run(["wc", "-l", filepath], capture_output=True)
     n = int(ret.stdout.split()[0])
     print(f"counted {n:,} lines")
