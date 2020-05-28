@@ -11,12 +11,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from features import add_base_features
+from deepform.features import add_base_features
 
 # Defaults
 ROOT_DIR = Path(__file__).absolute().parents[1]
-INPUT_CSV = ROOT_DIR / "source" / "training.csv"
-PARQUET_PATH = ROOT_DIR / "source" / "parquet"
+INPUT_CSV = ROOT_DIR / "data" / "training.csv"
+PARQUET_PATH = ROOT_DIR / "data" / "parquet"
 DOCUMENT_INDEX = PARQUET_PATH.parent / "doc_index.parquet"
 
 

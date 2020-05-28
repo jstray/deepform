@@ -24,7 +24,7 @@ parameters:
  steps_per_epoch:
    values: [10, 25, 50]
  len_train:
-   values: [4000, 8000]
+   values: [100, 200]
  vocab_size:
    values: [100, 500, 2000]
  vocab_embed_size:

@@ -5,7 +5,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 BUCKET_NAME = "project-deepform"
-LOCAL_PATH = Path().absolute().parent / "pdfs"
+LOCAL_PATH = Path().absolute().parent / "data" / "pdfs"
 
 
 def get_pdf_path(slug):

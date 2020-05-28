@@ -17,6 +17,9 @@ pdfplumber = "^0.5.20"
 boto3 = "^1.13.14"
 tqdm = "^4.46.0"
 tables = "^3.6.1"
+joblib = "^0.15.1"
+lz4 = "^3.0.2"
+p_tqdm = "^1.3.3"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
@@ -30,6 +33,8 @@ seed-isort-config = "^2.1.1"
 pre-commit = "^2.4.0"
 pytest = "^5.4.2"
 hypothesis = "^5.14.0"
+rope = "^0.17.0"
+pyinstrument = "^3.1.3"
 
 [tool.isort]
 multi_line_output = 3

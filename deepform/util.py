@@ -1,5 +1,6 @@
 import logging
 import math
+import random
 import re
 from collections import namedtuple
 from decimal import Decimal, InvalidOperation
@@ -63,3 +64,27 @@ def config_desc(config):
         "emb:{vocab_embed_size} "
         "steps:{steps_per_epoch}"
     ).format(**config)
+
+
+def sample(items, n=None, seed=None):
+    """Get a sample of `n` items without replacement.
+    
+    If n is None, return the input after shuffling it.
+    """
+    if seed:
+        random.seed(seed)
+    if n is None:
+        n = len(items)
+    return random.sample(items, k=n)
+
+
+def set_global_log_level(level):
+    log_levels = {
+        0: logging.CRITICAL,
+        1: logging.ERROR,
+        2: logging.WARN,
+        3: logging.INFO,
+        4: logging.DEBUG,
+    }
+    level = min(len(log_levels) - 1, max(0, level))
+    logging.basicConfig(level=log_levels[level])

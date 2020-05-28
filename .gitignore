@@ -3,14 +3,18 @@ logs/
 wandb/
 
 # Caches
+cache/
 __pycache__
+*.egg-info
 source/cached_features.p
 .ipynb_checkpoints
 .dvc/
 .hypothesis/
+*.joblib
 
 # Local environment files (for e.g. API keys)
 .env
+*.pem
 
 # Personal (e.g. editor) configuration
 .vscode/

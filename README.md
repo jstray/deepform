@@ -7,7 +7,7 @@ An project to extract information from TV and cable political advertising disclo
 - Start and end air dates dates (often known as "flight dates")
 - Total amount paid for the ads
 
-This model achieves 90% accuracy extracting total spending from the PDFs in the (held out) test set, which shows that deep learning can generalize surprisingly well to previously unseen form types. 
+This model achieves 90% accuracy extracting total spending from the PDFs in the (held out) test set, which shows that deep learning can generalize surprisingly well to previously unseen form types.
 
 For a discussion of how the 2019 prototype works, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
 
@@ -23,7 +23,7 @@ This project replicate this data extraction using modern deep learning technique
 
 ## Running with Docker
 
-The docker container expects access to `source/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
+The docker container expects access to `data/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
 
 ```
 WANDB_API_KEY=MY_API_KEY
@@ -34,7 +34,6 @@ You can find your key through your wanddb.com account. Click your face in the up
 To run a sweep, use `docker-compose up --build`. To run something else (e.g., `python train.py`, or even just `bash`), you can use `docker-compose run deepform-learner <command>`.
 
 Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
-
 
 ## How it works
 

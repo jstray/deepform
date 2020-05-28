@@ -23,7 +23,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
-COPY deepform ./
-COPY *.yaml ./
-COPY init_sweep.sh .
+COPY . .
+RUN poetry install
+
 ENTRYPOINT ["/bin/bash"]

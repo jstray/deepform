@@ -2,14 +2,14 @@ from decimal import Decimal
 from math import isclose
 
 import hypothesis.strategies as st
-from hypothesis import example, given
-from util import (
+from deepform.util import (
     docrow_to_bbox,
     dollar_amount,
     is_dollar_amount,
     log_dollar_amount,
     normalize_dollars,
 )
+from hypothesis import example, given
 
 
 def test_is_dollar_amount():
