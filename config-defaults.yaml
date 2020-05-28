@@ -80,6 +80,12 @@ doc_acc_max_sample_size:
 doc_acc_sample_size:
   desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
   value: 10
+use_wandb:
+  desc: report run to wandb and store annotations
+  value: 1
+log_level:
+  desc: minimum level to report in the logs
+  value: INFO
 
 # the rest of these are not hyperparamters, but config settings
 # meaning it may break things if you change them

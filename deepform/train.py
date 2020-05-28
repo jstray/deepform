@@ -5,6 +5,7 @@
 # jstray 2019-6-12
 
 import argparse
+import logging
 import os
 import random
 
@@ -29,7 +30,6 @@ from deepform.util import (
     docrow_to_bbox,
     is_dollar_amount,
     normalize_dollars,
-    set_global_log_level,
 )
 
 # Generator that reads raw training data
@@ -274,11 +274,9 @@ class DocAccCallback(K.callbacks.Callback):
         wandb.log({self.logname: acc})
 
 
-def main(use_wandb=False):
-    run = wandb.init(project="extract_total", entity="deepform", name="hypersweep")
-    config = run.config
+def main(config):
     config.name = config_desc(config)
-    if use_wandb:
+    if config.use_wandb:
         run.save()
 
     print("Configuration:")
@@ -294,7 +292,7 @@ def main(use_wandb=False):
     model = create_model(config)
     print(model.summary())
 
-    callbacks = [WandbCallback()] if use_wandb else []
+    callbacks = [WandbCallback()] if config.use_wandb else []
     callbacks.append(DocAccCallback(config, training_set, "doc_train_acc"))
     callbacks.append(DocAccCallback(config, validation_set, "doc_val_acc"))
 
@@ -307,18 +305,31 @@ def main(use_wandb=False):
 
 
 if __name__ == "__main__":
+    # First read in the initial configuration.
+    run = wandb.init(project="extract_total", entity="deepform", allow_val_change=True)
+    config = run.config
+
+    # Then override it with any parameters passed along the command line.
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--no-wandb", dest="use_wandb", action="store_false", default=True
-    )
-    parser.add_argument("-v", "--verbose", dest="verbosity", action="count", default=0)
+
+    # Anything that's in the config is fair game to be overridden by a command line flag.
+    for key, info in config.as_dict().items():
+        if key.startswith("_"):
+            continue
+        value = info["value"]
+        cli_flag = "--" + key.replace("_", "-")
+        parser.add_argument(
+            cli_flag, dest=key, help=info["desc"], type=type(value), default=value
+        )
+
     args = parser.parse_args()
+    config.update(args, allow_val_change=True)
 
-    set_global_log_level(args.verbosity + 2)
-
-    if not args.use_wandb:
+    if not config.use_wandb:
         os.environ["WANDB_SILENT"] = "true"
         os.environ["WANDB_MODE"] = "dryrun"
         wandb.log = lambda *args, **kwargs: None
 
-    main(use_wandb=args.use_wandb)
+    logging.basicConfig(level=config.log_level)
+
+    main(config)

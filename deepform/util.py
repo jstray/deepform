@@ -76,15 +76,3 @@ def sample(items, n=None, seed=None):
     if n is None:
         n = len(items)
     return random.sample(items, k=n)
-
-
-def set_global_log_level(level):
-    log_levels = {
-        0: logging.CRITICAL,
-        1: logging.ERROR,
-        2: logging.WARN,
-        3: logging.INFO,
-        4: logging.DEBUG,
-    }
-    level = min(len(log_levels) - 1, max(0, level))
-    logging.basicConfig(level=log_levels[level])
