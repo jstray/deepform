@@ -17,13 +17,16 @@ RUN apt-get update && apt-get install -y \
 RUN sed -i 's/<policy domain="coder" rights="none" pattern="PDF" \/>/<policy domain="coder" rights="read|write" pattern="PDF" \/>/' \
     /etc/ImageMagick-6/policy.xml
 
+# Get this out of the way early, because it takes so damn long -- we really want to cache it.
+RUN pip install "tensorflow==2.2.0"
+
 # Install Poetry and project dependencies.
 RUN pip install "poetry==$POETRY_VERSION"
+RUN poetry config virtualenvs.create false
 COPY pyproject.toml poetry.lock ./
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+RUN poetry export --dev -f requirements.txt | pip install -r /dev/stdin
 
 COPY . .
-RUN poetry install
+RUN poetry install --no-interaction --no-ansi
 
 ENTRYPOINT ["/bin/bash"]
