@@ -262,6 +262,9 @@ class DocAccCallback(K.callbacks.Callback):
             print_results = False
             test_size = self.config.doc_acc_sample_size + epoch
 
+        # Avoid sampling tens of thousands of documents on large training sets.
+        test_size = min(test_size, self.config.doc_acc_max_sample_size)
+
         acc = compute_accuracy(
             self.model, self.config, self.dataset, test_size, print_results,
         )

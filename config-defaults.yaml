@@ -67,13 +67,16 @@ penalize_missed:
 learning_rate:
   value: 0.001
 
-# These do not affect the training but control various setup and reportieng
+# These do not affect the training but control various setup and reporting
 render_results_size:
   desc: log this many PDF images on last epoch
   value: 20
 use_data_cache:
   desc: use pickled saved training data (freezes options like padding, amount_feature)
   value: 1
+doc_acc_max_sample_size:
+  desc: never sample more than this many documents
+  value: 1000
 doc_acc_sample_size:
   desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
   value: 10
