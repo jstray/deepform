@@ -6,32 +6,6 @@ from deepform.features import fraction_digits
 from deepform.util import is_dollar_amount, log_dollar_amount
 from test_csv_to_parquet import training_docs_data
 
-DOCS = ["doc.1", "doc-2", "doc_3"]
-
-
-def random_training_data_row(faker):
-    x0 = faker.pyfloat(min_value=-1, max_value=600)
-    y0 = faker.pyfloat(min_value=-1, max_value=750)
-    return {
-        "slug": faker.random_element(DOCS),
-        "page": faker.pyfloat(min_value=0, max_value=1),
-        "x0": x0,
-        "y0": y0,
-        "x1": x0 + faker.pyfloat(min_value=-1, max_value=20),
-        "y1": y0 + faker.pyfloat(min_value=-1, max_value=50),
-        "token": faker.pystr(min_chars=1, max_chars=50),
-        "gross_amount": faker.pyfloat(min_value=0, max_value=1),
-    }
-
-
-def random_data_parquet(faker, path):
-
-    cols = "slug,page,x0,y0,x1,y1,token,gross_amount".split(",")
-    data = [random_training_data_row(faker) for _ in range(100)]
-    df = pd.DataFrame(data, columns=cols)
-    df = df.sort_values(by="slug page y0 x0".split()).reset_index(drop=True)
-    df.to_csv(path, index=False)
-
 
 def test_convert_csv_to_parquet(faker, tmp_path):
     num_docs = 5

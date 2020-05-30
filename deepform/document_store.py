@@ -1,5 +1,4 @@
 import logging
-from collections import namedtuple
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -8,8 +7,6 @@ import pandas as pd
 
 from deepform.document import Document
 from joblib import dump, load
-
-TrainingSet = namedtuple("TrainingSet", ["slugs", "tokens", "features", "labels"])
 
 
 @dataclass(frozen=True)
