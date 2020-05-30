@@ -5,7 +5,6 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 from deepform.document import Document
 from joblib import dump, load
@@ -59,14 +58,13 @@ class DocumentStore:
 
         # Sample down to no more than the requested number of documents.
         num_docs = min(config.len_train, len(doc_index))
-        doc_index = doc_index.sample(n=num_docs).reset_index(drop=True)
+        doc_index = doc_index.sample(n=num_docs)
 
         # Load each of the documents, finishing any necessary feature computation.
         slug_to_doc = caching_doc_getter(index_file, config)
         # docs = concurrent.thread_map(slug_to_doc, doc_index["slug"])
 
-        tqdm.pandas()
-        docs = doc_index["slug"].progress_apply(slug_to_doc).to_numpy()
+        docs = doc_index.index.map(slug_to_doc)
 
         return DocumentStore(docs)
 

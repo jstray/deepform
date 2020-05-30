@@ -18,6 +18,8 @@ boto3 = "^1.13.14"
 tqdm = "^4.46.0"
 joblib = "^0.15.1"
 lz4 = "^3.0.2"
+humanize = "^2.4.0"
+dask = {extras = ["dataframe"], version = "^2.17.2"}
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

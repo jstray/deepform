@@ -23,7 +23,7 @@ from keras.models import Model
 from numpy import isclose as same_page
 from wandb.keras import WandbCallback
 
-from deepform.convert_to_parquet import DOCUMENT_INDEX
+from deepform.add_features import DOC_INDEX
 from deepform.document_store import DocumentStore
 from deepform.pdfs import get_pdf_path
 from deepform.util import (
@@ -284,7 +284,7 @@ def main(config):
     print(config)
 
     # all_data = load_training_data(config)
-    all_documents = DocumentStore.open(index_file=DOCUMENT_INDEX, config=config)
+    all_documents = DocumentStore.open(index_file=DOC_INDEX, config=config)
 
     # split into validation and training sets
     validation_set, training_set = all_documents.split(percent=config.val_split)

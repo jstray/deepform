@@ -3,9 +3,8 @@ CONTAINER=deepform/deepform_learner:latest
 
 # 'make test' is the default target for make.
 .PHONY: test
-test: docker-background
-	docker exec -ti $$(docker ps | grep $(CONTAINER) | cut -d' ' -f1 | head -1) \
-	pytest --verbose --color=yes tests/*
+test: docker-build
+	docker run --rm $(CONTAINER) pytest --verbose --color=yes tests
 
 .PHONY: docker-build
 docker-build:
@@ -17,36 +16,39 @@ docker-stop:
 
 .PHONY: docker-shell
 docker-shell: docker-stop docker-build
-	docker run -ti --env-file=.env \
+	docker run -ti --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/deepform,target=/deepform \
 	--mount type=bind,source=$(CURDIR)/data,target=/data \
 	$(CONTAINER)
 
 .PHONY: docker-background
 docker-background: docker-stop docker-build
-	docker run -td --env-file=.env \
+	docker run -td --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/deepform,target=/deepform \
 	--mount type=bind,source=$(CURDIR)/data,target=/data \
 	$(CONTAINER)
 
-data/training.csv.gz:
-	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/training-2012.csv.gz -o data/training.csv.gz
+data/training.parquet:
+	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/training.parquet -o data/training.parquet
 
-data/training.csv: data/training.csv.gz
-	gunzip -c data/training.csv.gz > data/training.csv
-
-# Generates data/doc_index.parquet, but we don't want to run it automatically.
-.PHONY: data
-data: data/training.csv docker-background
-	docker exec -ti $$(docker ps | grep $(CONTAINER) | cut -d' ' -f1 | head -1) \
-	python -um deepform.convert_to_parquet data/training.csv data/parquet
+data/doc_index.parquet: data/training.parquet
+	docker build -t $(CONTAINER) .
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.add_features
 
 .PHONY: train
-train: data/doc_index.parquet docker-background
-	docker exec -ti $$(docker ps | grep $(CONTAINER) | cut -d' ' -f1 | head -1) \
+train: data/doc_index.parquet .env docker-build
+	docker run --rm --env-file=.env \
+	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	python -um deepform.train
 
+.PHONY: test-train
+test-train: data/doc_index.parquet .env docker-build
+	docker run --rm --env-file=.env \
+	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --render-results-size=0
+
 .PHONY: sweep
-sweep: data/doc_index.parquet docker-background
-	docker exec -ti $$(docker ps | grep $(CONTAINER) | cut -d' ' -f1 | head -1) \
+sweep: data/doc_index.parquet .env docker-build
+	docker run --rm --env-file=.env \
+	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	./init_sweep.sh

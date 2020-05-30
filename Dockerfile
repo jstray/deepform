@@ -29,4 +29,4 @@ RUN poetry export --dev -f requirements.txt | pip install -r /dev/stdin
 COPY . .
 RUN poetry install --no-interaction --no-ansi
 
-ENTRYPOINT ["/bin/bash"]
+CMD ["/bin/bash"]
