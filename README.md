@@ -24,19 +24,55 @@ In 2014 Alex Byrnes [automated](https://github.com/alexbyrnes/FCC-Political-Ads)
 
 This project replicate this data extraction using modern deep learning techniques.
 
-## Running with Docker
+## Running
 
-The docker container expects access to `data/training.csv`, which needs to be mounted (see command below). It also expects you to have a Weights and Biases API key in a `.env` file at the root of your repo, with the format:
+The project is primarily intended to be run with [Docker](https://www.docker.com/products/docker-desktop), which eases issues with Python virtual environments, but it can also be run locally -- this is easiest to do with [Poetry](https://python-poetry.org/).
+
+### Docker
+
+To use Docker, you'll have to be running the daemon, which you can find and install from https://www.docker.com/products/docker-desktop. Fortunately, that's _all_ you need.
+
+The project has a `Makefile` that covers most of the things you might want to do with the project. Run:
+
+- `make test` to run all the unit tests for the project
+- `make docker-shell` will spin up a container and drop you into a bash shell after mounting the `deepform` folder of code so that commands that you run there reflect the code as you are editing it.
+- `make train` runs `deepform/train.py` with the default configuration. If it needs to it will download and preprocess the data it needs to train on.
+- `make test-train` runs the same training loop on the same data, but with very strongly reduced settings (just a few documents for a few steps) so that it can be used to check that it actually works.
+- `make sweep` runs a hyperparameter sweep with Weights & Biases, using the configuration in `sweep.yaml`
+
+Some of these commands require an `.env` file located at the root of the project directory. It will need to have an API key you can get from your [settings](https://app.wandb.ai/settings) page at Weights & Biases. The file should look like:
 
 ```
 WANDB_API_KEY=MY_API_KEY
 ```
 
-You can find your key through your wanddb.com account. Click your face in the upper right and select `Settings` then scroll down.
+If you don't want to use Weights & Biases, you can turn it off by setting `use_wandb=0`. You'll still need an `.env` file, but it can be empty.
 
-To run a sweep, use `docker-compose up --build`. To run something else (e.g., `python train.py`, or even just `bash`), you can use `docker-compose run deepform-learner <command>`.
+#### Caveats
 
-Note that the training script currently brings all of the training set into memory, and therefore has significant RAM requirements.
+Training the model brings all the training data into memory and is quite RAM-intensive. On my 16GB machine, Docker will terminate with an out-of-memory exception if I train on more than ~6000 documents. If I train locally, it uses all my ram but will keep going after it exceeds it, slowing down and paging as it needs to. So with Docker, either train on a subset of the data (use a smaller `len_train`) or use a machine with a lot of RAM.
+
+### Poetry - dependency management and running locally
+
+Deepform manages its dependencies with `Poetry`, which you only need if you want to run it locally or alter the project dependencies.
+
+You can install Poetry using any of the methods listed in their [documentation](https://python-poetry.org/docs/#installation).
+
+If you want to run Deepform locally:
+
+- run `poetry install` to install the deepform package and all of it's dependencies into a fresh virtual environment
+- enter this environment with `poetry shell`
+- or run a one-off command with `poetry run <command>`
+
+Since deepform is an installed package inside the virtual environment Poetry creates, run the code as modules, e.g. `python -m deepform.train` instead of `python deepform/train.py` -- this insures that imports and relative paths work the way they should.
+
+To update project dependencies:
+
+- `poetry add <package>` adds a new python package as a requirement
+- `poetry remove <package>` removes a package that's no longer needed
+- `poetry update` updates all the dependencies to their latest non-conflicting versions
+
+These three commands alter `pyproject.toml` and `poetry.lock`, which should be committed to git. Using them ensures that our project has reproducible builds.
 
 ## How it works
 
@@ -76,9 +112,11 @@ The `slug` is a unique document identifier, ultimately from the source TSV. The 
 
 ## Code quality and pre-commit hooks
 
-The code is currently automatically formatted with [black](https://black.readthedocs.io/en/stable/), and using [autoflake](https://pypi.org/project/autoflake/) to remove unused imports and [isort](https://timothycrosley.github.io/isort/) to sort them predictably. These tools are configured in `pyproject.toml` and should Just Work&trade; -- you shouldn't have to worry about them at all!
+The code is currently automatically formatted with [black](https://black.readthedocs.io/en/stable/), uses [autoflake](https://pypi.org/project/autoflake/) to remove unused imports, [isort](https://timothycrosley.github.io/isort/) to sort them, and [flake8](https://flake8.pycqa.org/en/latest/) to check for PEP8 violations. These tools are configured in `pyproject.toml` and should Just Work&trade; -- you shouldn't have to worry about them at all once you install them.
 
-To make this as painless as possible, `.pre-commit-config.yaml` contains rules for automatically running these tools as part of `git commit`. To turn these git pre-commit hook on, you need run `pre-commit install` (after `pip install`ing `black`, `autoflake`, `isort[pyproject]`, and `pre-commit` itself). After that, whenever you run `git commit`, these tools will run and clean up your code so that "dirty" code never gets committed in the first place.
+To make this as painless as possible, `.pre-commit-config.yaml` contains rules for automatically running these tools as part of `git commit`. To turn these git pre-commit hook on, you need run `pre-commit install` (after installing it and the above libraries with Poetry or pip). After that, whenever you run `git commit`, these tools will run and clean up your code so that "dirty" code never gets committed in the first place.
+
+GitHub runs a "python build" Action whenever you push new code to a branch (configured in [python-app.yml](https://github.com/project-deepform/deepform/blob/master/.github/workflows/python-app.yml)). This also runs `black`, `flake8`, and `pytest`, so it's best to just make sure things pass locally before pushing to GitHub.
 
 ## A research data set
 
