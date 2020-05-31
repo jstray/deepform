@@ -1,6 +1,6 @@
 import pandas as pd
 
-from deepform.add_features import extend_and_write_docs
+from deepform.add_features import extend_and_write_docs, pq_index_and_dir
 from deepform.csv_to_parquet import CSV_COL_TYPES
 from deepform.features import fraction_digits
 from deepform.util import is_dollar_amount, log_dollar_amount
@@ -11,7 +11,7 @@ def test_convert_csv_to_parquet(faker, tmp_path):
     num_docs = 5
 
     idx_path = tmp_path / "doc_index.parquet"
-    pd_path = tmp_path / "tokenized_docs"
+    idx_path, pq_path = pq_index_and_dir(idx_path)
 
     # Create the source data to start with.
     df = training_docs_data(faker, num_docs, repeat=False)
@@ -28,7 +28,7 @@ def test_convert_csv_to_parquet(faker, tmp_path):
 
     # Check out each individual document that was produced.
     for slug, length, best_match in index.itertuples():
-        doc = pd.read_parquet(pd_path / f"{slug}.parquet")
+        doc = pd.read_parquet(pq_path / f"{slug}.parquet")
         # Doc features
         assert doc.token.str.len().min() >= 3
         assert length == len(doc)

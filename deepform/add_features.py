@@ -25,13 +25,7 @@ DOC_INDEX = INPUT_PQ.parent / "doc_index.parquet"
 def extend_and_write_docs(df, pq_index=DOC_INDEX, pq_path=None):
     """Split data into individual documents, add features, and write to parquet."""
     # Set defaults and create whatever directories we need.
-    pq_index = Path(pq_index).resolve()
-    if pq_path is None:
-        pq_path = pq_index.parent / "tokenized_docs"
-    else:
-        pq_path = Path(pq_path)
-    pq_index.parent.mkdir(parents=True, exist_ok=True)
-    pq_path.mkdir(parents=True, exist_ok=True)
+    pq_index, pq_path = pq_index_and_dir(pq_index, pq_path)
 
     # Spin up a bunch of jobs to do the conversoi
     with ThreadPoolExecutor() as executor:
@@ -48,6 +42,18 @@ def extend_and_write_docs(df, pq_index=DOC_INDEX, pq_path=None):
     logging.debug(f"Writing document index to {pq_index}...")
     doc_index = pd.DataFrame(doc_results).set_index("slug", drop=True)
     doc_index.to_parquet(pq_index, compression="lz4")
+
+
+def pq_index_and_dir(pq_index, pq_path=None):
+    """Get directory for sharded training data, creating if necessary."""
+    pq_index = Path(pq_index).resolve()
+    if pq_path is None:
+        pq_path = pq_index.parent / "tokenized_docs"
+    else:
+        pq_path = Path(pq_path)
+    pq_index.parent.mkdir(parents=True, exist_ok=True)
+    pq_path.mkdir(parents=True, exist_ok=True)
+    return pq_index, pq_path
 
 
 def process_document_tokens(slug, doc, base_path):

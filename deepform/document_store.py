@@ -4,9 +4,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-
-from deepform.document import Document
 from joblib import dump, load
+
+from deepform.add_features import pq_index_and_dir
+from deepform.document import Document
 
 
 @dataclass(frozen=True)
@@ -67,9 +68,9 @@ class DocumentStore:
 
 
 def caching_doc_getter(index_file, config):
-    pq_root = index_file.parent / "parquet"
+    _, pq_root = pq_index_and_dir(index_file)
     if config.use_data_cache:
-        cache_root = index_file.parent / "cache" / cache_master_key(config)
+        cache_root = pq_root.parent / "cache" / cache_master_key(config)
         cache_root.mkdir(parents=True, exist_ok=True)
 
     def slug_to_doc(slug):

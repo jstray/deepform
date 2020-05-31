@@ -40,7 +40,7 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 line_length = 88
-known_third_party = ["boto3", "botocore", "fuzzywuzzy", "keras", "nltk", "numpy", "pandas", "pdfplumber", "pyarrow", "sqlalchemy", "tensorflow", "tqdm", "wandb"]
+known_third_party = ["boto3", "botocore", "fuzzywuzzy", "joblib", "keras", "nltk", "numpy", "pandas", "pdfplumber", "pyarrow", "sqlalchemy", "tensorflow", "tqdm", "wandb"]
 
 [tool.black]
 line-length = 88
