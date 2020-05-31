@@ -128,7 +128,7 @@ def predict_scores(model, document):
 def predict_answer(model, document):
     scores = predict_scores(model, document)
     best_score_idx = np.argmax(scores)
-    best_score_text = document.tokens[best_score_idx]["token"]
+    best_score_text = document.tokens.iloc[best_score_idx]["token"]
     return best_score_text, scores[best_score_idx], scores
 
 
@@ -195,9 +195,9 @@ def log_pdf(doc, score, scores, predict_text, answer_text):
 
         # Draw target tokens
         target_toks = [
-            doc.tokens[i]
+            doc.tokens.iloc[i]
             for i in target_idx
-            if same_page(doc.tokens[i]["page"], current_page)
+            if same_page(doc.tokens.iloc[i]["page"], current_page)
         ]
         rects = [docrow_to_bbox(t) for t in target_toks]
         im.draw_rects(rects, stroke="blue", stroke_width=3, fill=None)
@@ -205,7 +205,7 @@ def log_pdf(doc, score, scores, predict_text, answer_text):
         page_images.append(wandb.Image(im.annotated, caption="page " + str(pagenum)))
 
     # get best matching score of any token in the training data
-    match = max([tok["match"] for tok in doc.tokens])
+    match = doc.tokens["match"].max()
     caption = (
         f"{doc.slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}"
     )

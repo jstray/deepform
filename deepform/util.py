@@ -45,7 +45,7 @@ def docrow_to_bbox(t, min_height=10):
     cases where pdfplumber has incorrectly underlined rather than boxed in the
     recognized text.
     """
-    dims = {k: Decimal(t[k]) for k in ["x0", "y0", "x1", "y1"]}
+    dims = {k: Decimal(float(t[k])) for k in ["x0", "y0", "x1", "y1"]}
     if min_height:
         dims["y0"] = min(dims["y1"] - Decimal(min_height), dims["y0"])
     return BoundingBox(**dims)

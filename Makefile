@@ -45,7 +45,7 @@ train: data/doc_index.parquet .env docker-build
 test-train: data/doc_index.parquet .env docker-build
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
-	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --render-results-size=0
+	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0 --render-results-size=0
 
 .PHONY: sweep
 sweep: data/doc_index.parquet .env docker-build

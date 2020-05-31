@@ -23,7 +23,7 @@ TOKEN_COLS = ["token", "x0", "y0", "x1", "y1", "page", "match"]
 class Window:
     """A Window just holds views to the arrays held by a Document."""
 
-    tokens: np.ndarray
+    tokens: pd.DataFrame
     features: np.ndarray
     labels: np.ndarray
 
@@ -35,7 +35,7 @@ class Window:
 class Document:
     slug: str
     # tokens, features, and labels are all aligned with the same indices.
-    tokens: np.ndarray
+    tokens: pd.DataFrame
     features: np.ndarray
     labels: np.ndarray
     # positive_windows is a list of which (starting) indices have a match.
@@ -53,7 +53,7 @@ class Document:
     def __getitem__(self, n):
         """Return the `n`th window in the document."""
         k = n + self.window_len
-        return Window(self.tokens[n:k], self.features[n:k], self.labels[n:k])
+        return Window(self.tokens.iloc[n:k], self.features[n:k], self.labels[n:k])
 
     def __len__(self):
         """Return the number of windows in the document.
@@ -92,7 +92,7 @@ class Document:
 
         return Document(
             slug=slug,
-            tokens=np.array(df[TOKEN_COLS].to_dict("records")),
+            tokens=df[TOKEN_COLS],
             features=df[FEATURE_COLS].to_numpy(dtype=float),
             labels=df["label"].to_numpy(dtype=bool),
             positive_windows=np.array(positive_windows),
