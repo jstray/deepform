@@ -5,6 +5,7 @@
 
 import csv
 import decimal
+import numpy as np
 
 import pandas as pd
 from fuzzywuzzy import fuzz
@@ -17,7 +18,7 @@ output_docs = 0
 # We output a column for each one of these, indicating how close the token is to the correct answer
 # For our first experiment, just extract gross_amount
 # Other possible targets include 'committee','agency','callsign'
-targets = ["gross_amount"]
+targets = ["gross_amount", "contract_number"] ###Add additional targets
 
 filings = pd.read_csv("../source/ftf-all-filings.tsv", sep="\t")
 
@@ -31,28 +32,43 @@ outcsv.writeheader()
 # computes fuzzy distance from each token in the series to the target answer for the document
 # answer may be multiple tokens, in which case we take the max of matches
 
+def target_match(answer, tokens, target, max_n): 
+    anstok = str(answer).lower().replace(" ", "") # Remove spaces and make the answer lower case
+    tokens = [token.lower() for token in tokens] # lowercase all the tokens also
+    
+    if target == "gross_amount":
+        max_n = 1
+        for token in tokens:
+            if is_dollar_amount(anstok) and is_dollar_amount(token): 
+                try: 
+                    ratioslist.append(
+                        fuzz.ratio(normalize_dollars(anstok), normalize_dollars(token))
+                        / 100.0
+                    )
+                except decimal.InvalidOperation:
+                    # not a number, maybe a date?
+                    ratioslist.append(fuzz.ratio(anstok, token) / 100.0)
+            else: 
+                ratioslist.append([fuzz.ratio(x, token) anstok] / 100.0)
 
-def target_match_token(anstoks, token):
-    if len(anstoks) == 1 and is_dollar_amount(anstoks[0]) and is_dollar_amount(token):
-        try:
-            return (
-                fuzz.ratio(normalize_dollars(anstoks[0]), normalize_dollars(token))
-                / 100.0
-            )
-        except decimal.InvalidOperation:
-            # not a number, maybe a date?
-            return fuzz.ratio(anstoks[0], token) / 100.0
+    elif target == "contract_number":
 
-    else:
-        return max([fuzz.ratio(x, token) for x in anstoks]) / 100.0
+        best_match = np.zeroes(max_n)
+        #best_idx = np.zeroes(max_n)
+        ratioslist = np.zeroes(max_n, len(tokens))          # two dimensional because we will have one array for each possible n-gram length
+        for i in range (1, max_n):                          # For each possible number of tokens in answertoken
+           for idx in range (0, len(tokens) - i):           #for each n-gram of that length in the doc
+               token_string = tokens[idx:idx+i].join('')    # make it one token so we can compare
+               match = fuzz.ratio(anstok, token_string) / 100.0 # compare and store the float in match
+               ratiolist[i-1, idx] = match                  # update the ratiolist matrix with this match value for the n-gram length and index
+               if match > best_match[i]:                    # update our vector of best matches for each n-gram
+                   best_match[i-1] = match 
+                   #best_idx[i-1] = idx
+        ratioslist = ratioslist[np.argmax(best_match),:]    #Ratiolist is all the values in the column which corresponds to the 
+    
+    return ratioslist 
 
-
-def target_match(answer, tokens):
-    anstoks = str(answer).lower().split(" ")
-    return tokens.map(lambda x: target_match_token(anstoks, x.lower()))
-
-
-def process_doc(slug, rows):
+def process_doc(slug, rows, max_n):
     global output_docs
     if len(rows) < 10:
         # probably needs OCR
@@ -79,7 +95,7 @@ def process_doc(slug, rows):
         df["page"] = page / maxpage  # last page = 1.0
 
     for t in targets:
-        df[t] = target_match(answers[t], df["token"])
+        df[t] = target_match(answers[t], df["token"], t, max_n) # The value of the answer and an array of the tokens for that slug
 
     for _, row in df.iterrows():
         outcsv.writerow(row.to_dict())
@@ -93,10 +109,11 @@ def process_doc(slug, rows):
 active_rows = []
 active_slug = None
 input_docs = 0
-for row in incsv:
+max_n = 5
+   for row in incsv:
     if row["slug"] != active_slug:
         if active_slug:
-            process_doc(active_slug, active_rows)
+            process_doc(active_slug, active_rows, max_n)
             input_docs += 1
         active_slug = row["slug"]
         active_rows = [row]
