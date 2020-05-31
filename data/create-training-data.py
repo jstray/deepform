@@ -22,7 +22,7 @@ targets = ["gross_amount", "contract_number"] ###Add additional targets
 
 filings = pd.read_csv("../source/ftf-all-filings.tsv", sep="\t")
 
-incsv = csv.DictReader(open("filings-tokens.csv", mode="r"))
+incsv = pd.read_parquet("training.parquet")
 
 outcols = ["slug", "page", "x0", "y0", "x1", "y1", "token"] + targets
 outcsv = csv.DictWriter(open("training.csv", mode="w"), fieldnames=outcols)
@@ -33,10 +33,13 @@ outcsv.writeheader()
 # answer may be multiple tokens, in which case we take the max of matches
 
 def target_match(answer, tokens, target, max_n): 
+    print('')
+    print("answer: " + str(answer))
     anstok = str(answer).lower().replace(" ", "") # Remove spaces and make the answer lower case
     tokens = [token.lower() for token in tokens] # lowercase all the tokens also
     
     if target == "gross_amount":
+        ratioslist = []
         max_n = 1
         for token in tokens:
             if is_dollar_amount(anstok) and is_dollar_amount(token): 
@@ -49,22 +52,27 @@ def target_match(answer, tokens, target, max_n):
                     # not a number, maybe a date?
                     ratioslist.append(fuzz.ratio(anstok, token) / 100.0)
             else: 
-                ratioslist.append([fuzz.ratio(x, token) anstok] / 100.0)
+                ratioslist.append(fuzz.ratio(anstok, token) / 100.0)
 
     elif target == "contract_number":
 
-        best_match = np.zeroes(max_n)
-        #best_idx = np.zeroes(max_n)
-        ratioslist = np.zeroes(max_n, len(tokens))          # two dimensional because we will have one array for each possible n-gram length
-        for i in range (1, max_n):                          # For each possible number of tokens in answertoken
+        best_match = np.zeros(max_n)
+        best_idx = np.zeros(max_n)
+        print("len(tokens: " + str(len(tokens)))
+        ratioslist = np.zeros((max_n, len(tokens)))          # two dimensional because we will have one array for each possible n-gram length
+        for i in range (max_n):                          # For each possible number of tokens in answertoken
            for idx in range (0, len(tokens) - i):           #for each n-gram of that length in the doc
-               token_string = tokens[idx:idx+i].join('')    # make it one token so we can compare
+               token_string = ''.join(str(t) for t in tokens[idx:idx+i])    # make it one token so we can compare
                match = fuzz.ratio(anstok, token_string) / 100.0 # compare and store the float in match
-               ratiolist[i-1, idx] = match                  # update the ratiolist matrix with this match value for the n-gram length and index
-               if match > best_match[i]:                    # update our vector of best matches for each n-gram
+               ratioslist[i, idx] = match                  # update the ratioslist matrix with this match value for the n-gram length and index
+               if match > best_match[i-1]:                    # update our vector of best matches for each n-gram
                    best_match[i-1] = match 
-                   #best_idx[i-1] = idx
-        ratioslist = ratioslist[np.argmax(best_match),:]    #Ratiolist is all the values in the column which corresponds to the 
+                   best_idx[i-1] = idx
+        print("best_match array: " + str(best_match))
+        print("Best choice for number of tokens: " + str(np.argmax(best_match)+1))
+        print("Best Match Token Index: " + str(best_idx[np.argmax(best_match)]))
+        print("Best Match Tokens: " + str(tokens[int(best_idx[np.argmax(best_match)]):int(best_idx[np.argmax(best_match)])+np.argmax(best_match)+1]))
+        ratioslist = ratioslist[np.argmax(best_match),:]    #Ratioslist is all the values in the column which corresponds to the 
     
     return ratioslist 
 
@@ -95,7 +103,7 @@ def process_doc(slug, rows, max_n):
         df["page"] = page / maxpage  # last page = 1.0
 
     for t in targets:
-        df[t] = target_match(answers[t], df["token"], t, max_n) # The value of the answer and an array of the tokens for that slug
+        df[t] = target_match(answers[t], df["token"].fillna(''), t, max_n) # The value of the answer and an array of the tokens for that slug
 
     for _, row in df.iterrows():
         outcsv.writerow(row.to_dict())
@@ -106,19 +114,46 @@ def process_doc(slug, rows, max_n):
 
 # --- Main ---
 # Accumulate all rows with the same slug
+# active_rows = []
+# active_slug = None
+# input_docs = 0
+# max_n = 5
+#    for row in incsv:
+#     if row["slug"] != active_slug:
+#         if active_slug:
+#             process_doc(active_slug, active_rows, max_n)
+#             input_docs += 1
+#         active_slug = row["slug"]
+#         active_rows = [row]
+#     else:
+#         active_rows.append(row)
+
+# print(f"Input documents {input_docs}")
+# print(f"Output documents {output_docs}")
+
+
+
+
+# --- Main ---
+# Accumulate all rows with the same slug
 active_rows = []
-active_slug = None
+#active_slug = None
 input_docs = 0
 max_n = 5
-   for row in incsv:
-    if row["slug"] != active_slug:
-        if active_slug:
-            process_doc(active_slug, active_rows, max_n)
-            input_docs += 1
-        active_slug = row["slug"]
-        active_rows = [row]
-    else:
-        active_rows.append(row)
-
-print(f"Input documents {input_docs}")
-print(f"Output documents {output_docs}")
+# for row in incsv:
+#     if row["slug"] != active_slug:
+#         if active_slug:
+#             process_doc(active_slug, active_rows)
+#             input_docs += 1
+#         active_slug = row["slug"]
+#         active_rows = [row]
+#     else:
+#         active_rows.append(row)
+n = 0
+for slug, group in incsv.groupby("slug"):
+    process_doc(slug, group, max_n )
+    n += 1
+    if n > 200: 
+        break
+#print(f"Input documents {input_docs}")
+#print(f"Output documents {output_docs}")
