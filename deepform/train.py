@@ -12,7 +12,6 @@ import random
 
 import keras as K
 import numpy as np
-import pdfplumber
 import tensorflow as tf
 import wandb
 from keras.backend import squeeze
@@ -20,18 +19,12 @@ from keras.engine.input_layer import Input
 from keras.layers import Dense, Dropout, Flatten, Lambda, concatenate
 from keras.layers.embeddings import Embedding
 from keras.models import Model
-from numpy import isclose as same_page
 from wandb.keras import WandbCallback
 
 from deepform.add_features import DOC_INDEX
 from deepform.document_store import DocumentStore
-from deepform.pdfs import get_pdf_path
-from deepform.util import (
-    config_desc,
-    docrow_to_bbox,
-    is_dollar_amount,
-    normalize_dollars,
-)
+from deepform.pdfs import log_pdf
+from deepform.util import config_desc, dollar_match
 
 # Generator that reads raw training data
 # For each document, yields an array of dictionaries, each of which is a token
@@ -139,83 +132,6 @@ def correct_answer(features, labels, tokens):
     return answer_text
 
 
-# Match e.g. "$14,123.02" to "14123.02"
-def answer_match(predicted, actual):
-    return (
-        is_dollar_amount(predicted)
-        and is_dollar_amount(actual)
-        and (normalize_dollars(predicted) == normalize_dollars(actual))
-    )
-
-
-# -- Render visualization of output on PDF pages --
-
-
-def log_pdf(doc, score, scores, predict_text, answer_text):
-    fname = get_pdf_path(doc.slug)
-    try:
-        pdf = pdfplumber.open(fname)
-    except Exception:
-        # If the file's not there, that's fine -- we use available PDFs to
-        # define what to see
-        print("Cannot open pdf " + fname)
-        return
-
-    print(f"Rendering output for {fname}")
-
-    # Get the correct answers: find the indices of the token(s) labelled 1
-    target_idx = [idx for (idx, val) in enumerate(doc.labels) if val == 1]
-
-    # Draw the machine output: get a score for each token
-    page_images = []
-    for pagenum, page in enumerate(pdf.pages):
-        im = page.to_image(resolution=300)
-
-        # training data has 0..1 for page range (see create-training-data.py)
-        num_pages = len(pdf.pages)
-        if num_pages > 1:
-            current_page = pagenum / float(num_pages - 1)
-        else:
-            current_page = 0.0
-
-        # Draw guesses
-        for idx, tok in enumerate(doc.tokens):
-            rel_score = scores[idx] / score
-            if rel_score >= 0.5 and same_page(tok["page"], current_page):
-                if rel_score == 1:
-                    w = 5
-                    s = "magenta"
-                elif rel_score >= 0.75:
-                    w = 3
-                    s = "red"
-                else:
-                    w = 1
-                    s = "red"
-                im.draw_rect(docrow_to_bbox(tok), stroke=s, stroke_width=w, fill=None)
-
-        # Draw target tokens
-        target_toks = [
-            doc.tokens.iloc[i]
-            for i in target_idx
-            if same_page(doc.tokens.iloc[i]["page"], current_page)
-        ]
-        rects = [docrow_to_bbox(t) for t in target_toks]
-        im.draw_rects(rects, stroke="blue", stroke_width=3, fill=None)
-
-        page_images.append(wandb.Image(im.annotated, caption="page " + str(pagenum)))
-
-    # get best matching score of any token in the training data
-    match = doc.tokens["match"].max()
-    caption = (
-        f"{doc.slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}"
-    )
-    if answer_match(predict_text, answer_text):
-        caption = "CORRECT " + caption
-    else:
-        caption = "INCORRECT " + caption
-    wandb.log({caption: page_images})
-
-
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
 def compute_accuracy(model, config, dataset, num_to_test, print_results):
@@ -229,7 +145,7 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results):
 
         predict_text, predict_score, token_scores = predict_answer(model, doc)
 
-        match = answer_match(predict_text, answer_text)
+        match = dollar_match(predict_text, answer_text)
 
         acc += match
         prefix = f"Correct: {slug}" if match else f"**Incorrect: {slug}"

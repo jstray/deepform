@@ -38,6 +38,15 @@ def normalize_dollars(s) -> str:
         return None
 
 
+def dollar_match(predicted, actual):
+    """Best-effort matching of dollar amounts, e.g. '$14,123.02' to '14123.02'."""
+    return (
+        is_dollar_amount(predicted)
+        and is_dollar_amount(actual)
+        and (normalize_dollars(predicted) == normalize_dollars(actual))
+    )
+
+
 def docrow_to_bbox(t, min_height=10):
     """Create the array pdfplumber expects for bounding boxes from an input dict.
 
