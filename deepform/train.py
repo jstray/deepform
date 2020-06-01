@@ -8,128 +8,16 @@
 import argparse
 import logging
 import os
-import random
 
 import keras as K
-import numpy as np
-import tensorflow as tf
 import wandb
-from keras.backend import squeeze
-from keras.engine.input_layer import Input
-from keras.layers import Dense, Dropout, Flatten, Lambda, concatenate
-from keras.layers.embeddings import Embedding
-from keras.models import Model
 from wandb.keras import WandbCallback
 
 from deepform.add_features import DOC_INDEX
 from deepform.document_store import DocumentStore
+from deepform.model import create_model, predict_answer, windowed_generator
 from deepform.pdfs import log_pdf
 from deepform.util import config_desc, dollar_match
-
-# Generator that reads raw training data
-# For each document, yields an array of dictionaries, each of which is a token
-# ---- Resample features,labels as windows ----
-
-
-# control the fraction of windows that include a positive label. not efficient.
-def one_window(dataset, config):
-    require_positive = random.random() > config.positive_fraction
-    return dataset.random_document().random_window(require_positive)
-
-
-def windowed_generator(dataset, config):
-    # Create empty arrays to contain batch of features and labels#
-    batch_features = np.zeros((config.batch_size, config.window_len, config.token_dims))
-    batch_labels = np.zeros((config.batch_size, config.window_len))
-
-    while True:
-        for i in range(config.batch_size):
-            window = one_window(dataset, config)
-            batch_features[i, :, :] = window.features
-            batch_labels[i, :] = window.labels
-        yield batch_features, batch_labels
-
-
-# ---- Custom loss function is basically MSE but high penalty for missing a 1 label ---
-def missed_token_loss(one_penalty):
-    def _missed_token_loss(y_true, y_pred):
-        expected_zero = tf.cast(tf.math.equal(y_true, 0), tf.float32)
-        s = y_pred * expected_zero
-        zero_loss = K.backend.mean(K.backend.square(s))
-        expected_one = tf.cast(tf.math.equal(y_true, 1), tf.float32)
-        t = one_penalty * (1 - y_pred) * expected_one
-        one_loss = K.backend.mean(K.backend.square(t))
-        return zero_loss + one_loss
-
-    return _missed_token_loss  # closes over one_penalty
-
-
-# --- Specify network ---
-
-
-def create_model(config):
-    indata = Input((config.window_len, config.token_dims))
-
-    # split into the hash and the rest of the token features, embed hash as
-    # one-hot, then merge
-    tok_hash = Lambda(
-        lambda x: squeeze(K.backend.slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
-    )(indata)
-    tok_features = Lambda(lambda x: K.backend.slice(x, (0, 0, 1), (-1, -1, -1)))(indata)
-    embed = Embedding(config.vocab_size, config.vocab_embed_size)(tok_hash)
-    merged = concatenate([embed, tok_features], axis=2)
-
-    f = Flatten()(merged)
-    d1 = Dense(
-        int(config.window_len * config.token_dims * config.layer_1_size_factor),
-        activation="sigmoid",
-    )(f)
-    d2 = Dropout(config.dropout)(d1)
-    d3 = Dense(
-        int(config.window_len * config.token_dims * config.layer_2_size_factor),
-        activation="sigmoid",
-    )(d2)
-    d4 = Dropout(config.dropout)(d3)
-    d5 = Dense(config.window_len, activation="elu")(d4)
-
-    model = Model(inputs=[indata], outputs=[d5])
-    model.compile(
-        optimizer=K.optimizers.Adam(learning_rate=config.learning_rate),
-        loss=missed_token_loss(config.penalize_missed),
-        metrics=["acc"],
-    )
-
-    return model
-
-
-# --- Predict ---
-# Our network is windowed, so we have to aggregate windows to get a final score
-
-# Returns vector of token scores
-def predict_scores(model, document):
-    windowed_features = np.stack([window.features for window in document])
-    window_scores = model.predict(windowed_features)
-
-    scores = np.zeros(len(document) + document.window_len)
-    for i in range(len(document)):
-        # would max work better than sum?
-        scores[i : i + document.window_len] += window_scores[i]
-    return scores
-
-
-# returns text, score of best answer, plus all scores
-def predict_answer(model, document):
-    scores = predict_scores(model, document)
-    best_score_idx = np.argmax(scores)
-    best_score_text = document.tokens.iloc[best_score_idx]["token"]
-    return best_score_text, scores[best_score_idx], scores
-
-
-# returns text of correct answer,
-def correct_answer(features, labels, tokens):
-    answer_idx = np.argmax(labels)
-    answer_text = tokens[answer_idx]["token"]
-    return answer_text
 
 
 # Calculate accuracy of answer extraction over num_to_test docs, print
@@ -162,8 +50,6 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results):
 
 
 # ---- Custom callback to log document-level accuracy ----
-
-
 class DocAccCallback(K.callbacks.Callback):
     def __init__(self, config, dataset, logname):
         self.config = config
