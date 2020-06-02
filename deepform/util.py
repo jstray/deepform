@@ -48,13 +48,13 @@ def dollar_match(predicted, actual):
 
 
 def docrow_to_bbox(t, min_height=10):
-    """Create the array pdfplumber expects for bounding boxes from an input dict.
+    """Create the array pdfplumber expects for bounding boxes from an input namedtuple.
 
     If `min_height` is set, adjust the minimum size of the bounding boxes to fix the
     cases where pdfplumber has incorrectly underlined rather than boxed in the
     recognized text.
     """
-    dims = {k: Decimal(float(t[k])) for k in ["x0", "y0", "x1", "y1"]}
+    dims = {k: Decimal(float(getattr(t, k))) for k in ["x0", "y0", "x1", "y1"]}
     if min_height:
         dims["y0"] = min(dims["y1"] - Decimal(min_height), dims["y0"])
     return BoundingBox(**dims)

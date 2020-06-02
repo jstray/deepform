@@ -3,6 +3,7 @@ from math import isclose
 
 import hypothesis.strategies as st
 from deepform.util import (
+    BoundingBox,
     docrow_to_bbox,
     dollar_amount,
     is_dollar_amount,
@@ -87,7 +88,7 @@ height = st.floats(min_value=0, max_value=100)
 
 @given(x0=coord, y0=coord, x1=coord, y1=coord, mh=height)
 def test_docrow_to_bbox(x0, y0, x1, y1, mh):
-    t = {"x0": x0, "x1": x1, "y0": y0, "y1": y1}
+    t = BoundingBox(x0=x0, x1=x1, y0=y0, y1=y1)
     bbox0 = docrow_to_bbox(t, min_height=None)
     bbox1 = docrow_to_bbox(t)
     bbox2 = docrow_to_bbox(t, min_height=mh)

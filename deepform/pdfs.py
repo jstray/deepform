@@ -68,19 +68,19 @@ def log_pdf(doc, score, scores, predict_text, answer_text):
             current_page = 0.0
 
         # Draw guesses
-        for idx, tok in enumerate(doc.tokens):
-            rel_score = scores[idx] / score
-            if rel_score >= 0.5 and np.isclose(tok["page"], current_page):
-                if rel_score == 1:
-                    w = 5
-                    s = "magenta"
-                elif rel_score >= 0.75:
-                    w = 3
-                    s = "red"
-                else:
-                    w = 1
-                    s = "red"
-                im.draw_rect(docrow_to_bbox(tok), stroke=s, stroke_width=w, fill=None)
+        rel_score = scores / score
+        page_match = np.isclose(doc.tokens["page"], current_page)
+        for token in doc.tokens[page_match & (rel_score > 0.5)].itertuples():
+            if rel_score[token.Index] == 1:
+                w = 5
+                s = "magenta"
+            elif rel_score[token.Index] >= 0.75:
+                w = 3
+                s = "red"
+            else:
+                w = 1
+                s = "red"
+            im.draw_rect(docrow_to_bbox(token), stroke=s, stroke_width=w, fill=None)
 
         # Draw target tokens
         target_toks = [
