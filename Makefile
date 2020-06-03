@@ -33,7 +33,7 @@ data/training.parquet:
 
 data/doc_index.parquet: data/training.parquet
 	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.add_features
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.add_features
 
 .PHONY: train
 train: data/doc_index.parquet .env docker-build

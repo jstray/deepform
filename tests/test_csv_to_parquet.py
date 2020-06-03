@@ -2,7 +2,7 @@ import random
 
 import pandas as pd
 
-from deepform.csv_to_parquet import CSV_COL_TYPES, csv_to_parquet
+from deepform.data.csv_to_parquet import CSV_COL_TYPES, csv_to_parquet
 
 
 def random_training_data_row(faker):

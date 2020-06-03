@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from joblib import dump, load
 
-from deepform.add_features import pq_index_and_dir
+from deepform.data.add_features import pq_index_and_dir
 from deepform.document import Document
 
 

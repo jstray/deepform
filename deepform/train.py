@@ -13,7 +13,7 @@ import keras as K
 import wandb
 from wandb.keras import WandbCallback
 
-from deepform.add_features import DOC_INDEX
+from deepform.data.add_features import DOC_INDEX
 from deepform.document_store import DocumentStore
 from deepform.model import create_model, predict_answer, windowed_generator
 from deepform.pdfs import log_pdf

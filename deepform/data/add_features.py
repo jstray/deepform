@@ -14,7 +14,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from deepform.csv_to_parquet import OUTPUT_PQ as INPUT_PQ
+from deepform.data.csv_to_parquet import OUTPUT_PQ as INPUT_PQ
 from deepform.features import fraction_digits
 from deepform.util import is_dollar_amount, log_dollar_amount
 
@@ -27,7 +27,7 @@ def extend_and_write_docs(df, pq_index=DOC_INDEX, pq_path=None):
     # Set defaults and create whatever directories we need.
     pq_index, pq_path = pq_index_and_dir(pq_index, pq_path)
 
-    # Spin up a bunch of jobs to do the conversoi
+    # Spin up a bunch of jobs to do the conversion
     with ThreadPoolExecutor() as executor:
         doc_jobs = []
         logging.debug("Starting document conversion jobs")

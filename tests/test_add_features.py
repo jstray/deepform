@@ -1,7 +1,7 @@
 import pandas as pd
 
-from deepform.add_features import extend_and_write_docs, pq_index_and_dir
-from deepform.csv_to_parquet import CSV_COL_TYPES
+from deepform.data.add_features import extend_and_write_docs, pq_index_and_dir
+from deepform.data.csv_to_parquet import CSV_COL_TYPES
 from deepform.features import fraction_digits
 from deepform.util import is_dollar_amount, log_dollar_amount
 from test_csv_to_parquet import training_docs_data

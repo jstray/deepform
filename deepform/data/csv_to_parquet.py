@@ -11,12 +11,12 @@ from pathlib import Path
 
 import dask.dataframe as dd
 from dask.diagnostics import ProgressBar
+from deepform.common import DATA_DIR
 from humanize import naturalsize
 
 # Defaults
-ROOT_DIR = Path(__file__).absolute().parents[1]
-INPUT_CSV = ROOT_DIR / "data" / "training.csv"
-OUTPUT_PQ = ROOT_DIR / "data" / "training.parquet"
+INPUT_CSV = DATA_DIR / "training.csv"
+OUTPUT_PQ = DATA_DIR / "training.parquet"
 
 
 CSV_COL_TYPES = {
