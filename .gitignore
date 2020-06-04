@@ -1,8 +1,28 @@
-pdfs
-data
-*.csv
-.DS_Store
-.ipynb_checkpoints
-s2s/wandb/
-__pycache__
+# Logs
+logs/
+wandb/
 
+# Caches
+__pycache__
+source/cached_features.p
+.ipynb_checkpoints
+.dvc/
+.hypothesis/
+
+# Local environment files (for e.g. API keys)
+.env
+
+# Personal (e.g. editor) configuration
+.vscode/
+
+# Data files
+*.csv
+*.feather
+*.gz
+*.parquet
+*.pdf
+*.png
+*.pq
+
+# macOS system files
+.DS_Store

@@ -1,747 +1,0 @@
-Configuration:
-wandb_version: 1
-
-_wandb:
-  desc: null
-  value:
-    cli_version: 0.8.30
-    code_path: code/train.py
-    framework: keras
-    is_jupyter_run: false
-    is_kaggle_kernel: false
-    python_version: 3.6.3
-batch_size:
-  desc: null
-  value: 10000
-doc_acc_sample_size:
-  desc: null
-  value: 25
-epochs:
-  desc: null
-  value: 50
-len_train:
-  desc: null
-  value: 120
-penalize_missed:
-  desc: null
-  value: 5
-positive_fraction:
-  desc: null
-  value: 0.5
-read_docs:
-  desc: null
-  value: 150
-steps_per_epoch:
-  desc: null
-  value: 10
-target_thresh:
-  desc: null
-  value: 0.9
-token_dims:
-  desc: null
-  value: 7
-val_split:
-  desc: null
-  value: 0.2
-vocab_size:
-  desc: null
-  value: 500
-window_len:
-  desc: null
-  value: 30
-
-Loading training data from cache...
-Loaded 100
-Max document size 9873
-Average document size 1710.75
-Training on 84, validating on 16
-2020-04-22 22:51:17.361068: I tensorflow/core/platform/cpu_feature_guard.cc:142] Your CPU supports instructions that this TensorFlow binary was not compiled to use: AVX2 FMA
-2020-04-22 22:51:17.373350: I tensorflow/compiler/xla/service/service.cc:168] XLA service 0x7f8e28a22f30 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
-2020-04-22 22:51:17.373366: I tensorflow/compiler/xla/service/service.cc:176]   StreamExecutor device (0): Host, Default Version
-Model: "model_1"
-__________________________________________________________________________________________________
-Layer (type)                    Output Shape         Param #     Connected to                     
-==================================================================================================
-input_1 (InputLayer)            (None, 30, 7)        0                                            
-__________________________________________________________________________________________________
-lambda_1 (Lambda)               (None, 30)           0           input_1[0][0]                    
-__________________________________________________________________________________________________
-embedding_1 (Embedding)         (None, 30, 32)       16000       lambda_1[0][0]                   
-__________________________________________________________________________________________________
-lambda_2 (Lambda)               (None, 30, 6)        0           input_1[0][0]                    
-__________________________________________________________________________________________________
-concatenate_1 (Concatenate)     (None, 30, 38)       0           embedding_1[0][0]                
-                                                                 lambda_2[0][0]                   
-__________________________________________________________________________________________________
-flatten_1 (Flatten)             (None, 1140)         0           concatenate_1[0][0]              
-__________________________________________________________________________________________________
-dense_1 (Dense)                 (None, 1050)         1198050     flatten_1[0][0]                  
-__________________________________________________________________________________________________
-dropout_1 (Dropout)             (None, 1050)         0           dense_1[0][0]                    
-__________________________________________________________________________________________________
-dense_2 (Dense)                 (None, 210)          220710      dropout_1[0][0]                  
-__________________________________________________________________________________________________
-dropout_2 (Dropout)             (None, 210)          0           dense_2[0][0]                    
-__________________________________________________________________________________________________
-dense_3 (Dense)                 (None, 30)           6330        dropout_2[0][0]                  
-==================================================================================================
-Total params: 1,441,090
-Trainable params: 1,441,090
-Non-trainable params: 0
-__________________________________________________________________________________________________
-None
-/anaconda3/lib/python3.6/site-packages/tensorflow_core/python/framework/indexed_slices.py:433: UserWarning: Converting sparse IndexedSlices to a dense Tensor of unknown shape. This may consume a large amount of memory.
-  "Converting sparse IndexedSlices to a dense Tensor of unknown shape. "
-Epoch 1/50
- 1/10 [==>...........................] - ETA: 12s - loss: 1.3428 - acc: 0.0161 2/10 [=====>........................] - ETA: 7s - loss: 1.1419 - acc: 0.0259  3/10 [========>.....................] - ETA: 6s - loss: 1.0447 - acc: 0.0309 4/10 [===========>..................] - ETA: 5s - loss: 0.9838 - acc: 0.0313 5/10 [==============>...............] - ETA: 4s - loss: 0.9389 - acc: 0.0304 6/10 [=================>............] - ETA: 3s - loss: 0.9035 - acc: 0.0291 7/10 [====================>.........] - ETA: 2s - loss: 0.8679 - acc: 0.0281 8/10 [=======================>......] - ETA: 1s - loss: 0.8361 - acc: 0.0279 9/10 [==========================>...] - ETA: 0s - loss: 0.8069 - acc: 0.028610/10 [==============================] - 8s 847ms/step - loss: 0.7814 - acc: 0.0293
-480023-67469-2-13509282072244-_-pdf: guessed "$11,680.00" with score 13.145736992359161, correct "$11,680.00"
-442594-collect-files-73195-political-file-2012-non: guessed "$6,350.00" with score 13.466202706098557, correct "$6,350.00"
-470233-arpaio-10_16722619-13504209200222-_-pdf: guessed "$50,925.00" with score 13.463654547929764, correct "$50,925.00"
-511288-342852-2-13524183124047-_-pdf: guessed "$110,200.00" with score 12.650034472346306, correct "$110,200.00"
-470385-65716-1-13503969050907-_-pdf: guessed "$6,350.00" with score 13.144161105155945, correct "$6,350.00"
-469069-markell-10-16-22-13503282333116-_-pdf: guessed "Net" with score 12.515554696321487, correct "1600"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 12.56293135881424, correct "$27,100.00"
-511301-344550-0-13524180873822-_-pdf: guessed "$18,350.00" with score 13.157588139176369, correct "$18,350.00"
-436582-collect-files-23079-political-file-2012-non: guessed "$193,200.00" with score 12.956956088542938, correct "$193,200.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 13.170049786567688, correct "$17,750.00"
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCET" with score 12.933739230036736, correct "$43,740.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 12.520889669656754, correct "$1,170.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Agency" with score 12.949322551488876, correct "Print"
-436986-collect-files-28010-political-file-2012-non: guessed "$26,700.00" with score 13.437853366136551, correct "$26,700.00"
-511334-allen-c02c08-final_333970-1-13524180724089-_-pdf: guessed "WK6N-6D30P" with score 12.512283951044083, correct "Contract"
-420426-collect-files-72313-political-file-2012-non: guessed "$9,335.00" with score 13.45891509950161, correct "$9,335.00"
-469335-paton_1018-1024rev2-13503483811618-_-pdf: guessed "12900" with score 12.881238356232643, correct "$10,750.00"
-470385-65716-1-13503969050907-_-pdf: guessed "$6,350.00" with score 13.144161105155945, correct "$6,350.00"
-511286-334325-8-13524183157789-_-pdf: guessed "11/06/12" with score 12.741217315196991, correct "$203,175.00"
-511324-bongino-503-final_341981-1-13524180905355-_-pdf: guessed "5A-6A" with score 12.719294667243958, correct "$23,490.00"
-511287-342495-1-13524183135098-_-pdf: guessed "$22,650.00" with score 12.878576025366783, correct "$22,650.00"
-442594-collect-files-73195-political-file-2012-non: guessed "$6,350.00" with score 13.466202706098557, correct "$6,350.00"
-511299-344730-1-13524181150356-_-pdf: guessed "$143,875.00" with score 12.783661112189293, correct "$143,875.00"
-470233-arpaio-10_16722619-13504209200222-_-pdf: guessed "$50,925.00" with score 13.463654547929764, correct "$50,925.00"
-511283-342425-5-13524183101415-_-pdf: guessed "$50,350.00" with score 12.82316543161869, correct "$50,350.00"
-This epoch doc_train_acc: 0.72
-419761-collect-files-65684-political-file-2012-federal: guessed "Totals" with score 13.130221217870712, correct "$120,375.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WLWT" with score 13.017737299203873, correct "$900.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 12.750575840473175, correct "$1,275.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$600.00" with score 12.463763192296028, correct "$19,200.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 12.99443581700325, correct "$27,675.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$600.00" with score 12.463763192296028, correct "$19,200.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 12.817084923386574, correct "$22,000.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 12.99915885925293, correct "$141,900.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 12.99915885925293, correct "$141,900.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WJW" with score 12.856427937746048, correct "$15,900.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 13.457310318946838, correct "$30,500.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 12.817084923386574, correct "$22,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$600.00" with score 12.463763192296028, correct "$19,200.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 12.750575840473175, correct "$1,275.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "5A-6A" with score 12.735612228512764, correct "$136,740.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 12.99915885925293, correct "$141,900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 12.817084923386574, correct "$22,000.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 12.99443581700325, correct "$27,675.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WJW" with score 12.856427937746048, correct "$15,900.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 13.457310318946838, correct "$30,500.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 13.145736992359161, correct "$11,680.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$2,250.00" with score 12.75096906721592, correct "$56,575.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WLWT" with score 13.017737299203873, correct "$900.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "5A-6A" with score 12.735612228512764, correct "$136,740.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 12.99443581700325, correct "$27,675.00"
-This epoch doc_val_acc: 0.36
-Epoch 2/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.5367 - acc: 0.0341 2/10 [=====>........................] - ETA: 4s - loss: 0.5262 - acc: 0.0325 3/10 [========>.....................] - ETA: 3s - loss: 0.5205 - acc: 0.0317 4/10 [===========>..................] - ETA: 3s - loss: 0.5142 - acc: 0.0305 5/10 [==============>...............] - ETA: 2s - loss: 0.5096 - acc: 0.0296 6/10 [=================>............] - ETA: 2s - loss: 0.5045 - acc: 0.0297 7/10 [====================>.........] - ETA: 1s - loss: 0.5002 - acc: 0.0299 8/10 [=======================>......] - ETA: 1s - loss: 0.4962 - acc: 0.0300 9/10 [==========================>...] - ETA: 0s - loss: 0.4929 - acc: 0.030210/10 [==============================] - 5s 504ms/step - loss: 0.4891 - acc: 0.0309
-511320-romney-387-final_337905-1-13524181105942-_-pdf: guessed "$164,060.00" with score 13.668131619691849, correct "$212,600.00"
-433986-collect-files-68883-political-file-2012-non: guessed "$18,000.00" with score 14.072403728961945, correct "$18,000.00"
-511302-343141-3-13524181050948-_-pdf: guessed "Line" with score 13.501740545034409, correct "$113,600.00"
-511290-344206-2-13524181028832-_-pdf: guessed "11/05/12" with score 13.428622752428055, correct "$9,750.00"
-511301-344550-0-13524180873822-_-pdf: guessed "$18,350.00" with score 14.093928575515747, correct "$18,350.00"
-433811-collect-files-23079-political-file-2012-non: guessed "$32,325.00" with score 14.862534135580063, correct "$32,325.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 14.730102211236954, correct "$17,750.00"
-511337-allen-c16c22-final_322380-1-13524180702547-_-pdf: guessed "$89,564.50" with score 14.035480678081512, correct "$105,370.00"
-511299-344730-1-13524181150356-_-pdf: guessed "$143,875.00" with score 14.141654640436172, correct "$143,875.00"
-420426-collect-files-72313-political-file-2012-non: guessed "$9,335.00" with score 14.870815187692642, correct "$9,335.00"
-511288-342852-2-13524183124047-_-pdf: guessed "122" with score 13.648158103227615, correct "$110,200.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 14.851905286312103, correct "$3,490.00"
-433986-collect-files-68883-political-file-2012-non: guessed "$18,000.00" with score 14.072403728961945, correct "$18,000.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "6A-7A" with score 13.10351225733757, correct "Contract"
-511288-342852-2-13524183124047-_-pdf: guessed "122" with score 13.648158103227615, correct "$110,200.00"
-511319-rncromney-483-final_339838-1-13524180984389-_-pdf: guessed "Edited," with score 13.300953298807144, correct "$226,220.00"
-511316-obama-2051-final_341803-1-13524183386707-_-pdf: guessed "$137,861.50" with score 14.031036138534546, correct "$162,190.00"
-468469-menendez-order-4-13500774152684-_-pdf: guessed "$1,000.00" with score 13.56338906288147, correct "$41,450.00"
-511332-allen-nrsc-c09c12-final_340444-1-13524180194521: guessed "$96,400.00" with score 13.54566815495491, correct "$96,400.00"
-511286-334325-8-13524183157789-_-pdf: guessed "11/04/12" with score 13.923484176397324, correct "$203,175.00"
-470486-kirkpatrick_1009-1015rev6-13503492049654-_-pdf: guessed "KSAZ" with score 14.096679925918579, correct "$20,030.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 13.598157584667206, correct "$1,170.00"
-511301-344550-0-13524180873822-_-pdf: guessed "$18,350.00" with score 14.093928575515747, correct "$18,350.00"
-459790-nrsc_mandel_rep_senate_1010_101412_314271: guessed "WCVN" with score 13.853116422891617, correct "$21,100.00"
-436986-collect-files-28010-political-file-2012-non: guessed "$26,700.00" with score 14.860026270151138, correct "$26,700.00"
-470486-kirkpatrick_1009-1015rev6-13503492049654-_-pdf: guessed "KSAZ" with score 14.096679925918579, correct "$20,030.00"
-This epoch doc_train_acc: 0.46153846153846156
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 14.862770318984985, correct "$30,500.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WLWT" with score 13.826617866754532, correct "$900.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 13.879353493452072, correct "$11,680.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NOON" with score 13.606405556201935, correct "$1,275.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 13.79969447851181, correct "$141,900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 14.010742515325546, correct "$22,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 13.206429898738861, correct "$19,200.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 13.708695381879807, correct "$59,605.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "1:00" with score 13.149897277355194, correct "$80,800.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 13.154906421899796, correct "$136,740.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 14.853882551193237, correct "$30,000.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 13.79969447851181, correct "$141,900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 14.010742515325546, correct "$22,000.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$10,000.00" with score 13.393744170665741, correct "$169,860.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 13.154906421899796, correct "$136,740.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 14.853882551193237, correct "$30,000.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 13.879353493452072, correct "$11,680.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 13.408737421035767, correct "$27,675.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 13.708695381879807, correct "$59,605.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 13.514259904623032, correct "$56,575.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "1:00" with score 13.149897277355194, correct "$80,800.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 14.083907008171082, correct "$15,900.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 13.708695381879807, correct "$59,605.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 14.862770318984985, correct "$30,500.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 13.154906421899796, correct "$136,740.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 14.083907008171082, correct "$15,900.00"
-This epoch doc_val_acc: 0.5384615384615384
-Epoch 3/50
- 1/10 [==>...........................] - ETA: 5s - loss: 0.4542 - acc: 0.0417 2/10 [=====>........................] - ETA: 4s - loss: 0.4512 - acc: 0.0417 3/10 [========>.....................] - ETA: 3s - loss: 0.4465 - acc: 0.0429 4/10 [===========>..................] - ETA: 3s - loss: 0.4432 - acc: 0.0439 5/10 [==============>...............] - ETA: 2s - loss: 0.4412 - acc: 0.0453 6/10 [=================>............] - ETA: 2s - loss: 0.4396 - acc: 0.0456 7/10 [====================>.........] - ETA: 1s - loss: 0.4381 - acc: 0.0464 8/10 [=======================>......] - ETA: 1s - loss: 0.4355 - acc: 0.0468 9/10 [==========================>...] - ETA: 0s - loss: 0.4333 - acc: 0.047310/10 [==============================] - 5s 525ms/step - loss: 0.4311 - acc: 0.0475
-511320-romney-387-final_337905-1-13524181105942-_-pdf: guessed "$164,060.00" with score 14.735460638999939, correct "$212,600.00"
-511335-allen-c09c15-final_322398-1-13524180745299-_-pdf: guessed "$0.00" with score 14.806896358728409, correct "Contract"
-433986-collect-files-68883-political-file-2012-non: guessed "$18,000.00" with score 15.253508925437927, correct "$18,000.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 14.693791151046753, correct "$1,170.00"
-511302-343141-3-13524181050948-_-pdf: guessed "Date:" with score 14.709234327077866, correct "$113,600.00"
-468469-menendez-order-4-13500774152684-_-pdf: guessed "10/12/12" with score 14.822438657283783, correct "$41,450.00"
-459790-nrsc_mandel_rep_senate_1010_101412_314271: guessed "WCVN" with score 15.450301259756088, correct "$21,100.00"
-419765-collect-files-65684-political-file-2012-federal: guessed "$105,378.75" with score 14.839572370052338, correct "$123,975.00"
-511299-344730-1-13524181150356-_-pdf: guessed "$143,875.00" with score 15.449969708919525, correct "$143,875.00"
-511296-345028-0-13524180963339-_-pdf: guessed "$10,000.00" with score 14.34072294831276, correct "$1,000.00"
-470233-arpaio-10_16722619-13504209200222-_-pdf: guessed "$50,925.00" with score 16.465762317180634, correct "$50,925.00"
-511286-334325-8-13524183157789-_-pdf: guessed "11/04/12" with score 15.365018546581268, correct "$203,175.00"
-469114-398590-1-13503368825844-_-pdf: guessed "$2,200.00" with score 15.413221329450607, correct "$2,200.00"
-511314-obama-1844-final_337336-1-13524183455130-_-pdf: guessed "$34,300.00" with score 14.790095299482346, correct "$207,510.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$11,680.00" with score 14.953601568937302, correct "$11,680.00"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 14.733191847801208, correct "$27,100.00"
-431377-collect-files-35587-political-file-2012-federal: guessed "$196.95" with score 15.448778510093689, correct "$46,340.00"
-431377-collect-files-35587-political-file-2012-federal: guessed "$196.95" with score 15.448778510093689, correct "$46,340.00"
-480021-67688-1-13509366420764-_-pdf: guessed "$9,470.00" with score 14.95966574549675, correct "$9,470.00"
-469069-markell-10-16-22-13503282333116-_-pdf: guessed "61,600.00" with score 13.798167198896408, correct "1600"
-433983-collect-files-68883-political-file-2012-non: guessed "$63,375.00" with score 15.590049028396606, correct "$63,375.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 14.693791151046753, correct "$1,170.00"
-511316-obama-2051-final_341803-1-13524183386707-_-pdf: guessed "$137,861.50" with score 15.287432700395584, correct "$162,190.00"
-470651-obama187040-13503351151533-_-pdf: guessed "$19,250.00" with score 16.483829855918884, correct "$19,250.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "24937" with score 15.410180866718292, correct "$15,750.00"
-461537-smith-10-2-8-rev-3-13498800242806-_-pdf: guessed "1,000.00" with score 13.630448400974274, correct "204,550.00"
-511323-romney-final_340427-1-13524181116876-_-pdf: guessed "$119,459.00" with score 14.979201257228851, correct "$140,540.00"
-This epoch doc_train_acc: 0.4074074074074074
-419761-collect-files-65684-political-file-2012-federal: guessed "138" with score 14.993386298418045, correct "$120,375.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 14.450338929891586, correct "$56,575.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$10,000.00" with score 14.198744386434555, correct "$169,860.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 14.931183576583862, correct "$141,900.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 14.776538521051407, correct "$27,675.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 14.776538521051407, correct "$27,675.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 14.953601568937302, correct "$11,680.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 14.450338929891586, correct "$56,575.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 14.20589229464531, correct "$136,740.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCET" with score 15.283953249454498, correct "$900.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCET" with score 15.283953249454498, correct "$900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 15.123092025518417, correct "$22,000.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 14.20589229464531, correct "$136,740.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 14.20589229464531, correct "$136,740.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NOON" with score 14.485027819871902, correct "$1,275.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 14.931183576583862, correct "$141,900.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 15.792588025331497, correct "$15,900.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NOON" with score 14.485027819871902, correct "$1,275.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 15.123092025518417, correct "$22,000.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCET" with score 15.283953249454498, correct "$900.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 14.810381412506104, correct "$59,605.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$10,000.00" with score 14.198744386434555, correct "$169,860.00"
-This epoch doc_val_acc: 0.2962962962962963
-Epoch 4/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.4164 - acc: 0.0480 2/10 [=====>........................] - ETA: 3s - loss: 0.4136 - acc: 0.0486 3/10 [========>.....................] - ETA: 3s - loss: 0.4099 - acc: 0.0505 4/10 [===========>..................] - ETA: 2s - loss: 0.4073 - acc: 0.0511 5/10 [==============>...............] - ETA: 2s - loss: 0.4059 - acc: 0.0525 6/10 [=================>............] - ETA: 1s - loss: 0.4047 - acc: 0.0525 7/10 [====================>.........] - ETA: 1s - loss: 0.4038 - acc: 0.0522 8/10 [=======================>......] - ETA: 0s - loss: 0.4027 - acc: 0.0523 9/10 [==========================>...] - ETA: 0s - loss: 0.4013 - acc: 0.051910/10 [==============================] - 5s 471ms/step - loss: 0.3997 - acc: 0.0526
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 16.186632066965103, correct "$44,950.00"
-431304-collect-files-35576-political-file-2012-federal: guessed "$72,879.00" with score 15.860531896352768, correct "$85,740.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$9,900.00" with score 16.08508864045143, correct "$37,450.00"
-427588-collect-files-56537-political-file-2012-federal: guessed "NEWS" with score 14.276470303535461, correct "$33,275.00"
-420426-collect-files-72313-political-file-2012-non: guessed "$9,335.00" with score 18.29832774400711, correct "$9,335.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$9,900.00" with score 16.08508864045143, correct "$37,450.00"
-511319-rncromney-483-final_339838-1-13524180984389-_-pdf: guessed "Line" with score 15.058798134326935, correct "$226,220.00"
-511281-336563-4-13524183201766-_-pdf: guessed "$26,800.00" with score 17.248824775218964, correct "$26,800.00"
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCVN" with score 16.975648880004883, correct "$43,740.00"
-431304-collect-files-35576-political-file-2012-federal: guessed "$72,879.00" with score 15.860531896352768, correct "$85,740.00"
-417116-collect-files-65593-political-file-2012-non: guessed "$110,500.00" with score 18.27356082201004, correct "$110,500.00"
-433983-collect-files-68883-political-file-2012-non: guessed "$63,375.00" with score 17.301275670528412, correct "$63,375.00"
-511316-obama-2051-final_341803-1-13524183386707-_-pdf: guessed "$137,861.50" with score 16.973213881254196, correct "$162,190.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$2,150.00" with score 16.078357309103012, correct "$11,680.00"
-511320-romney-387-final_337905-1-13524181105942-_-pdf: guessed "$180,710.00" with score 15.898380726575851, correct "$212,600.00"
-511334-allen-c02c08-final_333970-1-13524180724089-_-pdf: guessed "$0.00" with score 14.03080439567566, correct "Contract"
-511297-345394-0-13524180941700-_-pdf: guessed "$20,000.00" with score 14.307090997695923, correct "$2,000.00"
-416946-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 17.282692342996597, correct "$15,900.00"
-511323-romney-final_340427-1-13524181116876-_-pdf: guessed "$140,540.00" with score 16.57522028684616, correct "$140,540.00"
-459790-nrsc_mandel_rep_senate_1010_101412_314271: guessed "WCVN" with score 16.975025922060013, correct "$21,100.00"
-511335-allen-c09c15-final_322398-1-13524180745299-_-pdf: guessed "$0.00" with score 16.08826571702957, correct "Contract"
-511331-allen-nrsc-c02c08-final_338617-1-13524180183685: guessed "$139,900.00" with score 15.682339668273926, correct "$139,900.00"
-511330-allen-nrsc-925c01-final_337307-1-13524180205067: guessed "$86,620.00" with score 16.080653935670853, correct "$86,620.00"
-511322-romney-505-final_342216-1-13524181139554-_-pdf: guessed "139" with score 16.448047280311584, correct "$235,610.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 13.971553921699524, correct "Contract"
-511339-sobhani1-final_341003-1-13524180777525-_-pdf: guessed "---------Su" with score 14.773611277341843, correct "$157,920.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 16.17809623479843, correct "$1,170.00"
-511334-allen-c02c08-final_333970-1-13524180724089-_-pdf: guessed "$0.00" with score 14.03080439567566, correct "Contract"
-This epoch doc_train_acc: 0.2857142857142857
-480022-67469-1-13509189034926-_-pdf: guessed "$2,150.00" with score 16.078357309103012, correct "$11,680.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 16.095438957214355, correct "$141,900.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 16.310651510953903, correct "$27,675.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 18.31080961227417, correct "$30,500.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.4472017288208, correct "$19,200.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 15.069727584719658, correct "$80,800.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 15.12280997633934, correct "$56,575.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 17.281676411628723, correct "$15,900.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 15.12280997633934, correct "$56,575.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 15.069727584719658, correct "$80,800.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 14.789376527071, correct "$136,740.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$2,150.00" with score 16.078357309103012, correct "$11,680.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 18.329190850257874, correct "$30,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.4472017288208, correct "$19,200.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 18.31080961227417, correct "$30,500.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.4472017288208, correct "$19,200.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 15.01307737827301, correct "$169,860.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 15.12280997633934, correct "$56,575.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "138" with score 16.47255828976631, correct "$120,375.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 16.860358029603958, correct "$22,000.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 16.860358029603958, correct "$22,000.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 15.069727584719658, correct "$80,800.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 16.860358029603958, correct "$22,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 15.91699132323265, correct "$59,605.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 15.91699132323265, correct "$59,605.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 16.860358029603958, correct "$22,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.4472017288208, correct "$19,200.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 15.91699132323265, correct "$59,605.00"
-This epoch doc_val_acc: 0.25
-Epoch 5/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.3843 - acc: 0.0591 2/10 [=====>........................] - ETA: 4s - loss: 0.3819 - acc: 0.0582 3/10 [========>.....................] - ETA: 3s - loss: 0.3795 - acc: 0.0578 4/10 [===========>..................] - ETA: 3s - loss: 0.3784 - acc: 0.0584 5/10 [==============>...............] - ETA: 2s - loss: 0.3776 - acc: 0.0589 6/10 [=================>............] - ETA: 2s - loss: 0.3758 - acc: 0.0596 7/10 [====================>.........] - ETA: 1s - loss: 0.3747 - acc: 0.0604 8/10 [=======================>......] - ETA: 1s - loss: 0.3733 - acc: 0.0605 9/10 [==========================>...] - ETA: 0s - loss: 0.3720 - acc: 0.060310/10 [==============================] - 6s 552ms/step - loss: 0.3709 - acc: 0.0604
-511335-allen-c09c15-final_322398-1-13524180745299-_-pdf: guessed "$0.00" with score 17.39119204878807, correct "Contract"
-511339-sobhani1-final_341003-1-13524180777525-_-pdf: guessed "---------Su" with score 14.934081465005875, correct "$157,920.00"
-511324-bongino-503-final_341981-1-13524180905355-_-pdf: guessed "5A-6A" with score 14.767830401659012, correct "$23,490.00"
-438598-collect-files-23079-political-file-2012-non: guessed "$79,075.00" with score 20.1715087890625, correct "$79,075.00"
-431377-collect-files-35587-political-file-2012-federal: guessed "$196.95" with score 18.679103791713715, correct "$46,340.00"
-511331-allen-nrsc-c02c08-final_338617-1-13524180183685: guessed "$139,900.00" with score 16.856200486421585, correct "$139,900.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 20.173920273780823, correct "$3,490.00"
-511301-344550-0-13524180873822-_-pdf: guessed "$18,350.00" with score 17.78655308485031, correct "$18,350.00"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 17.6675623357296, correct "$27,100.00"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 18.244450241327286, correct "$44,950.00"
-420233-collect-files-39746-political-file-2012-non: guessed "$6,950.00" with score 15.619713574647903, correct "$6,950.00"
-480018-67579-1-13509285046144-_-pdf: guessed "$4,580.00" with score 17.387544959783554, correct "$28,095.00"
-417116-collect-files-65593-political-file-2012-non: guessed "$110,500.00" with score 20.140750527381897, correct "$110,500.00"
-511288-342852-2-13524183124047-_-pdf: guessed "122" with score 17.12703612446785, correct "$110,200.00"
-436582-collect-files-23079-political-file-2012-non: guessed "$193,200.00" with score 16.922031074762344, correct "$193,200.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 20.449517011642456, correct "$17,750.00"
-511297-345394-0-13524180941700-_-pdf: guessed "$20,000.00" with score 14.95252937078476, correct "$2,000.00"
-436986-collect-files-28010-political-file-2012-non: guessed "$26,700.00" with score 20.213631331920624, correct "$26,700.00"
-511291-345363-0-13524181183619-_-pdf: guessed "$85,000.00" with score 18.700050830841064, correct "$100,000.00"
-470233-arpaio-10_16722619-13504209200222-_-pdf: guessed "$50,925.00" with score 20.17206847667694, correct "$50,925.00"
-511296-345028-0-13524180963339-_-pdf: guessed "$10,000.00" with score 15.76817387342453, correct "$1,000.00"
-419756-collect-files-65684-political-file-2012-federal: guessed "$101,851.25" with score 18.86218699812889, correct "$119,825.00"
-417116-collect-files-65593-political-file-2012-non: guessed "$110,500.00" with score 20.140750527381897, correct "$110,500.00"
-424869-collect-files-11909-political-file-2012-federal: guessed "$2,970.00" with score 20.155784964561462, correct "$2,970.00"
-420233-collect-files-39746-political-file-2012-non: guessed "$6,950.00" with score 15.619713574647903, correct "$6,950.00"
-511314-obama-1844-final_337336-1-13524183455130-_-pdf: guessed "$34,300.00" with score 17.741676181554794, correct "$207,510.00"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 18.244450241327286, correct "$44,950.00"
-511330-allen-nrsc-925c01-final_337307-1-13524180205067: guessed "$73,627.00" with score 17.375081956386566, correct "$86,620.00"
-470651-obama187040-13503351151533-_-pdf: guessed "$19,250.00" with score 20.167071282863617, correct "$19,250.00"
-This epoch doc_train_acc: 0.5172413793103449
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 18.59704700112343, correct "$22,000.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCET" with score 18.275222837924957, correct "$900.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 19.279476940631866, correct "$15,900.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$2,150.00" with score 17.379306942224503, correct "$11,680.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 20.19156849384308, correct "$30,000.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 17.424570202827454, correct "$141,900.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 18.412865608930588, correct "$27,675.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 18.412865608930588, correct "$27,675.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 16.52762533724308, correct "$169,860.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCET" with score 18.275222837924957, correct "$900.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NOON" with score 17.38008812069893, correct "$1,275.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "138" with score 17.979559391736984, correct "$120,375.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$50,664.25" with score 17.13455092906952, correct "$59,605.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 20.19156849384308, correct "$30,000.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 20.13895881175995, correct "$30,500.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "138" with score 17.979559391736984, correct "$120,375.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 20.19156849384308, correct "$30,000.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 20.13895881175995, correct "$30,500.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 19.279476940631866, correct "$15,900.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 20.19156849384308, correct "$30,000.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 19.279476940631866, correct "$15,900.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 20.13895881175995, correct "$30,500.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 20.13895881175995, correct "$30,500.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 20.19156849384308, correct "$30,000.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 18.412865608930588, correct "$27,675.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 15.878401726484299, correct "$56,575.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 19.279476940631866, correct "$15,900.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 15.878401726484299, correct "$56,575.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 16.645875483751297, correct "$80,800.00"
-This epoch doc_val_acc: 0.3793103448275862
-Epoch 6/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.3600 - acc: 0.0649 2/10 [=====>........................] - ETA: 4s - loss: 0.3583 - acc: 0.0648 3/10 [========>.....................] - ETA: 3s - loss: 0.3554 - acc: 0.0657 4/10 [===========>..................] - ETA: 2s - loss: 0.3527 - acc: 0.0648 5/10 [==============>...............] - ETA: 2s - loss: 0.3506 - acc: 0.0653 6/10 [=================>............] - ETA: 1s - loss: 0.3491 - acc: 0.0668 7/10 [====================>.........] - ETA: 1s - loss: 0.3481 - acc: 0.0681 8/10 [=======================>......] - ETA: 0s - loss: 0.3474 - acc: 0.0693 9/10 [==========================>...] - ETA: 0s - loss: 0.3461 - acc: 0.070210/10 [==============================] - 5s 483ms/step - loss: 0.3447 - acc: 0.0714
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCVN" with score 19.56458079814911, correct "$43,740.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 19.02294087409973, correct "$1,170.00"
-511299-344730-1-13524181150356-_-pdf: guessed "$122,293.75" with score 19.92144599556923, correct "$143,875.00"
-431736-collect-files-11909-political-file-2012-federal: guessed "$8,325.00" with score 21.561245322227478, correct "$8,325.00"
-511296-345028-0-13524180963339-_-pdf: guessed "$10,000.00" with score 16.993405997753143, correct "$1,000.00"
-511335-allen-c09c15-final_322398-1-13524180745299-_-pdf: guessed "$0.00" with score 18.25384446978569, correct "Contract"
-419756-collect-files-65684-political-file-2012-federal: guessed "$101,851.25" with score 20.12809321284294, correct "$119,825.00"
-438598-collect-files-23079-political-file-2012-non: guessed "$79,075.00" with score 21.626359164714813, correct "$79,075.00"
-511319-rncromney-483-final_339838-1-13524180984389-_-pdf: guessed "$226,220.00" with score 17.127476811408997, correct "$226,220.00"
-511331-allen-nrsc-c02c08-final_338617-1-13524180183685: guessed "$139,900.00" with score 17.99882799386978, correct "$139,900.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$9,900.00" with score 17.906655341386795, correct "$37,450.00"
-433812-collect-files-23079-political-file-2012-non: guessed "$40,150.00" with score 21.623830914497375, correct "$40,150.00"
-511324-bongino-503-final_341981-1-13524180905355-_-pdf: guessed "$23,490.00" with score 15.45850470662117, correct "$23,490.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 14.357178300619125, correct "Contract"
-417116-collect-files-65593-political-file-2012-non: guessed "$110,500.00" with score 21.588131964206696, correct "$110,500.00"
-461537-smith-10-2-8-rev-3-13498800242806-_-pdf: guessed "204,550.00" with score 16.579963713884354, correct "204,550.00"
-511327-kaine-11507-final_327366-1-13524180809750-_-pdf: guessed "$112,276.50" with score 17.83577486872673, correct "$132,090.00"
-470486-kirkpatrick_1009-1015rev6-13503492049654-_-pdf: guessed "KSAZ" with score 19.91447564959526, correct "$20,030.00"
-424869-collect-files-11909-political-file-2012-federal: guessed "$2,970.00" with score 21.560944974422455, correct "$2,970.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$2,150.00" with score 17.883080631494522, correct "$11,680.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Agency" with score 16.570501923561096, correct "Print"
-436582-collect-files-23079-political-file-2012-non: guessed "$193,200.00" with score 17.388848304748535, correct "$193,200.00"
-511291-345363-0-13524181183619-_-pdf: guessed "$100,000.00" with score 20.081467151641846, correct "$100,000.00"
-433811-collect-files-23079-political-file-2012-non: guessed "$32,325.00" with score 21.603184819221497, correct "$32,325.00"
-511283-342425-5-13524183101415-_-pdf: guessed "$50,350.00" with score 18.655209958553314, correct "$50,350.00"
-416946-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 20.53858396410942, correct "$15,900.00"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 19.456818521022797, correct "$44,950.00"
-511318-obama-2175-final_343497-1-13524183408511-_-pdf: guessed "11/01/12" with score 19.201358303427696, correct "$180,260.00"
-417116-collect-files-65593-political-file-2012-non: guessed "$110,500.00" with score 21.588131964206696, correct "$110,500.00"
-424869-collect-files-11909-political-file-2012-federal: guessed "$2,970.00" with score 21.560944974422455, correct "$2,970.00"
-This epoch doc_train_acc: 0.5333333333333333
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 19.609406143426895, correct "$27,675.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 21.616504848003387, correct "$30,000.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 17.245466247200966, correct "$169,860.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 21.58840775489807, correct "$30,500.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$18,700.00" with score 20.057759821414948, correct "$22,000.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 19.215808033943176, correct "$900.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NEWS" with score 18.08056738972664, correct "$1,275.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.638197779655457, correct "$19,200.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.733727753162384, correct "$59,605.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 20.538901150226593, correct "$15,900.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "NEWS" with score 18.08056738972664, correct "$1,275.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.733727753162384, correct "$59,605.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 16.564512342214584, correct "$136,740.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 17.45938901603222, correct "$80,800.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 17.954112023115158, correct "$141,900.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 21.58840775489807, correct "$30,500.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 20.538901150226593, correct "$15,900.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 17.046908885240555, correct "$56,575.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$102,318.75" with score 18.9024441242218, correct "$120,375.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 21.616504848003387, correct "$30,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.733727753162384, correct "$59,605.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 17.245466247200966, correct "$169,860.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.733727753162384, correct "$59,605.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 21.616504848003387, correct "$30,000.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 19.609406143426895, correct "$27,675.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 17.046908885240555, correct "$56,575.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$102,318.75" with score 18.9024441242218, correct "$120,375.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed ":30" with score 14.638197779655457, correct "$19,200.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 17.245466247200966, correct "$169,860.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 21.58840775489807, correct "$30,500.00"
-This epoch doc_val_acc: 0.43333333333333335
-Epoch 7/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.3275 - acc: 0.0803 2/10 [=====>........................] - ETA: 3s - loss: 0.3249 - acc: 0.0859 3/10 [========>.....................] - ETA: 3s - loss: 0.3240 - acc: 0.0886 4/10 [===========>..................] - ETA: 2s - loss: 0.3227 - acc: 0.0895 5/10 [==============>...............] - ETA: 2s - loss: 0.3222 - acc: 0.0894 6/10 [=================>............] - ETA: 1s - loss: 0.3220 - acc: 0.0886 7/10 [====================>.........] - ETA: 1s - loss: 0.3214 - acc: 0.0882 8/10 [=======================>......] - ETA: 0s - loss: 0.3210 - acc: 0.0879 9/10 [==========================>...] - ETA: 0s - loss: 0.3199 - acc: 0.088310/10 [==============================] - 5s 484ms/step - loss: 0.3185 - acc: 0.0885
-511296-345028-0-13524180963339-_-pdf: guessed "$10,000.00" with score 17.52002990245819, correct "$1,000.00"
-457315-romney-for-president-wo-10-6-order: guessed "$30,500.00" with score 22.401243686676025, correct "$30,500.00"
-511327-kaine-11507-final_327366-1-13524180809750-_-pdf: guessed "$112,276.50" with score 18.047607243061066, correct "$132,090.00"
-416903-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 19.410506069660187, correct "$900.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$37,450.00" with score 17.774005115032196, correct "$37,450.00"
-511302-343141-3-13524181050948-_-pdf: guessed "$113,600.00" with score 18.556559041142464, correct "$113,600.00"
-511316-obama-2051-final_341803-1-13524183386707-_-pdf: guessed "$137,861.50" with score 20.56238105893135, correct "$162,190.00"
-511288-342852-2-13524183124047-_-pdf: guessed "$93,670.00" with score 17.861485719680786, correct "$110,200.00"
-469114-398590-1-13503368825844-_-pdf: guessed "$1,870.00" with score 21.085979521274567, correct "$2,200.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Agency" with score 16.338455945253372, correct "Print"
-433983-collect-files-68883-political-file-2012-non: guessed "$63,375.00" with score 21.56735384464264, correct "$63,375.00"
-427588-collect-files-56537-political-file-2012-federal: guessed "$33,275.00" with score 14.785258889198303, correct "$33,275.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 19.80992442369461, correct "$1,170.00"
-435451-collect-files-23079-political-file-2012-non: guessed "$63,850.00" with score 22.430455803871155, correct "$63,850.00"
-511298-343408-0-13524180931287-_-pdf: guessed "ASSOCIATION" with score 19.63999991118908, correct "$3,900.00"
-469114-398590-1-13503368825844-_-pdf: guessed "$1,870.00" with score 21.085979521274567, correct "$2,200.00"
-424758-collect-files-35576-political-file-2012-federal: guessed "$25,680.00" with score 22.386646449565887, correct "$25,680.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "32812" with score 19.553921043872833, correct "$15,750.00"
-470385-65716-1-13503969050907-_-pdf: guessed "$6,350.00" with score 17.939605444669724, correct "$6,350.00"
-431304-collect-files-35576-political-file-2012-federal: guessed "$85,740.00" with score 17.85393762588501, correct "$85,740.00"
-424793-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 19.410506069660187, correct "$900.00"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 19.671939820051193, correct "$27,100.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 13.83282807469368, correct "Contract"
-433986-collect-files-68883-political-file-2012-non: guessed "$18,000.00" with score 20.865084528923035, correct "$18,000.00"
-511334-allen-c02c08-final_333970-1-13524180724089-_-pdf: guessed "$0.00" with score 14.459534585475922, correct "Contract"
-468469-menendez-order-4-13500774152684-_-pdf: guessed "10/12/12" with score 20.493694573640823, correct "$41,450.00"
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCVN" with score 19.908980906009674, correct "$43,740.00"
-511317-obama-2174-final_343259-1-13524183376079-_-pdf: guessed "$22,150.00" with score 19.576830625534058, correct "$96,785.00"
-511330-allen-nrsc-925c01-final_337307-1-13524180205067: guessed "$73,627.00" with score 18.624115228652954, correct "$86,620.00"
-511317-obama-2174-final_343259-1-13524183376079-_-pdf: guessed "$22,150.00" with score 19.576830625534058, correct "$96,785.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 23.083017230033875, correct "$17,750.00"
-This epoch doc_train_acc: 0.41935483870967744
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 22.414542615413666, correct "$30,000.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 17.807744294404984, correct "$141,900.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.071542724967003, correct "$27,675.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.071542724967003, correct "$27,675.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 19.410506069660187, correct "$900.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 17.91508972644806, correct "$11,680.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 16.788640916347504, correct "$136,740.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 14.446748673915863, correct "$19,200.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$102,318.75" with score 19.33599129319191, correct "$120,375.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 17.307278364896774, correct "$56,575.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 17.307278364896774, correct "$56,575.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 17.408647760748863, correct "$169,860.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.836277425289154, correct "$59,605.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.071542724967003, correct "$27,675.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 17.807744294404984, correct "$141,900.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$102,318.75" with score 19.33599129319191, correct "$120,375.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$35,275.00" with score 17.807744294404984, correct "$141,900.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 22.414542615413666, correct "$30,000.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 18.440488278865814, correct "$1,275.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 17.307278364896774, correct "$56,575.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 20.922179847955704, correct "$15,900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 20.63877844810486, correct "$22,000.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 22.414542615413666, correct "$30,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.836277425289154, correct "$59,605.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 18.440488278865814, correct "$1,275.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 20.922179847955704, correct "$15,900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 20.63877844810486, correct "$22,000.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 17.693151235580444, correct "$80,800.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 20.63877844810486, correct "$22,000.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 16.788640916347504, correct "$136,740.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 17.836277425289154, correct "$59,605.00"
-This epoch doc_val_acc: 0.5161290322580645
-Epoch 8/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.3047 - acc: 0.0936 2/10 [=====>........................] - ETA: 3s - loss: 0.3022 - acc: 0.0987 3/10 [========>.....................] - ETA: 3s - loss: 0.3030 - acc: 0.0984 4/10 [===========>..................] - ETA: 2s - loss: 0.3024 - acc: 0.1011 5/10 [==============>...............] - ETA: 2s - loss: 0.3016 - acc: 0.1029 6/10 [=================>............] - ETA: 1s - loss: 0.3004 - acc: 0.1052 7/10 [====================>.........] - ETA: 1s - loss: 0.2997 - acc: 0.1059 8/10 [=======================>......] - ETA: 0s - loss: 0.2991 - acc: 0.1074 9/10 [==========================>...] - ETA: 0s - loss: 0.2985 - acc: 0.107410/10 [==============================] - 5s 463ms/step - loss: 0.2976 - acc: 0.1079
-468469-menendez-order-4-13500774152684-_-pdf: guessed "10/12/12" with score 21.37091675400734, correct "$41,450.00"
-480021-67688-1-13509366420764-_-pdf: guessed "$9,470.00" with score 18.99077135324478, correct "$9,470.00"
-511317-obama-2174-final_343259-1-13524183376079-_-pdf: guessed "$22,150.00" with score 20.589737236499786, correct "$96,785.00"
-511337-allen-c16c22-final_322380-1-13524180702547-_-pdf: guessed "$89,564.50" with score 21.681609451770782, correct "$105,370.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "32812" with score 20.732445269823074, correct "$15,750.00"
-468469-menendez-order-4-13500774152684-_-pdf: guessed "10/12/12" with score 21.37091675400734, correct "$41,450.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 14.383946388959885, correct "Contract"
-461537-smith-10-2-8-rev-3-13498800242806-_-pdf: guessed "204,550.00" with score 19.0768521130085, correct "204,550.00"
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCVN" with score 20.84697785973549, correct "$43,740.00"
-420233-collect-files-39746-political-file-2012-non: guessed "$6,950.00" with score 18.40655815601349, correct "$6,950.00"
-457688-romney-for-president-wo-9-12-rev-order: guessed "$103,400.00" with score 18.66615429520607, correct "$103,400.00"
-511323-romney-final_340427-1-13524181116876-_-pdf: guessed "$140,540.00" with score 21.36403977870941, correct "$140,540.00"
-511327-kaine-11507-final_327366-1-13524180809750-_-pdf: guessed "$112,276.50" with score 18.593217186629772, correct "$132,090.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 21.475829601287842, correct "$1,170.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 24.082996726036072, correct "$3,490.00"
-419765-collect-files-65684-political-file-2012-federal: guessed "$105,378.75" with score 21.17096245288849, correct "$123,975.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$99,641.25" with score 22.410658478736877, correct "$117,225.00"
-436986-collect-files-28010-political-file-2012-non: guessed "$26,700.00" with score 24.10164988040924, correct "$26,700.00"
-511320-romney-387-final_337905-1-13524181105942-_-pdf: guessed "--111--" with score 19.070301234722137, correct "$212,600.00"
-420426-collect-files-72313-political-file-2012-non: guessed "$9,335.00" with score 24.081703424453735, correct "$9,335.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 24.082996726036072, correct "$3,490.00"
-438598-collect-files-23079-political-file-2012-non: guessed "$79,075.00" with score 24.05202877521515, correct "$79,075.00"
-470385-65716-1-13503969050907-_-pdf: guessed "$6,350.00" with score 18.99233615398407, correct "$6,350.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$11,680.00" with score 18.961755454540253, correct "$11,680.00"
-511334-allen-c02c08-final_333970-1-13524180724089-_-pdf: guessed "$0.00" with score 14.969843685626984, correct "Contract"
-511330-allen-nrsc-925c01-final_337307-1-13524180205067: guessed "$73,627.00" with score 19.542092382907867, correct "$86,620.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Agency" with score 16.816256821155548, correct "Print"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 20.63398140668869, correct "$44,950.00"
-424794-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.389132738113403, correct "$900.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 24.67273622751236, correct "$17,750.00"
-511283-342425-5-13524183101415-_-pdf: guessed "$50,350.00" with score 19.96981331706047, correct "$50,350.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$37,450.00" with score 18.77827364206314, correct "$37,450.00"
-This epoch doc_train_acc: 0.5
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 17.985099524259567, correct "$136,740.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 18.521764636039734, correct "$56,575.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.018799602985382, correct "$30,500.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 18.961755454540253, correct "$11,680.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.25036136060953, correct "$169,860.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 18.521764636039734, correct "$56,575.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.054862082004547, correct "$30,000.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.018799602985382, correct "$30,500.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 18.521764636039734, correct "$56,575.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.054862082004547, correct "$30,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 15.278311222791672, correct "$19,200.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.21735444664955, correct "$1,275.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.77057495713234, correct "$27,675.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 18.51293134689331, correct "$59,605.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 15.278311222791672, correct "$19,200.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 18.51293134689331, correct "$59,605.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.25036136060953, correct "$169,860.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.054862082004547, correct "$30,000.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.054862082004547, correct "$30,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 15.278311222791672, correct "$19,200.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.018799602985382, correct "$30,500.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.25036136060953, correct "$169,860.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 18.566456720232964, correct "$80,800.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.161119252443314, correct "$15,900.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.389132738113403, correct "$900.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 18.70288634300232, correct "$141,900.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.389132738113403, correct "$900.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 18.566456720232964, correct "$80,800.00"
-470655-dccc180368-13503423133267-_-pdf: guessed "$141,900.00" with score 18.70288634300232, correct "$141,900.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.161119252443314, correct "$15,900.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 18.961755454540253, correct "$11,680.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.054862082004547, correct "$30,000.00"
-This epoch doc_val_acc: 0.65625
-Epoch 9/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.2881 - acc: 0.1058 2/10 [=====>........................] - ETA: 4s - loss: 0.2841 - acc: 0.1072 3/10 [========>.....................] - ETA: 3s - loss: 0.2830 - acc: 0.1085 4/10 [===========>..................] - ETA: 2s - loss: 0.2828 - acc: 0.1095 5/10 [==============>...............] - ETA: 2s - loss: 0.2816 - acc: 0.1108 6/10 [=================>............] - ETA: 1s - loss: 0.2810 - acc: 0.1121 7/10 [====================>.........] - ETA: 1s - loss: 0.2800 - acc: 0.1144 8/10 [=======================>......] - ETA: 0s - loss: 0.2790 - acc: 0.1156 9/10 [==========================>...] - ETA: 0s - loss: 0.2777 - acc: 0.116710/10 [==============================] - 5s 486ms/step - loss: 0.2766 - acc: 0.1181
-511297-345394-0-13524180941700-_-pdf: guessed "$20,000.00" with score 17.580280780792236, correct "$2,000.00"
-457315-romney-for-president-wo-10-6-order: guessed "$30,500.00" with score 24.503527343273163, correct "$30,500.00"
-431304-collect-files-35576-political-file-2012-federal: guessed "$85,740.00" with score 19.000078946352005, correct "$85,740.00"
-435451-collect-files-23079-political-file-2012-non: guessed "$63,850.00" with score 24.559789061546326, correct "$63,850.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 22.34217205643654, correct "$1,170.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$37,450.00" with score 19.112970530986786, correct "$37,450.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$11,680.00" with score 19.211560904979706, correct "$11,680.00"
-511339-sobhani1-final_341003-1-13524180777525-_-pdf: guessed "$157,920.00" with score 15.565213084220886, correct "$157,920.00"
-511316-obama-2051-final_341803-1-13524183386707-_-pdf: guessed "$137,861.50" with score 22.15836662054062, correct "$162,190.00"
-511290-344206-2-13524181028832-_-pdf: guessed "11/05/12" with score 20.68061351776123, correct "$9,750.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$99,641.25" with score 22.389698177576065, correct "$117,225.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$99,641.25" with score 22.389698177576065, correct "$117,225.00"
-470486-kirkpatrick_1009-1015rev6-13503492049654-_-pdf: guessed "KSAZ" with score 21.385889768600464, correct "$20,030.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 24.61899161338806, correct "$3,490.00"
-456137-obama_dem_pres_1016_102212_311598-13480824489068: guessed "WCVN" with score 21.38119289278984, correct "$43,740.00"
-511301-344550-0-13524180873822-_-pdf: guessed "$18,350.00" with score 21.204994916915894, correct "$18,350.00"
-511339-sobhani1-final_341003-1-13524180777525-_-pdf: guessed "$157,920.00" with score 15.565213084220886, correct "$157,920.00"
-435451-collect-files-23079-political-file-2012-non: guessed "$63,850.00" with score 24.559789061546326, correct "$63,850.00"
-511291-345363-0-13524181183619-_-pdf: guessed "$100,000.00" with score 22.12842881679535, correct "$100,000.00"
-424869-collect-files-11909-political-file-2012-federal: guessed "$2,970.00" with score 24.542935490608215, correct "$2,970.00"
-511293-341356-4-13524181194607-_-pdf: guessed "$94,525.00" with score 15.960994988679886, correct "$94,525.00"
-457688-romney-for-president-wo-9-12-rev-order: guessed "$103,400.00" with score 19.00742131471634, correct "$103,400.00"
-511302-343141-3-13524181050948-_-pdf: guessed "$113,600.00" with score 19.35126742720604, correct "$113,600.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 22.34217205643654, correct "$1,170.00"
-480020-67120-2-13509173328168-_-pdf: guessed "$34,750.00" with score 17.769914746284485, correct "$34,750.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "32812" with score 21.12617188692093, correct "$15,750.00"
-511339-sobhani1-final_341003-1-13524180777525-_-pdf: guessed "$157,920.00" with score 15.565213084220886, correct "$157,920.00"
-511322-romney-505-final_342216-1-13524181139554-_-pdf: guessed "$235,610.00" with score 20.66353464126587, correct "$235,610.00"
-480023-67469-2-13509282072244-_-pdf: guessed "$11,680.00" with score 19.211560904979706, correct "$11,680.00"
-433811-collect-files-23079-political-file-2012-non: guessed "$32,325.00" with score 24.549603700637817, correct "$32,325.00"
-511317-obama-2174-final_343259-1-13524183376079-_-pdf: guessed "$22,150.00" with score 20.644830614328384, correct "$96,785.00"
-511314-obama-1844-final_337336-1-13524183455130-_-pdf: guessed "$207,510.00" with score 19.45089177787304, correct "$207,510.00"
-511283-342425-5-13524183101415-_-pdf: guessed "$50,350.00" with score 20.25675928592682, correct "$50,350.00"
-This epoch doc_train_acc: 0.7272727272727273
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 22.118462562561035, correct "$22,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.0065780878067, correct "$59,605.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.302960015833378, correct "$169,860.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.503527343273163, correct "$30,500.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.302960015833378, correct "$169,860.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 19.46319344639778, correct "$56,575.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 15.717577427625656, correct "$19,200.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.302960015833378, correct "$169,860.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.503527343273163, correct "$30,500.00"
-511315-obama-2002-final_340807-1-13524183429823-_-pdf: guessed "$144,381.00" with score 18.302960015833378, correct "$169,860.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.37847539782524, correct "$1,275.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.37847539782524, correct "$1,275.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.0065780878067, correct "$59,605.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.28470480442047, correct "$15,900.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 19.211560904979706, correct "$11,680.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.934593364596367, correct "$27,675.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 18.92893934249878, correct "$136,740.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.37847539782524, correct "$1,275.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 18.92893934249878, correct "$136,740.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 18.92893934249878, correct "$136,740.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 19.46319344639778, correct "$56,575.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 22.118462562561035, correct "$22,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.0065780878067, correct "$59,605.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.0065780878067, correct "$59,605.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 15.717577427625656, correct "$19,200.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$120,375.00" with score 20.426694974303246, correct "$120,375.00"
-511285-344110-0-13524181205225-_-pdf: guessed "10/30/12" with score 20.934593364596367, correct "$27,675.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 18.6623657271266, correct "$80,800.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 24.503527343273163, correct "$30,500.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 24.563279628753662, correct "$30,000.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$120,375.00" with score 20.426694974303246, correct "$120,375.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.91204735636711, correct "$900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 22.118462562561035, correct "$22,000.00"
-This epoch doc_val_acc: 0.6363636363636364
-Epoch 10/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.2702 - acc: 0.1321 2/10 [=====>........................] - ETA: 3s - loss: 0.2671 - acc: 0.1331 3/10 [========>.....................] - ETA: 3s - loss: 0.2647 - acc: 0.1314 4/10 [===========>..................] - ETA: 2s - loss: 0.2641 - acc: 0.1303 5/10 [==============>...............] - ETA: 2s - loss: 0.2627 - acc: 0.1320 6/10 [=================>............] - ETA: 1s - loss: 0.2616 - acc: 0.1323 7/10 [====================>.........] - ETA: 1s - loss: 0.2608 - acc: 0.1319 8/10 [=======================>......] - ETA: 0s - loss: 0.2599 - acc: 0.1320 9/10 [==========================>...] - ETA: 0s - loss: 0.2588 - acc: 0.132210/10 [==============================] - 5s 490ms/step - loss: 0.2582 - acc: 0.1331
-433812-collect-files-23079-political-file-2012-non: guessed "$40,150.00" with score 25.222053050994873, correct "$40,150.00"
-511322-romney-505-final_342216-1-13524181139554-_-pdf: guessed "$235,610.00" with score 20.447462171316147, correct "$235,610.00"
-511332-allen-nrsc-c09c12-final_340444-1-13524180194521: guessed "$96,400.00" with score 21.48691213130951, correct "$96,400.00"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 22.589188635349274, correct "$27,100.00"
-511297-345394-0-13524180941700-_-pdf: guessed "$20,000.00" with score 18.01549932360649, correct "$2,000.00"
-511291-345363-0-13524181183619-_-pdf: guessed "$85,000.00" with score 21.81514072418213, correct "$100,000.00"
-511319-rncromney-483-final_339838-1-13524180984389-_-pdf: guessed "$226,220.00" with score 17.44804061204195, correct "$226,220.00"
-511317-obama-2174-final_343259-1-13524183376079-_-pdf: guessed "$22,150.00" with score 19.932474225759506, correct "$96,785.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$117,225.00" with score 22.111847639083862, correct "$117,225.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$117,225.00" with score 22.111847639083862, correct "$117,225.00"
-431377-collect-files-35587-political-file-2012-federal: guessed "$196.95" with score 22.72822219133377, correct "$46,340.00"
-419765-collect-files-65684-political-file-2012-federal: guessed "$105,378.75" with score 21.493434190750122, correct "$123,975.00"
-424758-collect-files-35576-political-file-2012-federal: guessed "$25,680.00" with score 25.07091796398163, correct "$25,680.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Advertiser" with score 16.54379615187645, correct "Print"
-433811-collect-files-23079-political-file-2012-non: guessed "$32,325.00" with score 25.107384264469147, correct "$32,325.00"
-424869-collect-files-11909-political-file-2012-federal: guessed "$2,970.00" with score 25.113598346710205, correct "$2,970.00"
-457688-romney-for-president-wo-9-12-rev-order: guessed "$103,400.00" with score 19.134136825799942, correct "$103,400.00"
-511290-344206-2-13524181028832-_-pdf: guessed "11/05/12" with score 20.154046282172203, correct "$9,750.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 25.240857988595963, correct "$17,750.00"
-431736-collect-files-11909-political-file-2012-federal: guessed "$8,325.00" with score 25.105262398719788, correct "$8,325.00"
-419754-collect-files-65684-political-file-2012-federal: guessed "$117,225.00" with score 22.111847639083862, correct "$117,225.00"
-433812-collect-files-23079-political-file-2012-non: guessed "$40,150.00" with score 25.222053050994873, correct "$40,150.00"
-433983-collect-files-68883-political-file-2012-non: guessed "$63,375.00" with score 24.54412454366684, correct "$63,375.00"
-511296-345028-0-13524180963339-_-pdf: guessed "$10,000.00" with score 21.18315291404724, correct "$1,000.00"
-457746-romney-for-president-wo-9-26-rev-2-order: guessed "$37,450.00" with score 19.326378881931305, correct "$37,450.00"
-433986-collect-files-68883-political-file-2012-non: guessed "$18,000.00" with score 24.062695801258087, correct "$18,000.00"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 20.112209647893906, correct "$44,950.00"
-511318-obama-2175-final_343497-1-13524183408511-_-pdf: guessed "11/01/12" with score 20.13445395231247, correct "$180,260.00"
-511282-339995-1-13524183255885-_-pdf: guessed "11/01/12" with score 20.112209647893906, correct "$44,950.00"
-473630-116252-0-13442821773323-_-pdf: guessed "$1,170.00" with score 23.23763072490692, correct "$1,170.00"
-470522-american-action-network-est-3352-13503978063254: guessed "$27,100.00" with score 22.589188635349274, correct "$27,100.00"
-511291-345363-0-13524181183619-_-pdf: guessed "$85,000.00" with score 21.81514072418213, correct "$100,000.00"
-511332-allen-nrsc-c09c12-final_340444-1-13524180194521: guessed "$96,400.00" with score 21.48691213130951, correct "$96,400.00"
-511323-romney-final_340427-1-13524181116876-_-pdf: guessed "$140,540.00" with score 21.67794233560562, correct "$140,540.00"
-This epoch doc_train_acc: 0.6470588235294118
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.08049088716507, correct "$1,275.00"
-511328-kaine-11519-final_327648-1-13524180842039-_-pdf: guessed "$136,740.00" with score 19.63086798787117, correct "$136,740.00"
-510798-343280-1-13524180884487-_-pdf: guessed "$56,575.00" with score 19.96536612510681, correct "$56,575.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 17.98568604886532, correct "$80,800.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 21.816893994808197, correct "$22,000.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.06377002596855, correct "$59,605.00"
-480022-67469-1-13509189034926-_-pdf: guessed "$11,680.00" with score 19.447338104248047, correct "$11,680.00"
-470423-obrien-oct-15-17-buy-13503963034902-_-pdf: guessed "$225.00" with score 19.08049088716507, correct "$1,275.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 25.01250845193863, correct "$30,500.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 25.152313470840454, correct "$30,000.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.740119755268097, correct "$900.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.06377002596855, correct "$59,605.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.06377002596855, correct "$59,605.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 25.152313470840454, correct "$30,000.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$120,375.00" with score 20.100095123052597, correct "$120,375.00"
-419761-collect-files-65684-political-file-2012-federal: guessed "$120,375.00" with score 20.100095123052597, correct "$120,375.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 25.152313470840454, correct "$30,000.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 25.01250845193863, correct "$30,500.00"
-457316-romney-for-president-wo-10-6-rev-order: guessed "$30,500.00" with score 25.01250845193863, correct "$30,500.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.371116518974304, correct "$15,900.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 25.152313470840454, correct "$30,000.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.371116518974304, correct "$15,900.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.740119755268097, correct "$900.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 21.816893994808197, correct "$22,000.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 16.060533046722412, correct "$19,200.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.06377002596855, correct "$59,605.00"
-442496-collect-files-47904-political-file-2012-federal: guessed "$68,680.00" with score 17.98568604886532, correct "$80,800.00"
-511336-allen-c09c15-final_340547-1-13524180734725-_-pdf: guessed "$19,200.00" with score 16.060533046722412, correct "$19,200.00"
-435452-collect-files-23079-political-file-2012-non: guessed "$30,000.00" with score 25.152313470840454, correct "$30,000.00"
-511295-344107-1-13524180973818-_-pdf: guessed "$22,000.00" with score 21.816893994808197, correct "$22,000.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.371116518974304, correct "$15,900.00"
-416904-collect-files-39738-political-file-2012-non: guessed "WCPO" with score 20.740119755268097, correct "$900.00"
-416945-collect-files-59441-political-file-2012-non: guessed "WKYC" with score 22.371116518974304, correct "$15,900.00"
-457683-obama-wo-9-5-rev-order-1536-13496224056416-_-pdf: guessed "$59,605.00" with score 19.06377002596855, correct "$59,605.00"
-This epoch doc_val_acc: 0.6764705882352942
-Epoch 11/50
- 1/10 [==>...........................] - ETA: 4s - loss: 0.2487 - acc: 0.1461 2/10 [=====>........................] - ETA: 3s - loss: 0.2490 - acc: 0.1461 3/10 [========>.....................] - ETA: 3s - loss: 0.2485 - acc: 0.1499 4/10 [===========>..................] - ETA: 2s - loss: 0.2483 - acc: 0.1524 5/10 [==============>...............] - ETA: 2s - loss: 0.2484 - acc: 0.1540 6/10 [=================>............] - ETA: 1s - loss: 0.2471 - acc: 0.1547 7/10 [====================>.........] - ETA: 1s - loss: 0.2467 - acc: 0.1544 8/10 [=======================>......] - ETA: 0s - loss: 0.2456 - acc: 0.1547 9/10 [==========================>...] - ETA: 0s - loss: 0.2441 - acc: 0.155710/10 [==============================] - 5s 473ms/step - loss: 0.2432 - acc: 0.1554
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 14.406751424074173, correct "Contract"
-511298-343408-0-13524180931287-_-pdf: guessed "$3,900.00" with score 20.514897167682648, correct "$3,900.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "32812" with score 21.203109353780746, correct "$15,750.00"
-436708-collect-files-68883-political-file-2012-non: guessed "$17,750.00" with score 25.485427260398865, correct "$17,750.00"
-470651-obama187040-13503351151533-_-pdf: guessed "$19,250.00" with score 25.330020010471344, correct "$19,250.00"
-511331-allen-nrsc-c02c08-final_338617-1-13524180183685: guessed "$139,900.00" with score 20.55582246184349, correct "$139,900.00"
-431304-collect-files-35576-political-file-2012-federal: guessed "$85,740.00" with score 19.80989709496498, correct "$85,740.00"
-457688-romney-for-president-wo-9-12-rev-order: guessed "$103,400.00" with score 19.54032015800476, correct "$103,400.00"
-511302-343141-3-13524181050948-_-pdf: guessed "$113,600.00" with score 18.9220572412014, correct "$113,600.00"
-511330-allen-nrsc-925c01-final_337307-1-13524180205067: guessed "$73,627.00" with score 19.664787530899048, correct "$86,620.00"
-470651-obama187040-13503351151533-_-pdf: guessed "$19,250.00" with score 25.330020010471344, correct "$19,250.00"
-436986-collect-files-28010-political-file-2012-non: guessed "$26,700.00" with score 25.32399570941925, correct "$26,700.00"
-468321-judges-oct-15-25721460-13500762137599-_-pdf: guessed "$3,490.00" with score 25.475107312202454, correct "$3,490.00"
-470493-nrcc-ie_1019-1025-est-3390-13503489061150-_-pdf: guessed "32812" with score 21.203109353780746, correct "$15,750.00"
-511286-334325-8-13524183157789-_-pdf: guessed "5.00" with score 21.908957988023758, correct "$203,175.00"
-511333-allen-925c01-final_333974-1-13524180713220-_-pdf: guessed "$0.00" with score 14.406751424074173, correct "Contract"
-511293-341356-4-13524181194607-_-pdf: guessed "2.60" with score 16.072191268205643, correct "$94,525.00"
-435451-collect-files-23079-political-file-2012-non: guessed "$63,850.00" with score 25.305717885494232, correct "$63,850.00"
-426068-collect-files-11893-political-file-2012-federal: guessed "Advertiser" with score 16.37799221277237, correct "Print"
-426068-collect-files-11893-political-file-2012-federal: guessed "Advertiser" with score 16.37799221277237, correct "Print"
-420426-collect-files-72313-political-file-2012-non: guessed "$9,335.00" with score 25.30656409263611, correct "$9,335.00"
