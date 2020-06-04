@@ -18,13 +18,17 @@ output_docs = 0
 # We output a column for each one of these, indicating how close the token is to the correct answer
 # For our first experiment, just extract gross_amount
 # Other possible targets include 'committee','agency','callsign'
-targets = ["gross_amount", "contract_number"] ###Add additional targets
+targets = [
+           # "gross_amount", 
+           # "contract_number", 
+            "committee"
+            ] 
 
 filings = pd.read_csv("../source/ftf-all-filings.tsv", sep="\t")
 
 incsv = pd.read_parquet("training.parquet")
 
-outcols = ["slug", "page", "x0", "y0", "x1", "y1", "token"] + targets
+outcols = ["slug", "page", "x0", "y0", "x1", "y1", "token", "gross_amount"] + targets
 outcsv = csv.DictWriter(open("training.csv", mode="w"), fieldnames=outcols)
 outcsv.writeheader()
 
@@ -39,20 +43,20 @@ def target_match(answer, tokens, target, max_n):
     tokens = [token.lower() for token in tokens] # lowercase all the tokens also
     
     if target == "gross_amount":
-        ratioslist = []
+        scores = []
         max_n = 1
         for token in tokens:
             if is_dollar_amount(anstok) and is_dollar_amount(token): 
                 try: 
-                    ratioslist.append(
+                    scores.append(
                         fuzz.ratio(normalize_dollars(anstok), normalize_dollars(token))
                         / 100.0
                     )
                 except decimal.InvalidOperation:
                     # not a number, maybe a date?
-                    ratioslist.append(fuzz.ratio(anstok, token) / 100.0)
+                    scores.append(fuzz.ratio(anstok, token) / 100.0)
             else: 
-                ratioslist.append(fuzz.ratio(anstok, token) / 100.0)
+                scores.append(fuzz.ratio(anstok, token) / 100.0)
 
     elif target == "contract_number":
 
@@ -62,19 +66,44 @@ def target_match(answer, tokens, target, max_n):
         ratioslist = np.zeros((max_n, len(tokens)))          # two dimensional because we will have one array for each possible n-gram length
         for i in range (max_n):                          # For each possible number of tokens in answertoken
            for idx in range (0, len(tokens) - i):           #for each n-gram of that length in the doc
-               token_string = ''.join(str(t) for t in tokens[idx:idx+i])    # make it one token so we can compare
+               token_string = ''.join(str(t) for t in tokens[idx:idx+i+1])    # make it one token so we can compare
                match = fuzz.ratio(anstok, token_string) / 100.0 # compare and store the float in match
                ratioslist[i, idx] = match                  # update the ratioslist matrix with this match value for the n-gram length and index
-               if match > best_match[i-1]:                    # update our vector of best matches for each n-gram
-                   best_match[i-1] = match 
-                   best_idx[i-1] = idx
+               if match > best_match[i]:                    # update our vector of best matches for each n-gram
+                   best_match[i] = match 
+                   best_idx[i] = idx
         print("best_match array: " + str(best_match))
-        print("Best choice for number of tokens: " + str(np.argmax(best_match)+1))
+        print("Best choice for number of tokens: " + str(np.argmax(best_match)))
         print("Best Match Token Index: " + str(best_idx[np.argmax(best_match)]))
         print("Best Match Tokens: " + str(tokens[int(best_idx[np.argmax(best_match)]):int(best_idx[np.argmax(best_match)])+np.argmax(best_match)+1]))
-        ratioslist = ratioslist[np.argmax(best_match),:]    #Ratioslist is all the values in the column which corresponds to the 
+        return ratioslist[np.argmax(best_match),:]    #Ratioslist is all the values in the column which corresponds to the 
     
-    return ratioslist 
+    elif target == "committee":
+
+        best_match = [0 for i in range(max_n)]
+        best_idx = [0 for i in range(max_n)]
+        print("len(tokens: " + str(len(tokens)))
+        ratioslist = np.zeros((max_n, len(tokens)))          # two dimensional because we will have one array for each possible n-gram length
+        for i in range (max_n):                          # For each possible number of tokens in answertoken
+           for idx in range (0, len(tokens) - i):           #for each n-gram of that length in the doc
+               token_string = ''.join(str(t) for t in tokens[idx:idx+i+1])    # make it one token so we can compare
+               match = fuzz.ratio(anstok, token_string) / 100.0 # compare and store the float in match
+               ratioslist[i, idx] = match                  # update the ratioslist matrix with this match value for the n-gram length and index
+               if match > best_match[i]:                    # update our vector of best matches for each n-gram
+                   best_match[i] = match 
+                   best_idx[i] = idx
+        print("best_match array: " + str(best_match))
+        best_len = np.argmax(best_match)+1
+        best_match_idx = best_idx[best_len-1]
+        print("Best choice for number of tokens: " + str(best_len))
+        print("Best Match Token Index: " + str(best_match_idx))
+        print("Best Match Tokens: " + str(tokens[best_match_idx:best_match_idx+best_len]))
+        
+        scores = np.zeros(len(tokens))
+        for i in range(best_len):
+            scores[i] = best_match[best_len-1]
+
+    return scores
 
 def process_doc(slug, rows, max_n):
     global output_docs
