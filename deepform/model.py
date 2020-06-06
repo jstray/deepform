@@ -1,13 +1,16 @@
 import random
+from datetime import datetime
 
 import keras as K
 import numpy as np
 import tensorflow as tf
-from keras.backend import squeeze
 from keras.engine.input_layer import Input
 from keras.layers import Dense, Dropout, Flatten, Lambda, concatenate
 from keras.layers.embeddings import Embedding
 from keras.models import Model
+
+from deepform.common import MODEL_DIR
+from deepform.util import git_short_hash
 
 
 # control the fraction of windows that include a positive label. not efficient.
@@ -49,10 +52,18 @@ def create_model(config):
 
     # split into the hash and the rest of the token features, embed hash as
     # one-hot, then merge
-    tok_hash = Lambda(
-        lambda x: squeeze(K.backend.slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
-    )(indata)
-    tok_features = Lambda(lambda x: K.backend.slice(x, (0, 0, 1), (-1, -1, -1)))(indata)
+    def create_tok_hash(x):
+        from keras.backend import squeeze, slice
+
+        return squeeze(slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
+
+    def create_tok_features(x):
+        from keras.backend import slice
+
+        return slice(x, (0, 0, 1), (-1, -1, -1))
+
+    tok_hash = Lambda(create_tok_hash)(indata)
+    tok_features = Lambda(create_tok_features)(indata)
     embed = Embedding(config.vocab_size, config.vocab_embed_size)(tok_hash)
     merged = concatenate([embed, tok_features], axis=2)
 
@@ -70,9 +81,12 @@ def create_model(config):
     d5 = Dense(config.window_len, activation="elu")(d4)
 
     model = Model(inputs=[indata], outputs=[d5])
+
+    _missed_token_loss = missed_token_loss(config.penalize_missed)
+
     model.compile(
         optimizer=K.optimizers.Adam(learning_rate=config.learning_rate),
-        loss=missed_token_loss(config.penalize_missed),
+        loss=_missed_token_loss,
         metrics=["acc"],
     )
 
@@ -99,3 +113,30 @@ def predict_answer(model, document):
     best_score_idx = np.argmax(scores)
     best_score_text = document.tokens.iloc[best_score_idx]["token"]
     return best_score_text, scores[best_score_idx], scores
+
+
+def default_model_name(window_len):
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    return MODEL_DIR / f"{timestamp}_{git_short_hash()}_{window_len}.model"
+
+
+def latest_model():
+    models = MODEL_DIR.glob("*.model")
+    return max(models, key=lambda p: p.stat().st_ctime)
+
+
+def load_model(model_file=None):
+    filepath = model_file or latest_model()
+    window_len = int(filepath.stem.split("_")[-1])
+    return (
+        tf.keras.models.load_model(
+            filepath, custom_objects={"_missed_token_loss": missed_token_loss(5)}
+        ),
+        window_len,
+    )
+
+
+def save_model(model, config):
+    basename = config.model_path or default_model_name(config.window_len)
+    basename.parent.mkdir(parents=True, exist_ok=True)
+    model.save(basename)

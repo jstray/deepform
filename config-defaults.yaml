@@ -80,6 +80,12 @@ doc_acc_max_sample_size:
 doc_acc_sample_size:
   desc: sample epoch+this documents to compute doc_val_acc (uses all docs on last epoch)
   value: 10
+save_model:
+  desc: whether to save the trained model
+  value: 1
+model_path:
+  desc: path to save the model (if not set, autogenerate)
+  value: 0
 use_wandb:
   desc: report run to wandb and store annotations
   value: 1

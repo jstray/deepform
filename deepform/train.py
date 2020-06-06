@@ -15,7 +15,7 @@ from wandb.keras import WandbCallback
 
 from deepform.data.add_features import DOC_INDEX
 from deepform.document_store import DocumentStore
-from deepform.model import create_model, predict_answer, windowed_generator
+from deepform.model import create_model, predict_answer, save_model, windowed_generator
 from deepform.pdfs import log_pdf
 from deepform.util import config_desc, dollar_match
 
@@ -105,6 +105,9 @@ def main(config):
         epochs=config.epochs,
         callbacks=callbacks,
     )
+
+    if config.save_model:
+        save_model(model, config)
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@ import logging
 import math
 import random
 import re
+import subprocess
 from collections import namedtuple
 from decimal import Decimal, InvalidOperation
 
@@ -85,3 +86,11 @@ def sample(items, n=None, seed=None):
     if n is None:
         n = len(items)
     return random.sample(items, k=n)
+
+
+def git_short_hash():
+    try:
+        out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
+        return out.strip().decode("ascii")
+    except OSError:
+        return "Unknown"

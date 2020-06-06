@@ -6,11 +6,14 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import pdfplumber
 from tqdm import tqdm
 
 from deepform.common import PDF_DIR, TOKEN_DIR
+from deepform.data.add_features import add_base_features
+from deepform.document import FEATURE_COLS, TOKEN_COLS, Document
 from deepform.pdfs import get_pdf_path
 
 
@@ -95,6 +98,25 @@ def create_token_docs_from_slugs(slugs, token_dir=TOKEN_DIR):
     tokenized = [p for p in results if p]
     print(f"Tokenized {len(tokenized)} documents.")
     return tokenized
+
+
+def extract_doc(pdf_path, window_len):
+    """Create a Document with features extracted from a pdf."""
+    pdf_path = Path(pdf_path)
+    tokens = tokenize_pdf(pdf_path)
+    # Remove tokens shorter than three characters.
+    df = tokens[tokens["token"].str.len() >= 3]
+    df = add_base_features(df)
+    df["hash"] = df["hash"] % 500
+    return Document(
+        slug=pdf_path.stem,
+        tokens=df[TOKEN_COLS[:-1]],
+        features=df[FEATURE_COLS].to_numpy(dtype=float),
+        labels=np.zeros(len(df), dtype=bool),  # Dummy.
+        positive_windows=np.array(0),  # Dummy.
+        window_len=window_len,
+        gross_amount=np.NaN,  # Dummy.
+    )
 
 
 if __name__ == "__main__":
