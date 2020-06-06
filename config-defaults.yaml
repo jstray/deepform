@@ -1,6 +1,6 @@
 len_train:
   dec: number of documents to use (training + validation)
-  value: 8000
+  value: 15000
 
 val_split:
   value: 0.2
