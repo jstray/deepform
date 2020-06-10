@@ -15,24 +15,36 @@ FLOAT_COLS = [
     "match",
     "digitness",
     "log_amount",
+    "str_totals",
+    "str_amount",
+    "str_gross",
+    "str_net",
+    "str_contract"
 ]
 BOOL_COLS = ["is_dollar", "label"]
 
 
-def fraction_digits(s):
-    """Return the fraction of a string that is composed of digits."""
-    return np.mean([c.isdigit() for c in s]) if isinstance(s, str) else 0.0
+# def fraction_digits(s):
+#     """Return the fraction of a string that is composed of digits."""
+#     return np.mean([c.isdigit() for c in s]) if isinstance(s, str) else 0.0
 
+# def match_string(a,b):
+#     m = fuzz.ratio(a.lower(), b.lower()) / 100.0 
+#     return m if m>=0.9 else 0
 
-def add_base_features(token_df):
-    """Extend a DataFrame with features that can be pre-computed."""
-    df = token_df.copy()
-    df["hash"] = df["token"].apply(hash)
-    df["length"] = df["token"].str.len()
-    df["digitness"] = df["token"].apply(fraction_digits)
-    df["is_dollar"] = df["token"].apply(is_dollar_amount)
-    df["log_amount"] = df["token"].apply(log_dollar_amount)
-    return df.fillna(0)
+# def add_base_features(token_df):
+#     """Extend a DataFrame with features that can be pre-computed."""
+#     df = token_df.copy()
+#     df["hash"] = df["token"].apply(hash)
+#     df["length"] = df["token"].str.len()
+#     df["digitness"] = df["token"].apply(fraction_digits)
+#     df["is_dollar"] = df["token"].apply(is_dollar_amount)
+#     df["log_amount"] = df["token"].apply(log_dollar_amount)
+
+#     for s in ['amount','totals','gross','net','contract']:
+#         df['str_'+s] = df['str_'+s].apply(lambda x: match_string(s,x))
+
+#     return df.fillna(0)
 
 
 def fix_type(df, col, na_value, dtype, downcast=False):

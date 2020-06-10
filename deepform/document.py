@@ -14,12 +14,17 @@ FEATURE_COLS = [
     "digitness",
     "is_dollar",
     "log_amount",
+    "str_totals",
+    "str_amount",
+    "str_gross",
+    "str_net",
+    "str_contract"    
 ]
 
 TOKEN_COLS = ["token", "x0", "y0", "x1", "y1", "page", "match"]
 
 
-@dataclass(frozen=True)
+@dataclass
 class Window:
     """A Window just holds views to the arrays held by a Document."""
 
@@ -60,7 +65,7 @@ class Document:
 
         Note that unless window_len=1, this is less than the number of tokens.
         """
-        return len(self.labels) - self.window_len
+        return len(self.labels) - self.window_len + 1
 
     def __iter__(self):
         """Iterate over all windows in the document in order."""

@@ -16,7 +16,12 @@ from deepform.util import git_short_hash
 # control the fraction of windows that include a positive label. not efficient.
 def one_window(dataset, config):
     require_positive = random.random() > config.positive_fraction
-    return dataset.random_document().random_window(require_positive)
+    window = dataset.random_document().random_window(require_positive)
+    if config.permute_tokens:
+        shuffle = np.random.permutation(config.window_len)
+        window.features = window.features[shuffle]
+        window.labels = window.labels[shuffle]
+    return window
 
 
 def windowed_generator(dataset, config):
@@ -78,9 +83,18 @@ def create_model(config):
         activation="sigmoid",
     )(d2)
     d4 = Dropout(config.dropout)(d3)
-    d5 = Dense(config.window_len, activation="elu")(d4)
 
-    model = Model(inputs=[indata], outputs=[d5])
+    if config.num_layers == 3:
+        d5 = Dense(
+            int(config.window_len * config.token_dims * config.layer_3_size_factor),
+            activation="sigmoid",
+        )(d4)
+        last_layer = Dropout(config.dropout)(d5)
+    else:
+        last_layer = d4
+
+    outdata = Dense(config.window_len, activation="elu")(last_layer)
+    model = Model(inputs=[indata], outputs=[outdata])
 
     _missed_token_loss = missed_token_loss(config.penalize_missed)
 

@@ -39,12 +39,18 @@ target_thresh:
   value: 0.8
 
 # network size
+num_layers:
+  desc: number of layers in model, 2 or 3
+  value: 3
 layer_1_size_factor:
-  desc: layer 1 size = this factor * window_len
+  desc: layer 1 size = this factor * window_len * token_dims
   value: 4
 layer_2_size_factor:
-  desc: layer 2 size = this factor * window_len
+  desc: layer 2 size = this factor * window_len * token_dims
   value: 2
+layer_3_size_factor:
+  desc: layer 3 size = this factor * window_len * token_dims
+  value: 1
 dropout:
   value: 0.2
 
@@ -59,6 +65,9 @@ batch_size:
 positive_fraction:
   desc: target match scores larger than this will becomes positive labels
   value: 0.5
+permute_tokens:
+  desc: randomly re-order tokens in each training window
+  value: 0
 
 penalize_missed:
   desc: how much more a missed 1 counts than a missed 0 in outputs
@@ -97,4 +106,4 @@ log_level:
 # meaning it may break things if you change them
 token_dims:
   desc: number of features per token, including token hash
-  value: 8
+  value: 13
