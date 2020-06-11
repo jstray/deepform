@@ -15,16 +15,19 @@ pad_windows:
   desc: zero pad beginning and end of doc token stream
   value: 1
 use_amount:
-  desc: use token dollar value directly as feature?
+  desc: use token dollar value directly as feature
   value: 1
 use_page:
-  desc: use token page number as feature?
+  desc: use token page number as feature
   value: 1
 use_geom:
-  desc: use token geometry (bbox corner) as feature?
+  desc: use token geometry (bbox corner) as feature
   value: 1
 use_string:
-  desc: use token string as feature?
+  desc: use token string as feature
+  value: 1
+use_hints:
+  desc: use hard coded field names ("total") as features
   value: 1
 
 vocab_size:

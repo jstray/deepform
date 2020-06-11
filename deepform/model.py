@@ -114,7 +114,8 @@ def predict_scores(model, document):
     windowed_features = np.stack([window.features for window in document])
     window_scores = model.predict(windowed_features)
 
-    scores = np.zeros(len(document) + document.window_len)
+    num_windows = len(document) + document.window_len - 1
+    scores = np.zeros(num_windows) 
     for i in range(len(document)):
         # would max work better than sum?
         scores[i : i + document.window_len] += window_scores[i]

@@ -84,6 +84,9 @@ class Document:
         df["log_amount"] *= config.use_amount
         df["match"] = df["gross_amount"]
 
+        for s in ['amount','totals','gross','net','contract']:
+            df['str_'+s] *= config.use_hints
+
         if config.pad_windows:
             df = pad_df(df, config.window_len - 1)
         fix_dtypes(df)
