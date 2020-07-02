@@ -6,7 +6,7 @@ import pandas as pd
 from deepform.features import fix_dtypes
 
 FEATURE_COLS = [
-    "hash",
+    "tok_id",
     "page",
     "x0",
     "y0",
@@ -14,12 +14,8 @@ FEATURE_COLS = [
     "digitness",
     "is_dollar",
     "log_amount",
-    "str_totals",
-    "str_amount",
-    "str_gross",
-    "str_net",
-    "str_contract"    
 ]
+NUM_FEATURES = len(FEATURE_COLS)
 
 TOKEN_COLS = ["token", "x0", "y0", "x1", "y1", "page", "match"]
 
@@ -77,15 +73,14 @@ class Document:
         """Load precomputed features from a parquet file and apply a config."""
         df = pd.read_parquet(pq_path)
 
-        df["hash"] = (df["hash"] % config.vocab_size) * config.use_string
+        df["tok_id"] = (
+            np.minimum(df["tok_id"], config.vocab_size - 1) * config.use_string
+        )
         df["page"] *= config.use_page
         df["x0"] *= config.use_geom
         df["y0"] *= config.use_geom
         df["log_amount"] *= config.use_amount
         df["match"] = df["gross_amount"]
-
-        for s in ['amount','totals','gross','net','contract']:
-            df['str_'+s] *= config.use_hints
 
         if config.pad_windows:
             df = pad_df(df, config.window_len - 1)

@@ -31,10 +31,10 @@ use_hints:
   value: 1
 
 vocab_size:
-  desc: token strings are hashed mod this before embedding
-  value: 500
+  desc: identify (1-hot encode) this many common tokens
+  value: 512
 vocab_embed_size:
-  desc: number of outputs in token hash embedding
+  desc: number of outputs in the vocab embedding
   value: 16
 
 target_thresh:
@@ -104,9 +104,3 @@ use_wandb:
 log_level:
   desc: minimum level to report in the logs
   value: INFO
-
-# the rest of these are not hyperparamters, but config settings
-# meaning it may break things if you change them
-token_dims:
-  desc: number of features per token, including token hash
-  value: 13

@@ -10,6 +10,7 @@ from keras.layers.embeddings import Embedding
 from keras.models import Model
 
 from deepform.common import MODEL_DIR
+from deepform.document import NUM_FEATURES
 from deepform.util import git_short_hash
 
 
@@ -26,7 +27,7 @@ def one_window(dataset, config):
 
 def windowed_generator(dataset, config):
     # Create empty arrays to contain batch of features and labels#
-    batch_features = np.zeros((config.batch_size, config.window_len, config.token_dims))
+    batch_features = np.zeros((config.batch_size, config.window_len, NUM_FEATURES))
     batch_labels = np.zeros((config.batch_size, config.window_len))
 
     while True:
@@ -53,7 +54,7 @@ def missed_token_loss(one_penalty):
 
 # --- Specify network ---
 def create_model(config):
-    indata = Input((config.window_len, config.token_dims))
+    indata = Input((config.window_len, NUM_FEATURES))
 
     # split into the hash and the rest of the token features, embed hash as
     # one-hot, then merge
@@ -74,19 +75,19 @@ def create_model(config):
 
     f = Flatten()(merged)
     d1 = Dense(
-        int(config.window_len * config.token_dims * config.layer_1_size_factor),
+        int(config.window_len * NUM_FEATURES * config.layer_1_size_factor),
         activation="sigmoid",
     )(f)
     d2 = Dropout(config.dropout)(d1)
     d3 = Dense(
-        int(config.window_len * config.token_dims * config.layer_2_size_factor),
+        int(config.window_len * NUM_FEATURES * config.layer_2_size_factor),
         activation="sigmoid",
     )(d2)
     d4 = Dropout(config.dropout)(d3)
 
     if config.num_layers == 3:
         d5 = Dense(
-            int(config.window_len * config.token_dims * config.layer_3_size_factor),
+            int(config.window_len * NUM_FEATURES * config.layer_3_size_factor),
             activation="sigmoid",
         )(d4)
         last_layer = Dropout(config.dropout)(d5)
@@ -115,7 +116,7 @@ def predict_scores(model, document):
     window_scores = model.predict(windowed_features)
 
     num_windows = len(document) + document.window_len - 1
-    scores = np.zeros(num_windows) 
+    scores = np.zeros(num_windows)
     for i in range(len(document)):
         # would max work better than sum?
         scores[i : i + document.window_len] += window_scores[i]

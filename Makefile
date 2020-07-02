@@ -4,7 +4,8 @@ CONTAINER=deepform/deepform_learner:latest
 # 'make test' is the default target for make.
 .PHONY: test
 test: docker-build
-	docker run --rm $(CONTAINER) pytest --verbose --color=yes tests
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	pytest --verbose --color=yes tests
 
 .PHONY: docker-build
 docker-build:
@@ -35,20 +36,24 @@ data/doc_index.parquet: data/training.parquet
 	docker build -t $(CONTAINER) .
 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.add_features
 
+data/token_frequency.csv: data/doc_index.parquet
+	docker build -t $(CONTAINER) .
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.create_vocabulary
+
 .PHONY: train
-train: data/doc_index.parquet .env docker-build
+train: data/doc_index.parquet data/token_frequency.csv .env docker-build
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	python -um deepform.train
 
 .PHONY: test-train
-test-train: data/doc_index.parquet .env docker-build
+test-train: data/doc_index.parquet data/token_frequency.csv .env docker-build
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0 
 
 .PHONY: sweep
-sweep: data/doc_index.parquet .env docker-build
+sweep: data/doc_index.parquet data/token_frequency.csv .env docker-build
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	./init_sweep.sh

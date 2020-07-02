@@ -107,7 +107,7 @@ def extract_doc(pdf_path, window_len):
     # Remove tokens shorter than three characters.
     df = tokens[tokens["token"].str.len() >= 3]
     df = add_base_features(df)
-    df["hash"] = df["hash"] % 500
+    df["tok_id"] = np.minimum(511, df["tok_id"])
     return Document(
         slug=pdf_path.stem,
         tokens=df[TOKEN_COLS[:-1]],

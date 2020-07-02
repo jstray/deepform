@@ -9,11 +9,13 @@ import argparse
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from fuzzywuzzy import fuzz
+
 import numpy as np
 import pandas as pd
+from fuzzywuzzy import fuzz
 from tqdm import tqdm
 
+from deepform.data.create_vocabulary import get_token_id
 from deepform.data.csv_to_parquet import OUTPUT_PQ as INPUT_PQ
 from deepform.util import is_dollar_amount, log_dollar_amount
 
@@ -80,21 +82,23 @@ def fraction_digits(s):
     """Return the fraction of a string that is composed of digits."""
     return np.mean([c.isdigit() for c in s]) if isinstance(s, str) else 0.0
 
-def match_string(a,b):
-    m = fuzz.ratio(a.lower(), b.lower()) / 100.0 
-    return m if m>=0.9 else 0
+
+def match_string(a, b):
+    m = fuzz.ratio(a.lower(), b.lower()) / 100.0
+    return m if m >= 0.9 else 0
+
 
 def add_base_features(token_df):
     """Extend a DataFrame with features that can be pre-computed."""
     df = token_df.copy()
-    df["hash"] = df["token"].apply(hash).astype("i8")
+    df["tok_id"] = df["token"].apply(get_token_id).astype("i2")
     df["length"] = df["token"].str.len().astype("i2")
     df["digitness"] = df["token"].apply(fraction_digits).astype("f4")
     df["is_dollar"] = df["token"].apply(is_dollar_amount).astype("f4")
     df["log_amount"] = df["token"].apply(log_dollar_amount).fillna(0).astype("f4")
 
-    for s in ['amount','totals','gross','net','contract']:
-        df['str_'+s] = df['token'].apply(lambda x: match_string(s,x)).astype("f4")
+    for s in ["amount", "totals", "gross", "net", "contract"]:
+        df["str_" + s] = df["token"].apply(lambda x: match_string(s, x)).astype("f4")
 
     return df
 

@@ -1,8 +1,12 @@
 import pandas as pd
 
-from deepform.data.add_features import extend_and_write_docs, pq_index_and_dir
+from deepform.data.add_features import (
+    extend_and_write_docs,
+    fraction_digits,
+    pq_index_and_dir,
+)
+from deepform.data.create_vocabulary import get_token_id
 from deepform.data.csv_to_parquet import CSV_COL_TYPES
-from deepform.features import fraction_digits
 from deepform.util import is_dollar_amount, log_dollar_amount
 from test_csv_to_parquet import training_docs_data
 
@@ -34,7 +38,7 @@ def test_convert_csv_to_parquet(faker, tmp_path):
         assert length == len(doc)
         assert best_match == doc.gross_amount.max()
         # Row features
-        assert (doc.hash == doc.token.apply(hash)).all()
+        assert (doc.tok_id == doc.token.apply(get_token_id)).all()
         assert (doc.length == doc.token.str.len()).all()
         assert (doc.digitness == doc.token.apply(fraction_digits)).all()
         assert (doc.is_dollar == doc.token.apply(is_dollar_amount)).all()
