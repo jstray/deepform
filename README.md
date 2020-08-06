@@ -91,6 +91,19 @@ The training data is a combination of the raw PDFs from 2012 and 2014, and [ProP
 - `train.py` loads this data, trains a network that extracts the total, and logs the results using [Weights & Biases](https://www.wandb.com/)
 - `baseline.py` is a hand coded total extractor for comparison, which achieves 61% accuracy.
 
+## Training data for 2020
+Pdfs for the 2020 political ads and associated metadata were uploaded to [Overview](https://www.overviewdocs.com/) and a sample of 1000 were randomly chosen for training. To collect the pdfs, the file names were pulled from the [FCC API OPIF file search](https://publicfiles.fcc.gov/developer/) using the search terms: order, contract, invoice, and receipt. The search was run with filters for campaign year set to 2020 and source service code set to TV. 
+
+The FCC API search also returns the source service code (entity type, i.e. TV, cable), entity id, callsign, political file type (political ad or non-candidate issue ad), office type (presidential, senate, etc), nielsen dma rank (tv market area), network affiliation, and the time stamps for when the ad was created and last modified were pulled. These were added to the overview document set along with the search term, URL for the FCC download, and the date of the search.
+
+To process the pdfs, the text was first extracted and if there were less than 10 words present OCR was performed using the following steps:
+
+ - Convert pdf to a series of images
+ - Determine angle of each page and rotate if needed
+ - Use tesseract to OCR each image
+ - Upload processed pdf to an S3 bucket and add URL to overview
+ - Upload additional metadata on whether OCR was needed, the original angle of each page, and any errors that occurred during the OCR process
+
 ## Training data format
 
 The main training data file is `data/training.csv` but it's too big to post in github.
