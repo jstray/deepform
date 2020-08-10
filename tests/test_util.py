@@ -1,3 +1,4 @@
+from datetime import date
 from decimal import Decimal
 from math import isclose
 
@@ -8,6 +9,7 @@ from deepform.util import (
     dollar_amount,
     is_dollar_amount,
     log_dollar_amount,
+    normalize_date,
     normalize_dollars,
 )
 from hypothesis import example, given
@@ -80,6 +82,20 @@ def test_normalize_dollars():
     assert normalize_dollars("C") is None
     assert normalize_dollars("$x") is None
     assert normalize_dollars("3 .17") is None
+
+
+def test_normalize_date():
+    assert normalize_date("03/12/20") == date(2020, 3, 12)
+    assert normalize_date("3/4/19") == date(2019, 3, 4)
+    assert normalize_date("6-1") == date(2020, 6, 1)
+    assert normalize_date("4-28-21") == date(2021, 4, 28)
+    assert normalize_date("Apr16/20") == date(2020, 4, 16)
+    assert normalize_date("DEC30/19") == date(2019, 12, 30)
+    assert normalize_date("February 12, 2020") == date(2020, 2, 12)
+    assert normalize_date("11/20") == date(2020, 11, 20)
+    assert normalize_date("22") is None
+    assert normalize_date("") is None
+    assert normalize_date(None) is None
 
 
 coord = st.floats(min_value=-10, max_value=800, allow_nan=False)

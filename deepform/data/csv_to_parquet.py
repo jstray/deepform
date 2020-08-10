@@ -27,6 +27,10 @@ CSV_COL_TYPES = {
     "x1": "f4",
     "y1": "f4",
     "token": "string",  # Pandas 1.x string type.
+    "contract_num": "f4",
+    "advertiser": "f4",
+    "flight_from": "f4",
+    "flight_to": "f4",
     "gross_amount": "f4",
 }
 

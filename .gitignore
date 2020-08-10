@@ -27,6 +27,8 @@ source/cached_features.p
 *.pdf
 *.png
 *.pq
+*.model
+pdfs/
 
 # macOS system files
 .DS_Store

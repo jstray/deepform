@@ -1,7 +1,7 @@
 import pandas as pd
 
 STRING_COLS = ["slug", "token"]
-INT_COLS = ["tok_id", "length"]
+INT_COLS = ["tok_id", "length", "label"]
 FLOAT_COLS = [
     "page",
     "x0",
@@ -13,7 +13,7 @@ FLOAT_COLS = [
     "digitness",
     "log_amount",
 ]
-BOOL_COLS = ["is_dollar", "label"]
+BOOL_COLS = ["is_dollar"]
 
 
 def fix_type(df, col, na_value, dtype, downcast=False):

@@ -6,29 +6,36 @@ from deepform.data.add_features import (
     pq_index_and_dir,
 )
 from deepform.data.create_vocabulary import get_token_id
-from deepform.data.csv_to_parquet import CSV_COL_TYPES
 from deepform.util import is_dollar_amount, log_dollar_amount
-from test_csv_to_parquet import training_docs_data
+from test_csv_to_parquet import random_doc_data
 
 
-def test_convert_csv_to_parquet(faker, tmp_path):
+def test_add_features_to_labeled_parquet(faker, tmp_path):
     num_docs = 5
 
+    src_path = tmp_path / "labeled"
+    src_path.mkdir(parents=True, exist_ok=True)
     idx_path = tmp_path / "doc_index.parquet"
     idx_path, pq_path = pq_index_and_dir(idx_path)
 
     # Create the source data to start with.
-    df = training_docs_data(faker, num_docs, repeat=False)
-    df = df.astype(CSV_COL_TYPES)
+    docs = {}
+    for _ in range(num_docs):
+        doc = random_doc_data(faker)
+        docs[doc.slug[0]] = doc.drop("slug", axis=1)
+
+    # Write the data to the temp files `extend_and_write_docs` expects.
+    for slug, doc in docs.items():
+        doc.to_parquet(src_path / f"{slug}.parquet", compression="lz4", index=False)
 
     # Run the conversion code.
-    extend_and_write_docs(df, idx_path)
+    extend_and_write_docs(src_path, idx_path, pq_path)
 
     # Check out the index.
     index = pd.read_parquet(idx_path)
 
     assert len(index) == num_docs
-    assert set(df.slug) == set(index.index)
+    assert set(docs.keys()) == set(index.index)
 
     # Check out each individual document that was produced.
     for slug, length, best_match in index.itertuples():

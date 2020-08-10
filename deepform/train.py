@@ -8,32 +8,45 @@
 import argparse
 import logging
 import os
+from datetime import datetime
 
 import keras as K
 import wandb
 from wandb.keras import WandbCallback
 
-from deepform.data.add_features import DOC_INDEX
+from deepform.common import LOG_DIR, TRAINING_INDEX
+from deepform.document import SINGLE_CLASS_PREDICTION
 from deepform.document_store import DocumentStore
-from deepform.model import create_model, predict_answer, save_model, windowed_generator
+from deepform.model import create_model, save_model, windowed_generator
 from deepform.pdfs import log_pdf
-from deepform.util import config_desc, dollar_match
+from deepform.util import config_desc, date_match, dollar_match, loose_match
 
 
 # Calculate accuracy of answer extraction over num_to_test docs, print
 # diagnostics while we do so
-def compute_accuracy(model, config, dataset, num_to_test, print_results):
+def compute_accuracy(model, config, dataset, num_to_test, print_results, log_path):
     n_print = config.render_results_size
 
     n_docs = min(num_to_test, len(dataset))
     acc = 0
-    for doc in dataset.sample(n_docs):
+    for doc in sorted(dataset.sample(n_docs), key=lambda d: d.slug):
         slug = doc.slug
-        answer_text = doc.gross_amount
+        answer_text = doc.label_values[SINGLE_CLASS_PREDICTION]
 
-        predict_text, predict_score, token_scores = predict_answer(model, doc)
+        predict_text, predict_score, token_scores = doc.predict_answer(model)
 
-        match = dollar_match(predict_text, answer_text)
+        doc_output = doc.show_predictions(predict_text, predict_score, token_scores)
+
+        match = loose_match(predict_text, answer_text)
+        if SINGLE_CLASS_PREDICTION == "gross_amount":
+            match = match or dollar_match(predict_text, answer_text)
+        elif SINGLE_CLASS_PREDICTION in ("flight_from", "flight_to"):
+            match = match or date_match(predict_text, answer_text)
+
+        path = log_path / ("right" if match else "wrong")
+        path.mkdir(parents=True, exist_ok=True)
+        with open(path / f"{slug}.txt", "w") as predict_file:
+            predict_file.write(doc_output)
 
         acc += match
         prefix = f"Correct: {slug}" if match else f"**Incorrect: {slug}"
@@ -51,10 +64,11 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results):
 
 # ---- Custom callback to log document-level accuracy ----
 class DocAccCallback(K.callbacks.Callback):
-    def __init__(self, config, dataset, logname):
+    def __init__(self, config, run_timestamp, dataset, logname):
         self.config = config
         self.dataset = dataset
         self.logname = logname
+        self.log_path = LOG_DIR / "predictions" / run_timestamp
 
     def on_epoch_end(self, epoch, logs):
         if epoch >= self.config.epochs - 1:
@@ -69,11 +83,18 @@ class DocAccCallback(K.callbacks.Callback):
         # Avoid sampling tens of thousands of documents on large training sets.
         test_size = min(test_size, self.config.doc_acc_max_sample_size)
 
+        kind = "test" if self.logname == "doc_val_acc" else "train"
+
         acc = compute_accuracy(
-            self.model, self.config, self.dataset, test_size, print_results,
+            self.model,
+            self.config,
+            self.dataset,
+            test_size,
+            print_results,
+            self.log_path / kind / f"{epoch:02d}",
         )
 
-        print(f"This epoch {self.logname}: {acc}")
+        print(f"This epoch {self.logname}: {acc:.3f}")
         wandb.log({self.logname: acc})
 
 
@@ -85,8 +106,10 @@ def main(config):
     print("Configuration:")
     print(config)
 
+    run_ts = datetime.now().isoformat(timespec="seconds").replace(":", "")
+
     # all_data = load_training_data(config)
-    all_documents = DocumentStore.open(index_file=DOC_INDEX, config=config)
+    all_documents = DocumentStore.open(index_file=TRAINING_INDEX, config=config)
 
     # split into validation and training sets
     validation_set, training_set = all_documents.split(percent=config.val_split)
@@ -96,8 +119,8 @@ def main(config):
     print(model.summary())
 
     callbacks = [WandbCallback()] if config.use_wandb else []
-    callbacks.append(DocAccCallback(config, training_set, "doc_train_acc"))
-    callbacks.append(DocAccCallback(config, validation_set, "doc_val_acc"))
+    callbacks.append(DocAccCallback(config, run_ts, training_set, "doc_train_acc"))
+    callbacks.append(DocAccCallback(config, run_ts, validation_set, "doc_val_acc"))
 
     model.fit_generator(
         windowed_generator(training_set, config),

@@ -94,7 +94,7 @@ def create_model(config):
     else:
         last_layer = d4
 
-    outdata = Dense(config.window_len, activation="elu")(last_layer)
+    outdata = Dense(config.window_len, activation="sigmoid")(last_layer)
     model = Model(inputs=[indata], outputs=[outdata])
 
     _missed_token_loss = missed_token_loss(config.penalize_missed)
@@ -106,29 +106,6 @@ def create_model(config):
     )
 
     return model
-
-
-# --- Predict ---
-# Our network is windowed, so we have to aggregate windows to get a final score
-# Returns vector of token scores
-def predict_scores(model, document):
-    windowed_features = np.stack([window.features for window in document])
-    window_scores = model.predict(windowed_features)
-
-    num_windows = len(document) + document.window_len - 1
-    scores = np.zeros(num_windows)
-    for i in range(len(document)):
-        # would max work better than sum?
-        scores[i : i + document.window_len] += window_scores[i]
-    return scores
-
-
-# returns text, score of best answer, plus all scores
-def predict_answer(model, document):
-    scores = predict_scores(model, document)
-    best_score_idx = np.argmax(scores)
-    best_score_text = document.tokens.iloc[best_score_idx]["token"]
-    return best_score_text, scores[best_score_idx], scores
 
 
 def default_model_name(window_len):

@@ -4,13 +4,33 @@ import random
 import re
 import subprocess
 from collections import namedtuple
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 BoundingBox = namedtuple("BoundingBox", ["x0", "y0", "x1", "y1"])
 
+_whitespace = re.compile(r"\s")
+
+
+def simple_string(s):
+    """Lowercase and remove whitespace from a string."""
+    return _whitespace.sub("", str(s).casefold()) if s else ""
+
+
+def num_digits(s):
+    return sum(c.isdigit() for c in s)
+
+
+def loose_match(s1, s2):
+    """Match two strings irrespective of case and whitespace."""
+    return simple_string(s1) == simple_string(s2)
+
 
 def is_dollar_amount(s):
-    return bool(re.search(r"\d", s) and re.fullmatch(r"\$?\d*(,\d\d\d)*(\.\d\d)?", s))
+    try:
+        return num_digits(s) > 0 and bool(re.match(r"^\$?\d*(,\d\d\d)*(\.\d\d)?$", s))
+    except TypeError:
+        return False
 
 
 def dollar_amount(s):
@@ -22,6 +42,38 @@ def dollar_amount(s):
     return None
 
 
+date_formats = {
+    # If a string matches the regex key, it can be passed to strptime()
+    # with the respective format string. Ordered from most to least common.
+    re.compile(r"^[01]?\d/[0123]?\d/\d\d$"): "%m/%d/%y",
+    re.compile(r"^[01]?\d/[0123]?\d/20\d\d$"): "%m/%d/%Y",
+    re.compile(r"^[a-z]{3}\d?\d/\d\d$"): "%b%d/%y",
+    re.compile(r"^[a-z]{3}\d?\d/20\d\d$"): "%b%d/%Y",
+    re.compile(r"^[a-z]{4,9}\d?\d/\d\d$"): "%B%d/%y",
+    re.compile(r"^[a-z]{4,9}\d?\d/20\d\d$"): "%B%d/%Y",
+}
+_time_punc = re.compile(r"[-,\\]")
+_no_year = re.compile(r"^[01]?\d/[0123]?\d$")
+
+
+def normalize_date(s):
+    """Turn a string in a common date format into a date."""
+    try:
+        if num_digits(s) == 0:
+            return None
+        # Turn dashes, commas and back slashes into forward slashes.
+        s = _time_punc.sub("/", simple_string(s))
+        # Check the string against each possible date format.
+        for date_regex, strp_format in date_formats.items():
+            if date_regex.match(s):
+                return datetime.strptime(s, strp_format).date()
+        if _no_year.match(s):
+            # If no date is present, assume 2020.
+            return datetime.strptime(s + "/20", "%m/%d/%y").date()
+    except (TypeError, ValueError):
+        return None
+
+
 def log_dollar_amount(s):
     """Return the logarithm of 1 + a non-negative dollar amount."""
     d = dollar_amount(s)
@@ -31,10 +83,10 @@ def log_dollar_amount(s):
 def normalize_dollars(s) -> str:
     """Return a string of a number rounded to two digits (or None if not possible).
 
-    Given a string like '$56,333.1' return the string '5633.10'.
+    Given a string like '$56,333.1' return the string '56333.10'.
     """
     try:
-        return str(round(Decimal(s.replace("$", "").replace(",", "")), 2))
+        return str(round(Decimal(str(s).replace("$", "").replace(",", "")), 2))
     except InvalidOperation:
         return None
 
@@ -46,6 +98,12 @@ def dollar_match(predicted, actual):
         and is_dollar_amount(actual)
         and (normalize_dollars(predicted) == normalize_dollars(actual))
     )
+
+
+def date_match(predicted, actual):
+    """Best-effort matching of dates, e.g. '02-03-2020' to '2/3/20'."""
+    lhs, rhs = normalize_date(predicted), normalize_date(actual)
+    return bool(lhs and rhs and lhs == rhs)
 
 
 def docrow_to_bbox(t, min_height=10):

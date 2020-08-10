@@ -31,7 +31,7 @@ class DocumentStore:
     def sample(self, n=None):
         if n is None:
             n = len(self)
-        return DocumentStore(np.random.choice(self.documents, size=n))
+        return DocumentStore(np.random.choice(self.documents, size=n, replace=False))
 
     def split(self, percent=0.2):
         """Divide into two DocumentStores, e.g. a training and a validation set."""

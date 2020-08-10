@@ -16,15 +16,19 @@ def random_training_data_row(faker):
         "x1": x0 + faker.pyfloat(min_value=-1, max_value=20),
         "y1": y0 + faker.pyfloat(min_value=-1, max_value=50),
         "token": faker.pystr(min_chars=1, max_chars=50),
+        "contract_num": faker.pyfloat(min_value=0, max_value=1),
+        "advertiser": faker.pyfloat(min_value=0, max_value=1),
+        "flight_from": faker.pyfloat(min_value=0, max_value=1),
+        "flight_to": faker.pyfloat(min_value=0, max_value=1),
         "gross_amount": faker.pyfloat(min_value=0, max_value=1),
     }
 
 
 def random_doc_data(faker):
-    num_tokens = faker.pyint(min_value=1, max_value=200)
+    num_tokens = faker.pyint(min_value=1, max_value=500)
     df = pd.DataFrame([random_training_data_row(faker) for _ in range(num_tokens)])
     df.slug = faker.slug()
-    return df
+    return df.astype(CSV_COL_TYPES)
 
 
 def training_docs_data(faker, doc_count, repeat=True):

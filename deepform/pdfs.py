@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 from tqdm import tqdm
 
 from deepform.common import PDF_DIR, S3_BUCKET
+from deepform.document import SINGLE_CLASS_PREDICTION
 from deepform.util import docrow_to_bbox, dollar_match
 
 
@@ -100,7 +101,7 @@ def log_pdf(doc, score, scores, predict_text, answer_text):
         page_images.append(wandb.Image(im.annotated, caption="page " + str(pagenum)))
 
     # get best matching score of any token in the training data
-    match = doc.tokens["match"].max()
+    match = doc.tokens[SINGLE_CLASS_PREDICTION].max()
     caption = (
         f"{doc.slug} guessed:{predict_text} answer:{answer_text} match:{match:.2f}"
     )
