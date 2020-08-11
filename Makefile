@@ -34,43 +34,54 @@ docker-background: docker-stop docker-build
 	--mount type=bind,source=$(CURDIR)/data,target=/data \
 	$(CONTAINER)
 
-data/training.parquet:
-	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/training.parquet -o data/training.parquet
+# This was used by a previous version of our codebase.
+# data/training.parquet:
+# 	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/training.parquet -o data/training.parquet
 
+# This shouldn't normally need to be run, but this downloads all the PDF to local storage.
 data/pdfs: data/fcc-data-2020-labeled-manifest.csv
 	docker build -t $(CONTAINER) .
 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -c "import pandas as pd; print('\n'.join(pd.read_csv('data/fcc-data-2020-labeled-manifest.csv').URL))" | xargs wget -P data/pdfs
 
-data/tokenized: data/pdfs
-	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.tokenize_pdfs
+# This is the command we used to produce the tokenized data, but it is cached in S3
+# data/tokenized: data/pdfs
+# 	docker build -t $(CONTAINER) .
+# 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.tokenize_pdfs
 
-data/labeled: data/tokenized data/fcc-data-2020-labeled-manifest.csv
-	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.add_labels data/fcc-data-2020-labeled-manifest.csv
+# Instead, we just download the token data from S3.
+data/tokenized.tar.gz:
+	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/token_data.tar.gz -o data/tokenized.tar.gz
 
-data/token_frequency.csv: data/doc_index.parquet
+data/tokenized: data/tokenized.tar.gz
+	mkdir -p data/tokenized
+	tar xf data/tokenized.tar.gz -C data/tokenized
+
+data/token_frequency.csv: data/tokenized
 	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.create_vocabulary
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -m deepform.data.create_vocabulary
+
+data/labeled: data/fcc-data-2020-labeled-manifest.csv data/tokenized
+	docker build -t $(CONTAINER) .
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -m deepform.data.add_labels data/fcc-data-2020-labeled-manifest.csv
 
 data/doc_index.parquet: data/labeled data/token_frequency.csv
 	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.add_features
+	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -m deepform.data.add_features
 
 .PHONY: train
 train: data/doc_index.parquet data/token_frequency.csv .env docker-build
-	docker run --rm --env-file=.env \
-	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	docker run --rm --env-file=.env --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	python -um deepform.train
 
 .PHONY: test-train
 test-train: data/doc_index.parquet data/token_frequency.csv .env docker-build
-	docker run --rm --env-file=.env \
-	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
-	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0 
+	docker run --rm --env-file=.env --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0
 
 .PHONY: sweep
 sweep: data/doc_index.parquet data/token_frequency.csv .env docker-build
-	docker run --rm --env-file=.env \
-	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	docker run --rm --env-file=.env --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	./init_sweep.sh

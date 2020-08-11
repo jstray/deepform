@@ -150,5 +150,5 @@ def git_short_hash():
     try:
         out = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"])
         return out.strip().decode("ascii")
-    except OSError:
-        return "Unknown"
+    except (OSError, subprocess.CalledProcessError):
+        return "UnknownGitRevsion"

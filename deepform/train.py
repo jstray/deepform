@@ -10,8 +10,8 @@ import logging
 import os
 from datetime import datetime
 
-import keras as K
 import wandb
+from tensorflow import keras as K
 from wandb.keras import WandbCallback
 
 from deepform.common import LOG_DIR, TRAINING_INDEX
@@ -122,7 +122,7 @@ def main(config):
     callbacks.append(DocAccCallback(config, run_ts, training_set, "doc_train_acc"))
     callbacks.append(DocAccCallback(config, run_ts, validation_set, "doc_val_acc"))
 
-    model.fit_generator(
+    model.fit(
         windowed_generator(training_set, config),
         steps_per_epoch=config.steps_per_epoch,
         epochs=config.epochs,

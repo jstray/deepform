@@ -1,13 +1,17 @@
 import random
 from datetime import datetime
 
-import keras as K
 import numpy as np
 import tensorflow as tf
-from keras.engine.input_layer import Input
-from keras.layers import Dense, Dropout, Flatten, Lambda, concatenate
-from keras.layers.embeddings import Embedding
-from keras.models import Model
+from tensorflow.keras.layers import (
+    Dense,
+    Dropout,
+    Embedding,
+    Flatten,
+    Lambda,
+    concatenate,
+)
+from tensorflow.keras.models import Model
 
 from deepform.common import MODEL_DIR
 from deepform.document import NUM_FEATURES
@@ -43,10 +47,10 @@ def missed_token_loss(one_penalty):
     def _missed_token_loss(y_true, y_pred):
         expected_zero = tf.cast(tf.math.equal(y_true, 0), tf.float32)
         s = y_pred * expected_zero
-        zero_loss = K.backend.mean(K.backend.square(s))
+        zero_loss = tf.keras.backend.mean(tf.keras.backend.square(s))
         expected_one = tf.cast(tf.math.equal(y_true, 1), tf.float32)
         t = one_penalty * (1 - y_pred) * expected_one
-        one_loss = K.backend.mean(K.backend.square(t))
+        one_loss = tf.keras.backend.mean(tf.keras.backend.square(t))
         return zero_loss + one_loss
 
     return _missed_token_loss  # closes over one_penalty
@@ -54,19 +58,19 @@ def missed_token_loss(one_penalty):
 
 # --- Specify network ---
 def create_model(config):
-    indata = Input((config.window_len, NUM_FEATURES))
+    indata = tf.keras.Input((config.window_len, NUM_FEATURES))
 
     # split into the hash and the rest of the token features, embed hash as
     # one-hot, then merge
     def create_tok_hash(x):
-        from keras.backend import squeeze, slice
+        import tensorflow as tf
 
-        return squeeze(slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
+        return tf.squeeze(tf.slice(x, (0, 0, 0), (-1, -1, 1)), axis=2)
 
     def create_tok_features(x):
-        from keras.backend import slice
+        import tensorflow as tf
 
-        return slice(x, (0, 0, 1), (-1, -1, -1))
+        return tf.slice(x, (0, 0, 1), (-1, -1, -1))
 
     tok_hash = Lambda(create_tok_hash)(indata)
     tok_features = Lambda(create_tok_features)(indata)
@@ -100,7 +104,7 @@ def create_model(config):
     _missed_token_loss = missed_token_loss(config.penalize_missed)
 
     model.compile(
-        optimizer=K.optimizers.Adam(learning_rate=config.learning_rate),
+        optimizer=tf.keras.optimizers.Adam(learning_rate=config.learning_rate),
         loss=_missed_token_loss,
         metrics=["acc"],
     )

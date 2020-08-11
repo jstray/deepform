@@ -1927,7 +1927,7 @@ description = "A CLI and library for interacting with the Weights and Biases API
 name = "wandb"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-version = "0.8.36"
+version = "0.9.4"
 
 [package.dependencies]
 Click = ">=7.0"
@@ -1947,6 +1947,8 @@ subprocess32 = ">=3.5.3"
 watchdog = ">=0.8.3"
 
 [package.extras]
+aws = ["boto3"]
+gcp = ["google-cloud-storage"]
 kubeflow = ["kubernetes", "minio", "google-cloud-storage", "sh"]
 
 [[package]]
@@ -2022,7 +2024,7 @@ python-versions = "*"
 version = "1.12.1"
 
 [metadata]
-content-hash = "e68b4aa99bd0902bbe273d11852b0017b7542b9430f10170771565d4274b4ac8"
+content-hash = "7ba57955d0155c69478bf6b323f450684cc714032af67f32fb586f3db302ebc3"
 lock-version = "1.0"
 python-versions = "^3.8.1"
 
@@ -3159,8 +3161,8 @@ wand = [
     {file = "Wand-0.6.2.tar.gz", hash = "sha256:65440e478b595aaa18483e25091adacf6d4458c49c2fd8d59e0fd44a7393a14a"},
 ]
 wandb = [
-    {file = "wandb-0.8.36-py2.py3-none-any.whl", hash = "sha256:d2ac39d2ab1d506a8e8d962905203533533c60c7b83d9798e679edd778ce0503"},
-    {file = "wandb-0.8.36.tar.gz", hash = "sha256:9ab058ff2d7e0db50129444193ab6efc63de2fb247c33bfe79ab8d40c5164e82"},
+    {file = "wandb-0.9.4-py2.py3-none-any.whl", hash = "sha256:6c2b2fff356803f38a2620737f7ba280c5bc770146c711c52a2f4d233b1a0579"},
+    {file = "wandb-0.9.4.tar.gz", hash = "sha256:b3afba328455e885fd0af74fb8e40eb9fe1290d18d1e24181ab6f551f888532d"},
 ]
 watchdog = [
     {file = "watchdog-0.10.3.tar.gz", hash = "sha256:4214e1379d128b0588021880ccaf40317ee156d4603ac388b9adcf29165e0c04"},
