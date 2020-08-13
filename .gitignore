@@ -27,6 +27,7 @@ source/cached_features.p
 *.pdf
 *.png
 *.pq
+data/token_frequency.csv
 
 # macOS system files
 .DS_Store
