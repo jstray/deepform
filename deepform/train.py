@@ -35,6 +35,9 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results, log_pat
 
         predict_text, predict_score, token_scores = doc.predict_answer(model)
 
+        if predict_score < 0.8:
+            predict_text = None
+
         doc_output = doc.show_predictions(predict_text, predict_score, token_scores)
 
         match = loose_match(predict_text, answer_text)
@@ -119,6 +122,7 @@ def main(config):
     print(model.summary())
 
     callbacks = [WandbCallback()] if config.use_wandb else []
+    callbacks.append(K.callbacks.LambdaCallback(on_epoch_end=lambda *args: print()))
     callbacks.append(DocAccCallback(config, run_ts, training_set, "doc_train_acc"))
     callbacks.append(DocAccCallback(config, run_ts, validation_set, "doc_val_acc"))
 

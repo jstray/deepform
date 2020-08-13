@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from joblib import dump, load
 
-from deepform.data.add_features import pq_index_and_dir
+from deepform.data.add_features import LABEL_COLS, pq_index_and_dir
 from deepform.document import Document
 
 
@@ -44,14 +44,14 @@ class DocumentStore:
         """Load the documents referenced by `index_file` and apply `config`."""
         index_file = Path(index_file)
         doc_index = pd.read_parquet(index_file)
-        logging.debug(f"{len(doc_index)} documents in index")
+        logging.info(f"{len(doc_index)} documents in index")
 
         if not config.pad_windows:
             # Filter out documents that are too short for the curent config.
             doc_index = doc_index[doc_index["length"] >= config.window_len]
 
         # Filter out documents that don't have a sufficiently high match.
-        doc_index = doc_index[doc_index["best_match"] >= config.target_thresh]
+        # doc_index = doc_index[doc_index["best_match"] >= config.target_thresh]
         logging.info(f"After applying config {len(doc_index)} documents are available")
 
         # Sample down to no more than the requested number of documents.
@@ -62,7 +62,11 @@ class DocumentStore:
         slug_to_doc = caching_doc_getter(index_file, config)
         # docs = concurrent.thread_map(slug_to_doc, doc_index["slug"])
 
-        docs = doc_index.index.map(slug_to_doc)
+        labels = doc_index[LABEL_COLS.keys()]
+        docs = np.array(
+            [slug_to_doc(slug, labels.loc[slug]) for slug in doc_index.index]
+        )
+        docs = docs[docs != None]  # noqa: E711
 
         return DocumentStore(docs)
 
@@ -73,7 +77,7 @@ def caching_doc_getter(index_file, config):
         cache_root = pq_root.parent / "cache" / cache_master_key(config)
         cache_root.mkdir(parents=True, exist_ok=True)
 
-    def slug_to_doc(slug):
+    def slug_to_doc(slug, labels):
         pq_path = pq_root / f"{slug}.parquet"
         if config.use_data_cache:
             cache_path = cache_root / f"{slug}.joblib"
@@ -82,7 +86,11 @@ def caching_doc_getter(index_file, config):
                     return load(infile)
             except FileNotFoundError:
                 logging.debug(f"Cache file {cache_path} not found")
-        doc = Document.from_parquet(slug, pq_path, config)
+        try:
+            doc = Document.from_parquet(slug, labels, pq_path, config)
+        except AssertionError:
+            logging.warning(f"No correct answers for {slug}, skipping")
+            return None
         if config.use_data_cache:
             with open(cache_path, "wb") as outfile:
                 dump(doc, outfile, compress="lz4")

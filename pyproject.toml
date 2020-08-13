@@ -34,6 +34,7 @@ pre-commit = "^2.6.0"
 pytest = "^5.4.3"
 hypothesis = "^5.24.0"
 faker = "^4.1.1"
+babel = "^2.8.0"
 
 [tool.isort]
 multi_line_output = 3

@@ -7,6 +7,8 @@ from collections import namedtuple
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
+from fuzzywuzzy import fuzz
+
 BoundingBox = namedtuple("BoundingBox", ["x0", "y0", "x1", "y1"])
 
 _whitespace = re.compile(r"\s")
@@ -26,6 +28,10 @@ def loose_match(s1, s2):
     return simple_string(s1) == simple_string(s2)
 
 
+def default_similarity(lhs, rhs):
+    return fuzz.ratio(simple_string(lhs), simple_string(rhs)) / 100
+
+
 def is_dollar_amount(s):
     try:
         return num_digits(s) > 0 and bool(re.match(r"^\$?\d*(,\d\d\d)*(\.\d\d)?$", s))
@@ -40,6 +46,39 @@ def dollar_amount(s):
         except ValueError:
             logging.error(f"'{s}' could not be converted to a dollar amount.")
     return None
+
+
+def dollar_similarity(lhs, rhs):
+    lh_dollar, rh_dollar = normalize_dollars(lhs), normalize_dollars(rhs)
+    if lh_dollar and rh_dollar:
+        return fuzz.ratio(lh_dollar, rh_dollar) / 100
+    return default_similarity(lhs, rhs)
+
+
+def log_dollar_amount(s):
+    """Return the logarithm of 1 + a non-negative dollar amount."""
+    d = dollar_amount(s)
+    return math.log(d + 1) if d and d > 0 else None
+
+
+def normalize_dollars(s) -> str:
+    """Return a string of a number rounded to two digits (or None if not possible).
+
+    Given a string like '$56,333.1' return the string '56333.10'.
+    """
+    try:
+        return str(round(Decimal(str(s).replace("$", "").replace(",", "")), 2))
+    except InvalidOperation:
+        return None
+
+
+def dollar_match(predicted, actual):
+    """Best-effort matching of dollar amounts, e.g. '$14,123.02' to '14123.02'."""
+    return (
+        is_dollar_amount(predicted)
+        and is_dollar_amount(actual)
+        and (normalize_dollars(predicted) == normalize_dollars(actual))
+    )
 
 
 date_formats = {
@@ -74,30 +113,11 @@ def normalize_date(s):
         return None
 
 
-def log_dollar_amount(s):
-    """Return the logarithm of 1 + a non-negative dollar amount."""
-    d = dollar_amount(s)
-    return math.log(d + 1) if d and d > 0 else None
-
-
-def normalize_dollars(s) -> str:
-    """Return a string of a number rounded to two digits (or None if not possible).
-
-    Given a string like '$56,333.1' return the string '56333.10'.
-    """
-    try:
-        return str(round(Decimal(str(s).replace("$", "").replace(",", "")), 2))
-    except InvalidOperation:
-        return None
-
-
-def dollar_match(predicted, actual):
-    """Best-effort matching of dollar amounts, e.g. '$14,123.02' to '14123.02'."""
-    return (
-        is_dollar_amount(predicted)
-        and is_dollar_amount(actual)
-        and (normalize_dollars(predicted) == normalize_dollars(actual))
-    )
+def date_similarity(lhs, rhs):
+    lh_date, rh_date = normalize_date(lhs), normalize_date(rhs)
+    if lh_date and rh_date and lh_date == rh_date:
+        return 1
+    return default_similarity(lhs, rhs)
 
 
 def date_match(predicted, actual):

@@ -61,15 +61,10 @@ data/token_frequency.csv: data/tokenized
 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	python -m deepform.data.create_vocabulary
 
-data/labeled: data/fcc-data-2020-labeled-manifest.csv data/tokenized
+data/doc_index.parquet: data/tokenized data/token_frequency.csv
 	docker build -t $(CONTAINER) .
 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
-	python -m deepform.data.add_labels data/fcc-data-2020-labeled-manifest.csv
-
-data/doc_index.parquet: data/labeled data/token_frequency.csv
-	docker build -t $(CONTAINER) .
-	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
-	python -m deepform.data.add_features
+	python -m deepform.data.add_features data/fcc-data-2020-labeled-manifest.csv
 
 .PHONY: train
 train: data/doc_index.parquet data/token_frequency.csv .env docker-build

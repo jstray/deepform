@@ -65,7 +65,7 @@ class Document:
     label_values: dict[str, str]
 
     def random_window(self, require_positive=False):
-        if require_positive:
+        if require_positive and len(self.positive_windows):
             index = np.random.choice(self.positive_windows)
         else:
             index = np.random.randint(len(self))
@@ -118,6 +118,7 @@ class Document:
             {
                 "token": self.tokens.token,
                 "label": [TokenType(x).name if x else "" for x in self.labels],
+                "picked": ["*" if s > 0.8 else "" for s in scores],
                 "score": scores,
             }
         )
@@ -125,7 +126,7 @@ class Document:
         return "\n".join([title, predicted, body.to_string()])
 
     @staticmethod
-    def from_parquet(slug, pq_path, config):
+    def from_parquet(slug, label_values, pq_path, config):
         """Load precomputed features from a parquet file and apply a config."""
         df = pd.read_parquet(pq_path)
 
@@ -136,13 +137,6 @@ class Document:
         df["x0"] *= config.use_geom
         df["y0"] *= config.use_geom
         df["log_amount"] *= config.use_amount
-
-        label_values = {}
-        for token_type in TokenType:
-            if token_type is TokenType.NONE:
-                continue
-            name = token_type.name.lower()
-            label_values[name] = actual_value(df, value_col="token", match_col=name)
 
         if config.pad_windows:
             df = pad_df(df, config.window_len - 1)
@@ -155,7 +149,9 @@ class Document:
         for i in range(len(df) - config.window_len):
             if labels.iloc[i : i + config.window_len].any():
                 positive_windows.append(i)
-        assert len(positive_windows) > 0
+
+        # We're no longer requiring that there exists a correct answer.
+        # assert len(positive_windows) > 0
 
         return Document(
             slug=slug,

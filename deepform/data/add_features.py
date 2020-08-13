@@ -16,10 +16,15 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 
-from deepform.common import LABELED_DIR, TRAINING_DIR, TRAINING_INDEX
-from deepform.data.add_labels import LABEL_COLS
+from deepform.common import TOKEN_DIR, TRAINING_DIR, TRAINING_INDEX
 from deepform.data.create_vocabulary import get_token_id
-from deepform.util import is_dollar_amount, log_dollar_amount
+from deepform.util import (
+    date_similarity,
+    default_similarity,
+    dollar_similarity,
+    is_dollar_amount,
+    log_dollar_amount,
+)
 
 
 class TokenType(Enum):
@@ -31,15 +36,44 @@ class TokenType(Enum):
     GROSS_AMOUNT = auto()
 
 
-def extend_and_write_docs(source_dir, pq_index, out_path):
+LABEL_COLS = {
+    # Each label column, and the match function that it uses.
+    "contract_num": default_similarity,
+    "advertiser": default_similarity,
+    "flight_from": date_similarity,
+    "flight_to": date_similarity,
+    "gross_amount": dollar_similarity,
+}
+
+
+def extend_and_write_docs(source_dir, manifest, pq_index, out_path):
     """Split data into individual documents, add features, and write to parquet."""
+
+    token_files = {p.stem: p for p in source_dir.glob("*.parquet")}
+
+    jobqueue = []
+    for row in manifest.itertuples():
+        slug = row.file_id
+        if slug not in token_files:
+            logging.error(f"No token file for {slug}")
+            continue
+        labels = {}
+        for label_col in LABEL_COLS:
+            labels[label_col] = getattr(row, label_col)
+            if not labels[label_col]:
+                logging.warning(f"'{label_col}' for {slug} is empty")
+        jobqueue.append(
+            {
+                "token_file": token_files[slug],
+                "dest_file": out_path / f"{slug}.parquet",
+                "labels": labels,
+            }
+        )
 
     # Spin up a bunch of jobs to do the conversion
     with ThreadPoolExecutor() as executor:
         doc_jobs = []
-        logging.debug("Starting document conversion jobs")
-        for token_file in source_dir.glob("*.parquet"):
-            kwargs = {"token_file": token_file, "base_path": out_path}
+        for kwargs in jobqueue:
             doc_jobs.append(executor.submit(process_document_tokens, **kwargs))
 
         logging.debug("Waiting for jobs to complete")
@@ -63,10 +97,12 @@ def pq_index_and_dir(pq_index, pq_path=None):
     return pq_index, pq_path
 
 
-def process_document_tokens(token_file, base_path):
+def process_document_tokens(token_file, dest_file, labels):
     """Filter out short tokens, add computed features, and return index info."""
     slug = token_file.stem
     doc = pd.read_parquet(token_file)
+
+    doc = label_tokens(doc, labels)
 
     # Remove tokens shorter than three characters.
     doc = doc[doc["token"].str.len() >= 3]
@@ -78,18 +114,26 @@ def process_document_tokens(token_file, base_path):
     doc["label"] = np.zeros(len(doc), dtype="u1")
     # The "label" column stores the TokenType that correctly labels this token.
     # By default this is 0, or "NONE".
+    best_matches = {}
     for feature in LABEL_COLS:
         token_value = TokenType[feature.upper()].value
         max_score = doc[feature].max()
+        best_matches[f"best_match_{feature}"] = max_score
         matches = token_value * np.isclose(doc[feature], max_score)
         doc["label"] = np.maximum(doc["label"], matches)
 
     # Write to its final location.
-    file_path = base_path / f"{slug}.parquet"
-    doc.to_parquet(file_path, compression="lz4", index=False)
+    doc.to_parquet(dest_file, compression="lz4", index=False)
 
     # Return the summary information about the document.
-    return {"slug": slug, "length": len(doc), "best_match": max_score}
+    return {"slug": slug, "length": len(doc), **labels, **best_matches}
+
+
+def label_tokens(tokens, labels):
+    for col_name, label_value in labels.items():
+        match_fn = LABEL_COLS[col_name]
+        tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,))
+    return tokens
 
 
 def fraction_digits(s):
@@ -116,8 +160,9 @@ def add_base_features(token_df):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("manifest", help="CSV with labels for each document")
     parser.add_argument(
-        "indir", nargs="?", default=LABELED_DIR, help="labeled data to extend",
+        "indir", nargs="?", default=TOKEN_DIR, help="directory of document tokens",
     )
     parser.add_argument(
         "indexfile",
@@ -132,7 +177,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     logging.basicConfig(level=args.log_level.upper())
 
+    logging.info(f"Reading {Path(args.manifest).resolve()}")
+    manifest = pd.read_csv(args.manifest)
+
     indir, index, outdir = Path(args.indir), Path(args.indexfile), Path(args.outdir)
     index.parent.mkdir(parents=True, exist_ok=True)
     outdir.mkdir(parents=True, exist_ok=True)
-    extend_and_write_docs(indir, index, outdir)
+    extend_and_write_docs(indir, manifest, index, outdir)
