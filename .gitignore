@@ -23,11 +23,12 @@ source/cached_features.p
 *.csv
 *.feather
 *.gz
+*.model
 *.parquet
 *.pdf
 *.png
 *.pq
-*.model
+data/token_frequency.csv
 pdfs/
 
 # macOS system files
