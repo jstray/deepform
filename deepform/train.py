@@ -31,14 +31,23 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results, log_pat
     acc = 0
     for doc in sorted(dataset.sample(n_docs), key=lambda d: d.slug):
         slug = doc.slug
-        answer_text = doc.label_values[SINGLE_CLASS_PREDICTION]
+        answer_texts = doc.label_values
 
-        predict_text, predict_score, token_scores = doc.predict_answer(model)
-
+        predict_texts, predict_scores, token_scores = doc.predict_answer(model)
+        # predict_texts = np.ma.masked_array(
+        #     predict_texts, mask=predict_scores[:, 0] < 0.8
+        # )
+        # print(f"{predict_texts=}")
+        predict_text = list(predict_texts)[1]
+        # print(f"{answer_texts=}")
+        answer_text = answer_texts[SINGLE_CLASS_PREDICTION]
+        # print(f"{predict_scores=}")
+        predict_score = predict_scores[1, 1]
         if predict_score < 0.8:
             predict_text = None
+        scores = token_scores[:, 1]
 
-        doc_output = doc.show_predictions(predict_text, predict_score, token_scores)
+        doc_output = doc.show_predictions(predict_text, predict_score, scores)
 
         match = loose_match(predict_text, answer_text)
         if SINGLE_CLASS_PREDICTION == "gross_amount":
@@ -59,7 +68,7 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results, log_pat
         if print_results:
             print(f"{prefix}: {guessed}, {correct}")
             if not match and n_print > 0:
-                log_pdf(doc, predict_score, token_scores, predict_text, answer_text)
+                log_pdf(doc, predict_score, scores, predict_text, answer_text)
                 n_print -= 1
 
     return acc / n_docs

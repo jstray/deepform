@@ -9,6 +9,8 @@ from tensorflow.keras.layers import (
     Embedding,
     Flatten,
     Lambda,
+    Reshape,
+    Softmax,
     concatenate,
 )
 from tensorflow.keras.models import Model
@@ -38,7 +40,7 @@ def windowed_generator(dataset, config):
         for i in range(config.batch_size):
             window = one_window(dataset, config)
             batch_features[i, :, :] = window.features
-            batch_labels[i, :] = window.labels
+            batch_labels[i, :] = window.labels  # tf.one_hot(window.labels, 2)
         yield batch_features, batch_labels
 
 
@@ -98,14 +100,16 @@ def create_model(config):
     else:
         last_layer = d4
 
-    outdata = Dense(config.window_len, activation="sigmoid")(last_layer)
+    preout = Dense(config.window_len * 2, activation="linear")(last_layer)
+    shaped = Reshape((config.window_len, 2))(preout)
+    outdata = Softmax(axis=-1)(shaped)
     model = Model(inputs=[indata], outputs=[outdata])
 
-    _missed_token_loss = missed_token_loss(config.penalize_missed)
+    # _missed_token_loss = missed_token_loss(config.penalize_missed)
 
     model.compile(
         optimizer=tf.keras.optimizers.Adam(learning_rate=config.learning_rate),
-        loss=_missed_token_loss,
+        loss=tf.keras.losses.SparseCategoricalCrossentropy(),
         metrics=["acc"],
     )
 

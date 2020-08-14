@@ -94,16 +94,16 @@ class Document:
         window_scores = model.predict(windowed_features)
 
         num_windows = len(self.labels)
-        scores = np.zeros(num_windows)
+        scores = np.zeros((num_windows, 2))
         for i, window_score in enumerate(window_scores):
-            scores[i : i + self.window_len] += window_score / self.window_len
+            scores[i : i + self.window_len, :] += window_score / self.window_len
 
         return scores
 
     def predict_answer(self, model):
         """Score each token and return the text and score of the best match."""
         scores = self.predict_scores(model)
-        best_score_idx = np.argmax(scores)
+        best_score_idx = np.argmax(scores, axis=0)
         best_score_text = self.tokens.iloc[best_score_idx]["token"]
         return best_score_text, scores[best_score_idx], scores
 
