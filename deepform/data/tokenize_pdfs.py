@@ -2,7 +2,6 @@
 
 
 import argparse
-import logging
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -14,6 +13,7 @@ from tqdm import tqdm
 from deepform.common import PDF_DIR, TOKEN_DIR
 from deepform.data.add_features import add_base_features
 from deepform.document import FEATURE_COLS, TOKEN_COLS, Document
+from deepform.logger import logger
 from deepform.pdfs import get_pdf_path
 
 
@@ -45,10 +45,10 @@ def create_token_doc(pdf_path, token_dir=TOKEN_DIR):
     try:
         tokens = tokenize_pdf(pdf_path)
     except EOFError:
-        logging.warning(f"pdfplumber found no tokens in '{pdf_path}'")
+        logger.warning(f"pdfplumber found no tokens in '{pdf_path}'")
         return
     except Exception as e:
-        logging.error(f"Unable to tokenize {pdf_path}: {e}")
+        logger.error(f"Unable to tokenize {pdf_path}: {e}")
         return
 
     token_dir.mkdir(parents=True, exist_ok=True)
@@ -62,14 +62,14 @@ def pdf_paths(*paths):
         path = Path(path)
         if path.is_file():
             if path.suffix != ".pdf":
-                logging.warning(f"Skipping non-pdf '{path}'")
+                logger.warning(f"Skipping non-pdf '{path}'")
                 continue
             yield path
         elif path.is_dir():
             for file_path in path.glob("*.pdf"):
                 yield file_path
         else:
-            logging.warning(f"'{path}' is not a file or directory")
+            logger.warning(f"'{path}' is not a file or directory")
 
 
 def create_token_docs_from_pdfs(*paths, token_dir=TOKEN_DIR):
@@ -135,6 +135,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--log-level", dest="log_level", default="ERROR")
     args = parser.parse_args()
-    logging.basicConfig(level=args.log_level.upper())
+    logger.setLevel(args.log_level.upper())
 
     create_token_docs_from_pdfs(args.pdf, token_dir=args.tokendir)

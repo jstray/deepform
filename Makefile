@@ -78,7 +78,7 @@ train: data/doc_index.parquet data/token_frequency.csv .env docker-build ## Run 
 test-train: data/doc_index.parquet data/token_frequency.csv .env docker-build ## Run training on a small sample to test and validate code
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
-	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0
+	python -um deepform.train --len-train=100 --steps-per-epoch=3 --epochs=2 --log-level=DEBUG --use-wandb=0 --use-data-cache=0 --save-model=0 --doc-acc-max-sample-size=20 --render-results-size=3
 
 .PHONY: sweep
 sweep: data/doc_index.parquet data/token_frequency.csv .env docker-build ## Run a weights and biases training sweep.

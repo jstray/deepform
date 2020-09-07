@@ -1,4 +1,3 @@
-import logging
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -8,6 +7,7 @@ from joblib import dump, load
 
 from deepform.data.add_features import LABEL_COLS, pq_index_and_dir
 from deepform.document import Document
+from deepform.logger import logger
 
 
 @dataclass(frozen=True)
@@ -44,7 +44,7 @@ class DocumentStore:
         """Load the documents referenced by `index_file` and apply `config`."""
         index_file = Path(index_file)
         doc_index = pd.read_parquet(index_file)
-        logging.info(f"{len(doc_index)} documents in index")
+        logger.info(f"{len(doc_index)} documents in index")
 
         if not config.pad_windows:
             # Filter out documents that are too short for the curent config.
@@ -52,7 +52,7 @@ class DocumentStore:
 
         # Filter out documents that don't have a sufficiently high match.
         # doc_index = doc_index[doc_index["best_match"] >= config.target_thresh]
-        logging.info(f"After applying config {len(doc_index)} documents are available")
+        logger.info(f"After applying config {len(doc_index)} documents are available")
 
         # Sample down to no more than the requested number of documents.
         num_docs = min(config.len_train, len(doc_index))
@@ -85,16 +85,16 @@ def caching_doc_getter(index_file, config):
                 with open(cache_path, "rb") as infile:
                     return load(infile)
             except FileNotFoundError:
-                logging.debug(f"Cache file {cache_path} not found")
+                logger.debug(f"Cache file {cache_path} not found")
         try:
             doc = Document.from_parquet(slug, labels, pq_path, config)
         except AssertionError:
-            logging.warning(f"No correct answers for {slug}, skipping")
+            logger.warning(f"No correct answers for {slug}, skipping")
             return None
         if config.use_data_cache:
             with open(cache_path, "wb") as outfile:
                 dump(doc, outfile, compress="lz4")
-            logging.debug(f"Wrote document to cache file {cache_path}")
+            logger.debug(f"Wrote document to cache file {cache_path}")
         return doc
 
     return slug_to_doc

@@ -6,7 +6,6 @@
 # jstray 2019-6-12
 
 import argparse
-import logging
 import os
 from datetime import datetime
 
@@ -17,6 +16,7 @@ from wandb.keras import WandbCallback
 from deepform.common import LOG_DIR, TRAINING_INDEX
 from deepform.document import SINGLE_CLASS_PREDICTION
 from deepform.document_store import DocumentStore
+from deepform.logger import logger
 from deepform.model import create_model, save_model, windowed_generator
 from deepform.pdfs import log_pdf
 from deepform.util import config_desc, date_match, dollar_match, loose_match
@@ -88,7 +88,7 @@ class DocAccCallback(K.callbacks.Callback):
             print_results = self.logname == "doc_val_acc"
             test_size = len(self.dataset)
         else:
-            # intermediate epoch, small sample and no logging
+            # intermediate epoch, small sample and no logger
             print_results = False
             test_size = self.config.doc_acc_sample_size + epoch
 
@@ -172,6 +172,6 @@ if __name__ == "__main__":
         os.environ["WANDB_MODE"] = "dryrun"
         wandb.log = lambda *args, **kwargs: None
 
-    logging.basicConfig(level=config.log_level)
+    logger.setLevel(config.log_level)
 
     main(config)

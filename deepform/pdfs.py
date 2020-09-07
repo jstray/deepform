@@ -1,4 +1,3 @@
-import logging
 from concurrent.futures import ThreadPoolExecutor
 
 import boto3
@@ -12,6 +11,7 @@ from tqdm import tqdm
 
 from deepform.common import PDF_DIR, S3_BUCKET
 from deepform.document import SINGLE_CLASS_PREDICTION
+from deepform.logger import logger
 from deepform.util import docrow_to_bbox, dollar_match
 
 
@@ -43,7 +43,7 @@ def download_from_remote(local_path):
     try:
         s3.Bucket(S3_BUCKET).download_file(s3_key, str(local_path))
     except ClientError:
-        logging.error(f"Unable to retrieve {s3_key} from s3://{S3_BUCKET}")
+        logger.error(f"Unable to retrieve {s3_key} from s3://{S3_BUCKET}")
         raise
 
 

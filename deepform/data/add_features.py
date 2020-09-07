@@ -6,7 +6,6 @@ small samples, with an index over all the documents.
 """
 
 import argparse
-import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from enum import Enum, auto
 from pathlib import Path
@@ -18,6 +17,7 @@ from tqdm import tqdm
 
 from deepform.common import TOKEN_DIR, TRAINING_DIR, TRAINING_INDEX
 from deepform.data.create_vocabulary import get_token_id
+from deepform.logger import logger
 from deepform.util import (
     date_similarity,
     default_similarity,
@@ -55,13 +55,13 @@ def extend_and_write_docs(source_dir, manifest, pq_index, out_path):
     for row in manifest.itertuples():
         slug = row.file_id
         if slug not in token_files:
-            logging.error(f"No token file for {slug}")
+            logger.error(f"No token file for {slug}")
             continue
         labels = {}
         for label_col in LABEL_COLS:
             labels[label_col] = getattr(row, label_col)
             if not labels[label_col]:
-                logging.warning(f"'{label_col}' for {slug} is empty")
+                logger.warning(f"'{label_col}' for {slug} is empty")
         jobqueue.append(
             {
                 "token_file": token_files[slug],
@@ -76,11 +76,11 @@ def extend_and_write_docs(source_dir, manifest, pq_index, out_path):
         for kwargs in jobqueue:
             doc_jobs.append(executor.submit(process_document_tokens, **kwargs))
 
-        logging.debug("Waiting for jobs to complete")
+        logger.debug("Waiting for jobs to complete")
         progress = tqdm(as_completed(doc_jobs), total=len(doc_jobs))
         doc_results = [j.result() for j in progress]
 
-    logging.debug(f"Writing document index to {pq_index}...")
+    logger.debug(f"Writing document index to {pq_index}...")
     doc_index = pd.DataFrame(doc_results).set_index("slug", drop=True)
     doc_index.to_parquet(pq_index, compression="lz4")
 
@@ -181,9 +181,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("--log-level", dest="log_level", default="INFO")
     args = parser.parse_args()
-    logging.basicConfig(level=args.log_level.upper())
+    logger.setLevel(args.log_level.upper())
 
-    logging.info(f"Reading {Path(args.manifest).resolve()}")
+    logger.info(f"Reading {Path(args.manifest).resolve()}")
     manifest = pd.read_csv(args.manifest)
 
     indir, index, outdir = Path(args.indir), Path(args.indexfile), Path(args.outdir)

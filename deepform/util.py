@@ -1,4 +1,3 @@
-import logging
 import math
 import random
 import re
@@ -8,6 +7,8 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
 from fuzzywuzzy import fuzz
+
+from deepform.logger import logger
 
 BoundingBox = namedtuple("BoundingBox", ["x0", "y0", "x1", "y1"])
 
@@ -44,7 +45,7 @@ def dollar_amount(s):
         try:
             return float(s.replace("$", "").replace(",", ""))
         except ValueError:
-            logging.error(f"'{s}' could not be converted to a dollar amount.")
+            logger.error(f"'{s}' could not be converted to a dollar amount.")
     return None
 
 
