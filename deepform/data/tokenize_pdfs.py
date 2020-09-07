@@ -122,7 +122,10 @@ def extract_doc(pdf_path, window_len):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "pdf", nargs="?", default=PDF_DIR, help="pdf or directory of pdfs to process",
+        "pdf",
+        nargs="?",
+        default=PDF_DIR,
+        help="pdf or directory of pdfs to process",
     )
     parser.add_argument(
         "tokendir",

@@ -162,7 +162,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("manifest", help="CSV with labels for each document")
     parser.add_argument(
-        "indir", nargs="?", default=TOKEN_DIR, help="directory of document tokens",
+        "indir",
+        nargs="?",
+        default=TOKEN_DIR,
+        help="directory of document tokens",
     )
     parser.add_argument(
         "indexfile",
@@ -171,7 +174,10 @@ if __name__ == "__main__":
         help="path to index of resulting parquet files",
     )
     parser.add_argument(
-        "outdir", nargs="?", default=TRAINING_DIR, help="directory of parquet files",
+        "outdir",
+        nargs="?",
+        default=TRAINING_DIR,
+        help="directory of parquet files",
     )
     parser.add_argument("--log-level", dest="log_level", default="INFO")
     args = parser.parse_args()

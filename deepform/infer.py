@@ -18,11 +18,9 @@ def infer_from_pdf(pdf_path, model_file=None):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "-m", "--model", dest="model", help="model file to use in prediction",
+        "-m", "--model", dest="model", help="model file to use in prediction"
     )
-    parser.add_argument(
-        "pdf", nargs="+", help="pdf to run inference on",
-    )
+    parser.add_argument("pdf", nargs="+", help="pdf to run inference on")
     args = parser.parse_args()
 
     model, window_len = load_model(args.model)
