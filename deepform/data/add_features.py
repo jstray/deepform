@@ -104,8 +104,11 @@ def process_document_tokens(token_file, dest_file, labels):
 
     doc = label_tokens(doc, labels)
 
+    # Strip whitespace off all tokens.
+    doc["token"] = doc.token.str.strip()
+
     # Remove tokens shorter than three characters.
-    doc = doc[doc["token"].str.len() >= 3]
+    doc = doc[doc.token.str.len() >= 3]
 
     # Extend with the straightforward features.
     doc = add_base_features(doc)
