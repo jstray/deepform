@@ -53,7 +53,7 @@ data/pdfs: data/fcc-data-2020-labeled-manifest.csv
 # 	docker build -t $(CONTAINER) .
 # 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -m deepform.data.tokenize_pdfs
 
-data/tokenized: data/tokenized.tar.gz  ## Get document tokens from S3
+data/tokenized:  ## Get document tokens from S3
 	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/token_data.tar.gz -o data/tokenized.tar.gz
 	mkdir -p data/tokenized
 	tar xf data/tokenized.tar.gz -C data/tokenized
