@@ -9,11 +9,11 @@ if os.path.exists(DATA_DIR / "3_year_manifest.csv"):
     os.remove(DATA_DIR / "3_year_manifest.csv")
 
 
-df12 = pd.read_csv(DATA_DIR / "ftf-all-filings.tsv", sep="\t")
+df12 = pd.read_csv(DATA_DIR / "2012_manifest.tsv", sep="\t") # Formerly called ftf-all-filings.tsv
 df12.insert(0, "serial_num", np.nan)
 df12.insert(0, "flight_from", np.nan)
 df12.insert(0, "flight_to", np.nan)
-df12.insert(0, "Issues", np.nan)
+df12.insert(0, "issues", np.nan)
 df12_new = df12.filter(
     [
         "dc_slug",
@@ -22,25 +22,28 @@ df12_new = df12.filter(
         "committee",
         "flight_from",
         "flight_to",
-        "Issues",
+        "url",
+        "issues",
     ],
     axis=1,
 )
 df12_new.insert(0, "year", "2012")
 df12_new.columns = [
     "year",
-    "slug",
-    "serial_num",
+    "file_id",
+    "contract_num",
     "gross_amount",
     "advertiser",
     "flight_from",
     "flight_to",
-    "Issues",
+    "url",
+    "issues",
 ]
 
-df14 = pd.read_csv(DATA_DIR / "2014-orders.tsv", sep="\t")
+df14 = pd.read_csv(DATA_DIR / "2014_manifest.tsv", sep="\t") # Formerly called 2014-orders.tsv
 df14.insert(0, "gross_amount", np.nan)
-df14.insert(0, "Issues", np.nan)
+df14.insert(0, "url", np.nan)
+df14.insert(0, "issues", np.nan)
 df14_new = df14.filter(
     [
         "id",
@@ -49,23 +52,25 @@ df14_new = df14.filter(
         "advertiser",
         "flight_from",
         "flight_to",
-        "Issues",
+        "url",
+        "issues",
     ],
     axis=1,
 )
 df14_new.insert(0, "year", "2014")
 df14_new.columns = [
     "year",
-    "slug",
-    "serial_num",
+    "file_id",
+    "contract_num",
     "gross_amount",
     "advertiser",
     "flight_from",
     "flight_to",
-    "Issues",
+    "url",
+    "issues",
 ]
 
-df20 = pd.read_csv(DATA_DIR / "fcc-data-2020-sample-updated.csv")
+df20 = pd.read_csv(DATA_DIR / "2020_manifest.csv") # Formerly called fcc-data-2020-sample-updated.csv
 df20_new = df20.filter(
     [
         "full_file_name",
@@ -74,6 +79,7 @@ df20_new = df20.filter(
         "advertiser",
         "flight_from",
         "flight_to",
+        "url",
         "Issues ('', Type, or Token)",
     ],
     axis=1,
@@ -81,17 +87,18 @@ df20_new = df20.filter(
 df20_new.insert(0, "year", "2020")
 df20_new.columns = [
     "year",
-    "slug",
-    "serial_num",
+    "file_id",
+    "contract_num",
     "gross_amount",
     "advertiser",
     "flight_from",
     "flight_to",
-    "Issues",
+    "url",
+    "issues",
 ]
 
 df = pd.concat([df12_new, df14_new, df20_new])
 
-df.set_index(["year", "slug"]).count(level="year")
+#df.set_index(["year", "slug"]).count(level="year")
 
-df.to_csv(DATA_DIR / "3_year_manifest.csv")
+df.to_csv(DATA_DIR / "3_year_manifest.csv", index=False)
