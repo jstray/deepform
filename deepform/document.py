@@ -94,7 +94,7 @@ class Document:
         window_scores = model.predict(windowed_features)
 
         num_windows = len(self.labels)
-        scores = np.zeros((num_windows, 2))
+        scores = np.zeros((num_windows, len(TokenType)))
         for i, window_score in enumerate(window_scores):
             scores[i : i + self.window_len, :] += window_score / self.window_len
 
@@ -102,24 +102,30 @@ class Document:
 
     def predict_answer(self, model):
         """Score each token and return the text and score of the best match."""
-        scores = self.predict_scores(model)
-        best_score_idx = np.argmax(scores, axis=0)
-        best_score_text = self.tokens.iloc[best_score_idx]["token"]
-        return best_score_text, scores[best_score_idx], scores
+        # The first score column is how "irrelevant" a token is, so drop it.
+        scores = self.predict_scores(model)[:, 1:]
+        best_score_idxs = np.argmax(scores, axis=0)
+        best_score_texts = self.tokens.iloc[best_score_idxs]["token"]
+        individual_scores = np.diag(scores[best_score_idxs])
+        return best_score_texts, individual_scores, scores
 
-    def show_predictions(self, pred_text, pred_score, scores):
+    def show_predictions(self, pred_texts, pred_scores, scores):
         """Predict token scores and print them alongside the tokens and true labels."""
         # pred_text, pred_score, scores = self.predict_answer(model)
         title = f"======={self.slug}======="
-        predicted = "predictions (actual / predicted <score>):"
-        for name, value in self.label_values.items():
-            predicted += f"\t{name}: {pred_text} / {value} <{pred_score}>"
+        predicted = "predictions (actual / predicted <score>):\n"
+        cols = {}
+        for i, item in enumerate(self.label_values.items()):
+            name, value = item
+            predicted += f"\t{name}: {pred_texts[i]} / {value} <{pred_scores[i]}>\n"
+            cols[f"{name}_?"] = ["*" if s > 0.8 else "" for s in scores[:, i]]
+            cols[f"{name}_s"] = scores[:, i]
+
         body = pd.DataFrame(
             {
                 "token": self.tokens.token,
                 "label": [TokenType(x).name if x else "" for x in self.labels],
-                "picked": ["*" if s > 0.8 else "" for s in scores],
-                "score": scores,
+                **cols,
             }
         )
         body = body.iloc[self.window_len - 1 : 1 - self.window_len]
@@ -142,12 +148,10 @@ class Document:
             df = pad_df(df, config.window_len - 1)
         fix_dtypes(df)
 
-        labels = df["label"] == TokenType[SINGLE_CLASS_PREDICTION.upper()].value
-
         # Pre-compute which windows have the desired token.
         positive_windows = []
         for i in range(len(df) - config.window_len):
-            if labels.iloc[i : i + config.window_len].any():
+            if df["label"].iloc[i : i + config.window_len].any():
                 positive_windows.append(i)
 
         # We're no longer requiring that there exists a correct answer.
@@ -157,7 +161,7 @@ class Document:
             slug=slug,
             tokens=df[TOKEN_COLS],
             features=df[FEATURE_COLS].to_numpy(dtype=float),
-            labels=labels.to_numpy(dtype=int),
+            labels=df["label"].to_numpy(dtype=int),
             positive_windows=np.array(positive_windows),
             window_len=config.window_len,
             label_values=label_values,

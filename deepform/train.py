@@ -7,14 +7,17 @@
 
 import argparse
 import os
+import re
+from collections import defaultdict
 from datetime import datetime
 
+import pandas as pd
 import wandb
 from tensorflow import keras as K
 from wandb.keras import WandbCallback
 
 from deepform.common import LOG_DIR, TRAINING_INDEX
-from deepform.document import SINGLE_CLASS_PREDICTION
+from deepform.data.add_features import LABEL_COLS
 from deepform.document_store import DocumentStore
 from deepform.logger import logger
 from deepform.model import create_model, save_model, windowed_generator
@@ -28,50 +31,60 @@ def compute_accuracy(model, config, dataset, num_to_test, print_results, log_pat
     n_print = config.render_results_size
 
     n_docs = min(num_to_test, len(dataset))
-    acc = 0
+
+    accuracies = defaultdict(int)
+
     for doc in sorted(dataset.sample(n_docs), key=lambda d: d.slug):
         slug = doc.slug
         answer_texts = doc.label_values
 
-        predict_texts, predict_scores, token_scores = doc.predict_answer(model)
+        predict_texts, predict_scores, all_scores = doc.predict_answer(model)
         # predict_texts = np.ma.masked_array(
         #     predict_texts, mask=predict_scores[:, 0] < 0.8
         # )
-        # print(f"{predict_texts=}")
-        predict_text = list(predict_texts)[1]
-        # print(f"{answer_texts=}")
-        answer_text = answer_texts[SINGLE_CLASS_PREDICTION]
-        # print(f"{predict_scores=}")
-        predict_score = predict_scores[1, 1]
-        if predict_score < 0.8:
-            predict_text = None
-        scores = token_scores[:, 1]
+        predict_texts = list(predict_texts)
+        answer_texts = [answer_texts[c] for c in LABEL_COLS.keys()]
 
-        doc_output = doc.show_predictions(predict_text, predict_score, scores)
+        # for i in range(len(predict_texts)):
+        #     if predict_scores[i] < 0.8:
+        #         predict_texts[i] = None
 
-        match = loose_match(predict_text, answer_text)
-        if SINGLE_CLASS_PREDICTION == "gross_amount":
-            match = match or dollar_match(predict_text, answer_text)
-        elif SINGLE_CLASS_PREDICTION in ("flight_from", "flight_to"):
-            match = match or date_match(predict_text, answer_text)
-
-        path = log_path / ("right" if match else "wrong")
-        path.mkdir(parents=True, exist_ok=True)
-        with open(path / f"{slug}.txt", "w") as predict_file:
+        doc_output = doc.show_predictions(predict_texts, predict_scores, all_scores)
+        # path = log_path / ("right" if match else "wrong")
+        log_path.mkdir(parents=True, exist_ok=True)
+        with open(log_path / f"{slug}.txt", "w") as predict_file:
             predict_file.write(doc_output)
 
-        acc += match
-        prefix = f"Correct: {slug}" if match else f"**Incorrect: {slug}"
-        guessed = f'guessed "{predict_text}" with score {predict_score:.2f}, '
-        correct = f'correct "{answer_text}"'
-
         if print_results:
-            print(f"{prefix}: {guessed}, {correct}")
-            if not match and n_print > 0:
-                log_pdf(doc, predict_score, scores, predict_text, answer_text)
-                n_print -= 1
+            print(f"file_id:{slug}")
+        for i, (field, answer_text) in enumerate(doc.label_values.items()):
+            predict_text = predict_texts[i]
+            predict_score = predict_scores[i]
+            match = loose_match(predict_text, answer_text)
+            if field == "gross_amount":
+                match = match or dollar_match(predict_text, answer_text)
+            elif field in ("flight_from", "flight_to"):
+                match = match or date_match(predict_text, answer_text)
 
-    return acc / n_docs
+            accuracies[field] += match
+            # print(
+            #     f"\t{i=}, {field}={answer_text}, {predict_text=} "
+            #     f"({predict_score} / {match})"
+            # )
+
+            prefix = "✔️ " if match else "❌"
+            guessed = f'guessed "{predict_text}" with score {predict_score:.3f}'
+            correction = "" if match else f', was actually "{answer_text}"'
+
+            if print_results:
+                print(f"\t{prefix} {field}: {guessed}{correction}")
+                if not match and n_print > 0:
+                    log_pdf(
+                        doc, predict_score, all_scores[:, i], predict_text, answer_text
+                    )
+                    n_print -= 1
+
+    return pd.Series(accuracies) / n_docs
 
 
 # ---- Custom callback to log document-level accuracy ----
@@ -105,9 +118,10 @@ class DocAccCallback(K.callbacks.Callback):
             print_results,
             self.log_path / kind / f"{epoch:02d}",
         )
+        acc_str = re.sub(r"\s+", " ", acc.to_string())
 
-        print(f"This epoch {self.logname}: {acc:.3f}")
-        wandb.log({self.logname: acc})
+        print(f"This epoch {self.logname}: {acc_str}")
+        wandb.log({self.logname: acc_str})
 
 
 def main(config):

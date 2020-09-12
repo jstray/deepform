@@ -16,6 +16,7 @@ from tensorflow.keras.layers import (
 from tensorflow.keras.models import Model
 
 from deepform.common import MODEL_DIR
+from deepform.data.add_features import TokenType
 from deepform.document import NUM_FEATURES
 from deepform.util import git_short_hash
 
@@ -100,8 +101,8 @@ def create_model(config):
     else:
         last_layer = d4
 
-    preout = Dense(config.window_len * 2, activation="linear")(last_layer)
-    shaped = Reshape((config.window_len, 2))(preout)
+    preout = Dense(config.window_len * len(TokenType), activation="linear")(last_layer)
+    shaped = Reshape((config.window_len, len(TokenType)))(preout)
     outdata = Softmax(axis=-1)(shaped)
     model = Model(inputs=[indata], outputs=[outdata])
 

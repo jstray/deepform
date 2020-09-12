@@ -9,7 +9,9 @@ if os.path.exists(DATA_DIR / "3_year_manifest.csv"):
     os.remove(DATA_DIR / "3_year_manifest.csv")
 
 
-df12 = pd.read_csv(DATA_DIR / "2012_manifest.tsv", sep="\t") # Formerly called ftf-all-filings.tsv
+df12 = pd.read_csv(
+    DATA_DIR / "2012_manifest.tsv", sep="\t"
+)  # Formerly called ftf-all-filings.tsv
 df12.insert(0, "serial_num", np.nan)
 df12.insert(0, "flight_from", np.nan)
 df12.insert(0, "flight_to", np.nan)
@@ -40,7 +42,9 @@ df12_new.columns = [
     "issues",
 ]
 
-df14 = pd.read_csv(DATA_DIR / "2014_manifest.tsv", sep="\t") # Formerly called 2014-orders.tsv
+df14 = pd.read_csv(
+    DATA_DIR / "2014_manifest.tsv", sep="\t"
+)  # Formerly called 2014-orders.tsv
 df14.insert(0, "gross_amount", np.nan)
 df14.insert(0, "url", np.nan)
 df14.insert(0, "issues", np.nan)
@@ -70,7 +74,9 @@ df14_new.columns = [
     "issues",
 ]
 
-df20 = pd.read_csv(DATA_DIR / "2020_manifest.csv") # Formerly called fcc-data-2020-sample-updated.csv
+df20 = pd.read_csv(
+    DATA_DIR / "2020_manifest.csv"
+)  # Formerly called fcc-data-2020-sample-updated.csv
 df20_new = df20.filter(
     [
         "full_file_name",
@@ -99,6 +105,6 @@ df20_new.columns = [
 
 df = pd.concat([df12_new, df14_new, df20_new])
 
-#df.set_index(["year", "slug"]).count(level="year")
+# df.set_index(["year", "slug"]).count(level="year")
 
 df.to_csv(DATA_DIR / "3_year_manifest.csv", index=False)
