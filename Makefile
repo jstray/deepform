@@ -5,7 +5,7 @@ CONTAINER=deepform/deepform_learner:latest
 
 .PHONY: help
 help: ## Show this help dialog
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z/\._-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 .PHONY: test
 test: docker-build  ## Run all the unit tests for the project
@@ -43,8 +43,7 @@ docker-background: docker-stop docker-build ## Launch a docker container as a ba
 # data/training.parquet:
 # 	curl https://project-deepform.s3-us-west-1.amazonaws.com/training_data/training.parquet -o data/training.parquet
 
-# This shouldn't normally need to be run, but this downloads all the PDFs to local storage.
-data/pdfs: data/fcc-data-2020-labeled-manifest.csv
+data/pdfs: data/fcc-data-2020-labeled-manifest.csv ## Downloads all PDFs to local storage. Not usually necessary.
 	docker build -t $(CONTAINER) .
 	docker run --rm --mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) python -c "import pandas as pd; print('\n'.join(pd.read_csv('data/fcc-data-2020-labeled-manifest.csv').URL))" | xargs wget -P data/pdfs
 
