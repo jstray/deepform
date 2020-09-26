@@ -12,7 +12,7 @@ An project to extract information from TV and cable political advertising disclo
 
 This model achieves 90% accuracy extracting total spending from the PDFs in the (held out) test set, which shows that deep learning can generalize surprisingly well to previously unseen form types.
 
-For a discussion of how the 2019 prototype works, see [this talk](https://www.youtube.com/watch?v=uNN59kJQ7CA).
+For a discussion of how the 2019 prototype works, see [this post](http://jonathanstray.com/extracting-campaign-finance-data-from-gnarly-pdfs-using-deep-learning).
 
 ## Why?
 
