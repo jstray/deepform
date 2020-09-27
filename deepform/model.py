@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -128,7 +129,9 @@ def latest_model():
 
 
 def load_model(model_file=None):
-    filepath = model_file or latest_model()
+    print(f"model_file type {type(model_file)}")
+    filepath = Path(model_file)  # or latest_model()
+    print(f"filepath type {type(filepath)}")
     window_len = int(filepath.stem.split("_")[-1])
     return (
         tf.keras.models.load_model(
