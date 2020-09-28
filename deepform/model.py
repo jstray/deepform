@@ -1,5 +1,6 @@
 import random
 from datetime import datetime
+from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
@@ -139,6 +140,6 @@ def load_model(model_file=None):
 
 
 def save_model(model, config):
-    basename = config.model_path or default_model_name(config.window_len)
+    basename = Path(config.model_path) or default_model_name(config.window_len)
     basename.parent.mkdir(parents=True, exist_ok=True)
     model.save(basename)
