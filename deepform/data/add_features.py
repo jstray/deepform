@@ -15,7 +15,7 @@ import pandas as pd
 from fuzzywuzzy import fuzz
 from tqdm import tqdm
 
-from deepform.common import DATA_DIR, TOKEN_DIR, TRAINING_DIR, TRAINING_INDEX
+from deepform.common import TOKEN_DIR, TRAINING_DIR, TRAINING_INDEX
 from deepform.data.create_vocabulary import get_token_id
 from deepform.logger import logger
 from deepform.util import (
@@ -26,7 +26,6 @@ from deepform.util import (
     log_dollar_amount,
 )
 
-n = 5
 
 class TokenType(Enum):
     NONE = 0
@@ -103,7 +102,7 @@ def process_document_tokens(token_file, dest_file, labels):
     slug = token_file.stem
     doc = pd.read_parquet(token_file)
 
-    doc = label_tokens(doc, labels, n)
+    doc = label_tokens(doc, labels)
 
     # Strip whitespace off all tokens.
     doc["token"] = doc.token.str.strip()
@@ -132,30 +131,11 @@ def process_document_tokens(token_file, dest_file, labels):
     # Return the summary information about the document.
     return {"slug": slug, "length": len(doc), **labels, **best_matches}
 
-## This is the function as it currently exists:
-def label_tokens(tokens, labels, n):
+
+def label_tokens(tokens, labels):
     for col_name, label_value in labels.items():
-        tokens[col_name] = 0.0
         match_fn = LABEL_COLS[col_name]
-
-    # Assemble all the token strings that can be formed for a token at a specific index with maximum n-gram length of n
-        for index, token in tokens.token.items():  
-            n_grams = []
-            match_percentages = []
-            for x in range(1,n+1): # x is all the possible lengths of n-gram
-                for y in range (1, x+1): # y is all the possible index modifications for that length of n-gram
-                    n_gram = tokens.loc[max(0,index-y+1):max(0,index-y+x), "token"].values 
-                    n_gram = ''.join(n_gram)
-                    n_grams.append(n_gram)
-
-        # Calculate the match percentage for each of them using the correct match_fn
-            match_percentages = [match_fn(label_value, match) for match in n_grams]
-
-        # Take the maximum value from match_percentages
-            best_match = max(match_percentages)
-
-        #Add that value to the tokens column at the correct index
-            tokens.loc[index,col_name] = best_match
+        tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,))
     return tokens
 
 
@@ -183,7 +163,7 @@ def add_base_features(token_df):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("manifest", help="CSV with labels for each document", default = DATA_DIR / "3_year_manifest.csv")
+    parser.add_argument("manifest", help="CSV with labels for each document")
     parser.add_argument(
         "indir",
         nargs="?",
