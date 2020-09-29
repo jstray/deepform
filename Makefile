@@ -84,3 +84,9 @@ sweep: data/doc_index.parquet data/token_frequency.csv .env docker-build ## Run 
 	docker run --rm --env-file=.env \
 	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
 	./init_sweep.sh
+
+VERSION='stable'
+download-model: ## Download a model for use with the inference script
+	docker run --rm --env-file=.env \
+	--mount type=bind,source=$(CURDIR)/data,target=/data $(CONTAINER) \
+	python -m deepform.artifacts --version $(VERSION)

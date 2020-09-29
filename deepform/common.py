@@ -11,3 +11,6 @@ LABELED_DIR = DATA_DIR / "labeled"
 TRAINING_DIR = DATA_DIR / "training"
 TRAINING_INDEX = TRAINING_DIR.parent / "doc_index.parquet"
 MODEL_DIR = DATA_DIR / "models"
+
+WANDB_PROJECT = "extract_total"
+WANDB_ENTITY = "deepform"

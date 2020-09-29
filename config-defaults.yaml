@@ -98,6 +98,9 @@ save_model:
 model_path:
   desc: path to save the model (if not set, autogenerate)
   value: 0
+model_artifact_name:
+  desc: used to identify saved models in Weights & Biases
+  value: deepform-model
 use_wandb:
   desc: report run to wandb and store annotations
   value: 1

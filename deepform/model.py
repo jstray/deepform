@@ -139,6 +139,11 @@ def load_model(model_file=None):
 
 
 def save_model(model, config):
-    basename = Path(config.model_path) or default_model_name(config.window_len)
+    basename = (
+        Path(config.model_path)
+        if config.model_path
+        else default_model_name(config.window_len)
+    )
     basename.parent.mkdir(parents=True, exist_ok=True)
     model.save(basename)
+    return basename
