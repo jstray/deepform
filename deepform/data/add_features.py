@@ -26,6 +26,7 @@ from deepform.util import (
     log_dollar_amount,
 )
 
+n = 5
 
 class TokenType(Enum):
     NONE = 0
@@ -102,7 +103,7 @@ def process_document_tokens(token_file, dest_file, labels):
     slug = token_file.stem
     doc = pd.read_parquet(token_file)
 
-    doc = label_tokens(doc, labels)
+    doc = label_tokens(doc, labels, n)
 
     # Strip whitespace off all tokens.
     doc["token"] = doc.token.str.strip()
@@ -143,7 +144,7 @@ def label_tokens(tokens, labels, n):
             match_percentages = []
             for x in range(1,n+1): # x is all the possible lengths of n-gram
                 for y in range (1, x+1): # y is all the possible index modifications for that length of n-gram
-                    n_gram = doc.loc[index-y+1:index-y+x, "token"].values.tolist()   
+                    n_gram = tokens.loc[index-y+1:index-y+x, "token"].values.tolist()   
                     n_gram = ''.join(n_gram)
                     n_grams.append(n_gram)
 
@@ -156,21 +157,6 @@ def label_tokens(tokens, labels, n):
         #Add that value to the tokens column at the correct index
             tokens.loc[index,col_name] = best_match
     return tokens
-
-## Need to rewrite it with the following capacities: 
-def label_tokens(tokens, labels):
-    """
-    tokens is a 
-    """
-    # in here we need to add n (the maximum number of possible tokens in the target)
-    n = 5
-    # in here we need to compile a series of n possible answer sets.  
-    for col_name, label_value in labels.items():
-        match_fn = LABEL_COLS[col_name] # Gets us the particular match function to use for this type of data
-        tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,)) #Applies the match function to the label value and ""  <<? 
-    # each token has to have only one value assigned to it rather than (N + N-1 + N-2 + ... + n-N).  So we're going to need a max function here. 
-    return tokens # Confirm this returns the entire set of tokens.
-
 
 
 def fraction_digits(s):
