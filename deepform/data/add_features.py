@@ -144,7 +144,7 @@ def label_tokens(tokens, labels, n):
             match_percentages = []
             for x in range(1,n+1): # x is all the possible lengths of n-gram
                 for y in range (1, x+1): # y is all the possible index modifications for that length of n-gram
-                    n_gram = tokens.loc[index-y+1:index-y+x, "token"].values 
+                    n_gram = tokens.loc[max(0,index-y+1):max(0,index-y+x), "token"].values 
                     n_gram = ''.join(n_gram)
                     n_grams.append(n_gram)
 
