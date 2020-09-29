@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 from deepform.common import PDF_DIR, TOKEN_DIR
 from deepform.data.add_features import add_base_features
-from deepform.document import FEATURE_COLS, TOKEN_COLS, Document
+from deepform.document import FEATURE_COLS, Document
 from deepform.logger import logger
 from deepform.pdfs import get_pdf_path
 
@@ -110,12 +110,12 @@ def extract_doc(pdf_path, window_len):
     df["tok_id"] = np.minimum(511, df["tok_id"])
     return Document(
         slug=pdf_path.stem,
-        tokens=df[TOKEN_COLS[:-1]],
+        tokens=df,
         features=df[FEATURE_COLS].to_numpy(dtype=float),
         labels=np.zeros(len(df), dtype=bool),  # Dummy.
         positive_windows=np.array(0),  # Dummy.
         window_len=window_len,
-        gross_amount=np.NaN,  # Dummy.
+        label_values={},
     )
 
 

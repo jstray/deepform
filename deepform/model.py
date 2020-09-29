@@ -4,6 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.layers import (
     Dense,
     Dropout,
@@ -129,14 +130,12 @@ def latest_model():
 
 
 def load_model(model_file=None):
-    filepath = model_file or latest_model()
+    filepath = Path(model_file) if model_file else latest_model()
     window_len = int(filepath.stem.split("_")[-1])
-    return (
-        tf.keras.models.load_model(
-            filepath, custom_objects={"_missed_token_loss": missed_token_loss(5)}
-        ),
-        window_len,
+    model = keras.models.load_model(
+        filepath, custom_objects={"_missed_token_loss": missed_token_loss(5)}
     )
+    return model, window_len
 
 
 def save_model(model, config):

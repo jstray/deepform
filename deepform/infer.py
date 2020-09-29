@@ -3,16 +3,33 @@
 
 import argparse
 
+import numpy as np
+
+from deepform.data.add_features import TokenType
 from deepform.data.tokenize_pdfs import extract_doc
-from deepform.model import load_model, predict_answer
+from deepform.model import load_model
 
 
-def infer_from_pdf(pdf_path, model_file=None):
+def infer_from_pdf(pdf_path, model=None, window_len=None):
     """Extract features from a PDF and run infrence on it."""
-    model, window_len = load_model(model_file)
+    if not model:
+        model, window_len = load_model()
+    if not window_len:
+        raise Exception("No window_len param provided or inferrable")
+
     doc = extract_doc(pdf_path, window_len)
-    token, score, _ = predict_answer(model, doc)
-    return token, score
+
+    best_score_texts, individual_scores, _ = doc.predict_answer(model)
+
+    # TODO: clean up the column name from the token type enum
+    predictions = {
+        str(column.name.lower()): {"prediction": text, "score": score}
+        for text, score, column in zip(
+            best_score_texts, individual_scores, np.array(TokenType)[1:]
+        )
+    }
+
+    return predictions
 
 
 if __name__ == "__main__":
@@ -22,10 +39,9 @@ if __name__ == "__main__":
     )
     parser.add_argument("pdf", nargs="+", help="pdf to run inference on")
     args = parser.parse_args()
-
     model, window_len = load_model(args.model)
 
     for pdf in args.pdf:
-        doc = extract_doc(pdf, window_len)
-        token, score, _ = predict_answer(model, doc)
-        print(f"Predicted '{token}' with score {score} on {pdf}")
+        predictions = infer_from_pdf(pdf, model, window_len)
+        print(f"predictions for {pdf}")
+        print(predictions)
