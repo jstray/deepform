@@ -127,6 +127,14 @@ def date_match(predicted, actual):
     return bool(lhs and rhs and lhs == rhs)
 
 
+def any_similarity(lhs, rhs):
+    return max(dollar_similarity(lhs, rhs), date_similarity(lhs, rhs))
+
+
+def any_match(lhs, rhs):
+    return loose_match(lhs, rhs) or dollar_match(lhs, rhs) or date_match(lhs, rhs)
+
+
 def docrow_to_bbox(t, min_height=10):
     """Create the array pdfplumber expects for bounding boxes from an input namedtuple.
 

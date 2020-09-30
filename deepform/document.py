@@ -7,6 +7,7 @@ import pandas as pd
 
 from deepform.data.add_features import TokenType
 from deepform.features import fix_dtypes
+from deepform.util import any_match
 
 FEATURE_COLS = [
     "tok_id",
@@ -113,23 +114,19 @@ class Document:
         """Predict token scores and print them alongside the tokens and true labels."""
         # pred_text, pred_score, scores = self.predict_answer(model)
         title = f"======={self.slug}======="
-        predicted = "predictions (actual / predicted <score>):\n"
-        cols = {}
+        predicted = "field (predicted / actual <score>):\n"
+
+        df = pd.DataFrame({"token": self.tokens.token.str.slice(0, 20)})
+        df["label"] = [TokenType(x).name if x else "" for x in self.labels]
+
         for i, item in enumerate(self.label_values.items()):
             name, value = item
-            predicted += f"\t{name}: {pred_texts[i]} / {value} <{pred_scores[i]}>\n"
-            cols[f"{name}_?"] = ["*" if s > 0.8 else "" for s in scores[:, i]]
-            cols[f"{name}_s"] = scores[:, i]
+            x = "✔️" if any_match(pred_texts[i], value) else "❌"
+            predicted += f"\t{x}{name}: {pred_texts[i]} / {value} <{pred_scores[i]}>\n"
+            df[name] = [f"{'*' if s > 0.5 else ''} {s:0.5f}" for s in scores[:, i]]
 
-        body = pd.DataFrame(
-            {
-                "token": self.tokens.token,
-                "label": [TokenType(x).name if x else "" for x in self.labels],
-                **cols,
-            }
-        )
-        body = body.iloc[self.window_len - 1 : 1 - self.window_len]
-        return "\n".join([title, predicted, body.to_string()])
+        df = df.iloc[self.window_len - 1 : 1 - self.window_len]
+        return "\n".join([title, predicted, df.to_string()])
 
     @staticmethod
     def from_parquet(slug, label_values, pq_path, config):
