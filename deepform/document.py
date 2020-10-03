@@ -108,15 +108,7 @@ class Document:
 
         score_texts, individual_scores = [], []
         for column in scores.T:
-            # Select all runs of tokens where each token meets the threshold.
-            chosen = list(selected_tokens(column, self.tokens.token, threshold))
-            if chosen:
-                # Take the text with the highest score.
-                score, text = list(sorted(chosen))[-1]
-            else:
-                # No sequence meets the threshold, so choose the best single token.
-                text = self.tokens.token[np.argmax(column)]
-                score = np.max(column)
+            text, score = best_token(column, self.tokens.token, threshold)
             score_texts.append(text)
             individual_scores.append(score)
 
@@ -186,6 +178,19 @@ def actual_value(df, value_col, match_col):
     """Return the best value from `value_col`, as evaluated by `match_col`."""
     index = df[match_col].argmax()
     return df.iloc[index][value_col]
+
+
+def best_token(scores, tokens, threshold):
+    # All runs of tokens where each token meets the threshold.
+    options = list(selected_tokens(scores, tokens, threshold))
+    if options:
+        # Take the text with the highest score.
+        score, text = list(sorted(options, key=lambda t: t[0] * len(t[1])))[-1]
+    else:
+        # No sequence meets the threshold, so choose the best single token.
+        text = tokens[np.argmax(scores)]
+        score = np.max(scores)
+    return text, score
 
 
 def selected_tokens(scores, tokens, threshold):

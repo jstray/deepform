@@ -17,7 +17,7 @@ _whitespace = re.compile(r"\s")
 
 def simple_string(s):
     """Lowercase and remove whitespace from a string."""
-    return _whitespace.sub("", str(s).casefold()) if s else ""
+    return _whitespace.sub("", s.casefold()) if isinstance(s, str) else ""
 
 
 def num_digits(s):
