@@ -138,26 +138,24 @@ def label_tokens(tokens, labels, max_token_count):
         tokens[col_name] = 0.0
         match_fn = LABEL_COLS[col_name]
 
-        # Assemble all the token strings that can be formed for a token
-        # at a specific index with maximum n-gram length of max_token_count
-        for i in range(len(tokens)):
-            n_grams = []
-            match_percentages = []
-            for length in range(1, max_token_count + 1):
-                for start in range(max(0, i - length + 1), i + 1):
-                    n_gram = tokens.token[start : start + length].values
-                    n_gram = " ".join(n_gram)
-                    n_grams.append(n_gram)
+        if col_name == "advertiser":
+            tokens[col_name] = label_multitoken(
+                tokens.token.to_numpy(), label_value, max_token_count, match_fn
+            )
+        else:
+            tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,))
 
-            # Calculate the match percentage for each of them using the correct match_fn
-            match_percentages = [match_fn(label_value, match) for match in n_grams]
-
-            # Take the maximum value from match_percentages
-            best_match = max(match_percentages)
-
-            # Add that value to the tokens column at the correct index
-            tokens.loc[i, col_name] = best_match
     return tokens
+
+
+def label_multitoken(tokens, value, token_count, match_fn=default_similarity):
+    best_match_values = np.array([match_fn(value, x) for x in tokens])
+    for c in range(1, token_count):
+        texts = [" ".join(tokens[i - c : i]) for i in range(c, tokens.size)]
+        match_values = np.array([match_fn(value, x) for x in texts] + [0] * c)
+        for p in range(c):
+            best_match_values = np.maximum(best_match_values, np.roll(match_values, p))
+    return best_match_values
 
 
 def fraction_digits(s):
