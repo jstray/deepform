@@ -79,6 +79,11 @@ penalize_missed:
 learning_rate:
   value: 0.001
 
+# Affects prediction
+predict_thresh:
+  desc: predictions below this value count as predicting "None"
+  value: 0.5
+
 # These do not affect the training but control various setup and reporting
 render_results_size:
   desc: log this many PDF images on last epoch
@@ -97,7 +102,7 @@ save_model:
   value: 1
 model_path:
   desc: path to save the model (if not set, autogenerate)
-  value: 0
+  value: ""
 model_artifact_name:
   desc: used to identify saved models in Weights & Biases
   value: deepform-model

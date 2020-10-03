@@ -101,18 +101,29 @@ class Document:
 
         return scores
 
-    def predict_answer(self, model):
-        """Score each token and return the text and score of the best match."""
+    def predict_answer(self, model, threshold):
+        """Score each token and return all texts that exceed the threshold."""
         # The first score column is how "irrelevant" a token is, so drop it.
         scores = self.predict_scores(model)[:, 1:]
-        best_score_idxs = np.argmax(scores, axis=0)
-        best_score_texts = self.tokens.iloc[best_score_idxs]["token"]
-        individual_scores = np.diag(scores[best_score_idxs])
-        return best_score_texts, individual_scores, scores
+
+        score_texts, individual_scores = [], []
+        for column in scores.T:
+            # Select all runs of tokens where each token meets the threshold.
+            chosen = list(selected_tokens(column, self.tokens.token, threshold))
+            if chosen:
+                # Take the text with the highest score.
+                score, text = list(sorted(chosen))[-1]
+            else:
+                # No sequence meets the threshold, so choose the best single token.
+                text = self.tokens.token[np.argmax(column)]
+                score = np.max(column)
+            score_texts.append(text)
+            individual_scores.append(score)
+
+        return score_texts, individual_scores, scores
 
     def show_predictions(self, pred_texts, pred_scores, scores):
         """Predict token scores and print them alongside the tokens and true labels."""
-        # pred_text, pred_score, scores = self.predict_answer(model)
         title = f"======={self.slug}======="
         predicted = "field (predicted / actual <score>):\n"
 
@@ -175,3 +186,18 @@ def actual_value(df, value_col, match_col):
     """Return the best value from `value_col`, as evaluated by `match_col`."""
     index = df[match_col].argmax()
     return df.iloc[index][value_col]
+
+
+def selected_tokens(scores, tokens, threshold):
+    """Yield all consecutive runs of tokens where each token exceeds the threshold."""
+    current_strings, current_score, count = [], 0, 0
+    for s, t in zip(scores, tokens):
+        if s > threshold:
+            current_strings.append(t)
+            current_score += s
+            count += 1
+        elif count > 0:
+            yield current_score / count, " ".join(current_strings)
+            current_strings, current_score, count = [], 0, 0
+    if count > 0:
+        yield current_score / count, " ".join(current_strings)
