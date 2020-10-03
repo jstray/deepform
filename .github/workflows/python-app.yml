@@ -34,7 +34,7 @@ jobs:
 
       - name: Install project
         run: |
-          pip install poetry
+          pip install poetry==1.0.10
           poetry config virtualenvs.create false
           poetry export --dev -f requirements.txt | pip install -r /dev/stdin
           poetry install --no-interaction --no-ansi
