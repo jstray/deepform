@@ -149,7 +149,7 @@ def label_tokens(tokens, labels, max_token_count):
         max_token_count = MAX_TOKENS_BY_TARGET[col_name]
         if col_name == "advertiser":
             tokens[col_name] = label_multitoken(
-                tokens.token.to_numpy(), label_value, max_token_count[0], match_fn
+                tokens.token.to_numpy(), label_value, max_token_count, match_fn
             )
         else:
             tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,))
