@@ -45,6 +45,15 @@ LABEL_COLS = {
     "gross_amount": dollar_similarity,
 }
 
+MAX_TOKENS_BY_TARGET = {
+    # Each label column, and the maximum expected tokens that it uses.
+    "contract_num": 3,
+    "advertiser": 11,
+    "flight_from": 3,
+    "flight_to": 3,
+    "gross_amount": 3,
+}
+
 
 def extend_and_write_docs(source_dir, manifest, pq_index, out_path, max_token_count):
     """Split data into individual documents, add features, and write to parquet."""
@@ -137,10 +146,10 @@ def label_tokens(tokens, labels, max_token_count):
     for col_name, label_value in labels.items():
         tokens[col_name] = 0.0
         match_fn = LABEL_COLS[col_name]
-
+        max_token_count = MAX_TOKENS_BY_TARGET[col_name]
         if col_name == "advertiser":
             tokens[col_name] = label_multitoken(
-                tokens.token.to_numpy(), label_value, max_token_count, match_fn
+                tokens.token.to_numpy(), label_value, max_token_count[0], match_fn
             )
         else:
             tokens[col_name] = tokens.token.apply(match_fn, args=(label_value,))
