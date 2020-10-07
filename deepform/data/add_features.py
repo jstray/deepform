@@ -83,7 +83,7 @@ def extend_and_write_docs(source_dir, manifest, pq_index, out_path, max_token_co
 
     logger.debug(f"Writing document index to {pq_index}...")
     doc_index = pd.DataFrame(doc_results).set_index("slug", drop=True)
-    doc_index.to_parquet(pq_index, compression="lz4")
+    doc_index.to_parquet(pq_index)
 
 
 def pq_index_and_dir(pq_index, pq_path=None):
@@ -127,7 +127,7 @@ def process_document_tokens(token_file, dest_file, labels, max_token_count):
         doc["label"] = np.maximum(doc["label"], matches)
 
     # Write to its final location.
-    doc.to_parquet(dest_file, compression="lz4", index=False)
+    doc.to_parquet(dest_file, index=False)
 
     # Return the summary information about the document.
     return {"slug": slug, "length": len(doc), **labels, **best_matches}

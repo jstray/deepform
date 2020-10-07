@@ -93,7 +93,7 @@ def caching_doc_getter(index_file, config):
             return None
         if config.use_data_cache:
             with open(cache_path, "wb") as outfile:
-                dump(doc, outfile, compress="lz4")
+                dump(doc, outfile)
             logger.debug(f"Wrote document to cache file {cache_path}")
         return doc
 

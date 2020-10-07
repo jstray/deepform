@@ -124,7 +124,7 @@ def main(config):
         run.save()
 
     print("Configuration:")
-    print(config)
+    print("{\n\t" + ",\n\t".join(f"'{k}': {v}" for k, v in config.items()) + "\n}")
 
     run_ts = datetime.now().isoformat(timespec="seconds").replace(":", "")
 
@@ -164,6 +164,7 @@ def main(config):
 
 if __name__ == "__main__":
     # First read in the initial configuration.
+    os.environ["WANDB_CONFIG_PATHS"] = "config-defaults.yaml"
     run = wandb.init(
         project=WANDB_PROJECT,
         entity=WANDB_ENTITY,
@@ -176,14 +177,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     # Anything in the config is fair game to be overridden by a command line flag.
-    for key, info in config.as_dict().items():
-        if key.startswith("_"):
-            continue
-        value = info["value"]
-        cli_flag = "--" + key.replace("_", "-")
-        parser.add_argument(
-            cli_flag, dest=key, help=info["desc"], type=type(value), default=value
-        )
+    for key, value in config.items():
+        cli_flag = f"--{key}".replace("_", "-")
+        parser.add_argument(cli_flag, dest=key, type=type(value), default=value)
 
     args = parser.parse_args()
     config.update(args, allow_val_change=True)

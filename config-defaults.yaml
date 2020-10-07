@@ -1,3 +1,5 @@
+wandb_version: 1
+
 len_train:
   dec: number of documents to use (training + validation)
   value: 15000

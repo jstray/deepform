@@ -58,7 +58,7 @@ def create_tokens_and_manifest(faker, src_path, manifest_path, num_docs=5):
     manifest = []
 
     for slug, doc in docs.items():
-        doc.to_parquet(src_path / f"{slug}.parquet", compression="lz4", index=False)
+        doc.to_parquet(src_path / f"{slug}.parquet", index=False)
         manifest.append(
             {
                 "file_id": slug,

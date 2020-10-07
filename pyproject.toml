@@ -1,47 +1,43 @@
 [tool.poetry]
 name = "deepform"
-version = "0.1.0"
+version = "0.1.1"
 description = "extract information from TV station political advertising disclosure forms"
 authors = ["Jonathan Stray <jonathanstray@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8.1"
-pandas = "^1.1.0"
-wandb = "^0.9.4"
-pyarrow = "^0.17.1"
-fuzzywuzzy = "^0.18.0"
-keras = "^2.4.3"
-tensorflow = "^2.3.0"
-sqlalchemy = "^1.3.18"
-pdfplumber = "^0.5.22"
 boto3 = "^1.14.39"
-tqdm = "^4.48.2"
-joblib = "^0.15.1"
-lz4 = "^3.1.0"
-humanize = "^2.5.0"
-dask = {extras = ["dataframe"], version = "^2.17.2"}
+fuzzywuzzy = "^0.18.0"
+humanize = "^3.0.0"
+joblib = "^0.16.0"
+keras = "^2.4.3"
+numpy = "^1.18.5"
+pandas = "^1.1.2"
+pdfplumber = "^0.5.23"
+pyarrow = "^1.0.1"
+python = "^3.8.1"
 python-Levenshtein = "^0.12.0"
+sqlalchemy = "^1.3.18"
+tensorflow = "^2.3.1"
+tqdm = "^4.48.2"
+wandb = "^0.10.4"
 
 [tool.poetry.dev-dependencies]
-black = "^20.8b1"
-pylint = "^2.5.3"
-jupyter = "^1.0.0"
-matplotlib = "^3.3.0"
 autoflake = "^1.3.1"
-flake8 = "^3.8.3"
-isort = {extras = ["pyproject"], version = "^4.3.21"}
-pre-commit = "^2.6.0"
-pytest = "^5.4.3"
-hypothesis = "^5.24.0"
-faker = "^4.1.1"
 babel = "^2.8.0"
+black = "^20.8b1"
+faker = "^4.1.1"
+flake8 = "^3.8.3"
+hypothesis = "^5.24.0"
+isort = "^5.5.4"
+matplotlib = "^3.3.0"
+pre-commit = "^2.6.0"
+pylint = "^2.5.3"
+pytest = "^6.1.0"
+jupyterlab = "^2.2.8"
 
 [tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
-line_length = 88
+profile = "black"
+src_paths = ["deepform", "test"]
 known_third_party = ["boto3", "botocore", "fuzzywuzzy", "joblib", "keras", "nltk", "numpy", "pandas", "pdfplumber", "pyarrow", "sqlalchemy", "tensorflow", "tqdm", "wandb"]
 
 [tool.black]
@@ -49,5 +45,5 @@ line-length = 88
 target-version = ['py38']
 
 [build-system]
-requires = ["poetry>=1.0"]
-build-backend = "poetry.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

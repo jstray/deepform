@@ -53,7 +53,7 @@ def create_token_doc(pdf_path, token_dir=TOKEN_DIR):
 
     token_dir.mkdir(parents=True, exist_ok=True)
     token_path = token_dir / f"{slug}.parquet"
-    tokens.to_parquet(token_path, compression="lz4")
+    tokens.to_parquet(token_path)
     return token_path
 
 

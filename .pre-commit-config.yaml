@@ -9,8 +9,8 @@ repos:
             "--remove-all-unused-imports",
             "--remove-unused-variable",
           ]
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.5.1
+  - repo: https://github.com/pycqa/isort
+    rev: 5.5.4
     hooks:
       - id: isort
         additional_dependencies: ["toml"]
