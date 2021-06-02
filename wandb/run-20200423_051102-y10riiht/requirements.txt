@@ -243,7 +243,7 @@ tqdm==4.42.1
 traitlets==4.3.3
 typed-ast==1.4.1
 unicodecsv==0.14.1
-urllib3==1.25.8
+urllib3==1.26.5
 wand==0.5.9
 wandb==0.8.30
 watchdog==0.10.2
