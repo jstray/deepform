@@ -151,7 +151,7 @@ pdfplumber==0.5.18
 pep8==1.7.1
 pexpect==4.8.0
 pickleshare==0.7.5
-pillow==7.1.1
+pillow==9.0.1
 pip==20.0.2
 pkginfo==1.5.0.1
 pluggy==0.13.1
